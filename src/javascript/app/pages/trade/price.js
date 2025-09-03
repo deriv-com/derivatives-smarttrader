@@ -39,8 +39,6 @@ const Price = (() => {
         };
 
         const contract_type = type_of_contract;
-        const start_date    = getStartDateNode();
-        const start_time    = CommonFunctions.getElementById('time_start');
         const underlying    = CommonFunctions.getElementById('underlying');
         const amount_type   = CommonFunctions.getElementById('amount_type');
         const currency      = CommonFunctions.getVisibleElement('currency');
@@ -86,12 +84,6 @@ const Price = (() => {
             proposal.symbol = underlying.value;
         }
 
-        if (start_date && CommonFunctions.isVisible(start_date) && start_date.value !== 'now') {
-            const time     = start_time.value.split(':');
-            const set_time = moment.utc(Number(start_date.value) * 1000).hour(time[0]).minute(time[1]);
-
-            proposal.date_start = set_time ? set_time.unix() : undefined;
-        }
 
         if (expiry_type && CommonFunctions.isVisible(expiry_type) && expiry_type.value === 'duration') {
             proposal.duration      = parseInt(duration.value);
