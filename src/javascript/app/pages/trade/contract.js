@@ -68,7 +68,6 @@ const Contract = (() => {
     let contract_details = {};
     let barriers         = {};
     let durations        = {};
-    let start_dates      = {};
 
     let open,
         close,

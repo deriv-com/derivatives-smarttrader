@@ -1,7 +1,6 @@
 const moment               = require('moment');
 const commonTrading        = require('./common');
 const displayPriceMovement = require('./common_independent').displayPriceMovement;
-const getStartDateNode     = require('./common_independent').getStartDateNode;
 const getTradingTimes      = require('./common_independent').getTradingTimes;
 const Contract             = require('./contract');
 const Defaults             = require('./defaults');
@@ -83,7 +82,6 @@ const Price = (() => {
         if (underlying && underlying.value) {
             proposal.symbol = underlying.value;
         }
-
 
         if (expiry_type && CommonFunctions.isVisible(expiry_type) && expiry_type.value === 'duration') {
             proposal.duration      = parseInt(duration.value);
