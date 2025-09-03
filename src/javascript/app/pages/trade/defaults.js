@@ -24,7 +24,6 @@ const Defaults = (() => {
         BARRIER_HIGH   : 'barrier_high',
         BARRIER_LOW    : 'barrier_low',
         CURRENCY       : 'currency',
-        DATE_START     : 'date_start',
         DURATION       : 'duration',
         DURATION_AMOUNT: 'duration_amount',
         DURATION_UNITS : 'duration_units',
@@ -39,7 +38,6 @@ const Defaults = (() => {
         MULTIPLIER     : 'multiplier',
         PREDICTION     : 'prediction',
         SELECTED_TICK  : 'selected_tick',
-        TIME_START     : 'time_start',
         UNDERLYING     : 'underlying',
     };
     const getDefault = (key) => {
