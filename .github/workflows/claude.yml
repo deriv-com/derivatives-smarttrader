@@ -1,0 +1,63 @@
+name: Claude Code Assistant
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  claude-assistant:
+    # Only run on PR-related events that contain @claude
+    if: |
+      (github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude'))
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+      id-token: write
+
+    steps:
+      - name: Get PR details
+        id: pr
+        run: |
+          # Get PR URL based on event type
+          if [ "${{ github.event_name }}" = "issue_comment" ]; then
+            PR_URL="${{ github.event.issue.pull_request.url }}"
+          elif [ "${{ github.event_name }}" = "pull_request_review_comment" ]; then
+            PR_URL="${{ github.event.pull_request.url }}"
+          elif [ "${{ github.event_name }}" = "pull_request_review" ]; then
+            PR_URL="${{ github.event.pull_request.url }}"
+          fi
+          
+          echo "Getting PR data from: $PR_URL"
+          PR_DATA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "$PR_URL")
+          
+          # Extract fork repository and branch
+          FORK_REPO=$(echo "$PR_DATA" | jq -r '.head.repo.full_name')
+          BRANCH_NAME=$(echo "$PR_DATA" | jq -r '.head.ref')
+          
+          echo "fork_repo=$FORK_REPO" >> $GITHUB_OUTPUT
+          echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
+          
+          echo "PR is from: $FORK_REPO:$BRANCH_NAME"
+
+      - name: Checkout PR branch from fork
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.pr.outputs.fork_repo }}
+          ref: ${{ steps.pr.outputs.branch_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Run Claude Code Action
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          timeout_minutes: "60"
