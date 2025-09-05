@@ -83,9 +83,6 @@ export const FormComponent = () => {
         'evenodd',
         'overunder',
         'asian',
-        'lookbackhigh',
-        'lookbacklow',
-        'lookbackhighlow',
         'reset',
         'highlowticks',
         'runs',
@@ -323,10 +320,7 @@ export const FormComponent = () => {
                                     </div>
                                 </div>
                             )}
-                            {!['lookbackhigh', 'lookbacklow', 'lookbackhighlow'].includes(
-                                form_name
-                            ) && (
-                                <div className='quill-form-row'>
+                            <div className='quill-form-row'>
                                     <div className='form_field field-pb'>
                                         <DropdownComponent
                                             options={payout_type_options}
@@ -367,46 +361,6 @@ export const FormComponent = () => {
                                         </div>
                                     )}
                                 </div>
-                            )}
-                            {['lookbackhigh', 'lookbacklow', 'lookbackhighlow'].includes(
-                                form_name
-                            ) && (
-                                <div className='quill-form-row'>
-                                    {currency_list ? (
-                                        <>
-                                            <div className='form_field field-pb'>
-                                                <TextField
-                                                    value={multiplier}
-                                                    label={localize('Multiplier')}
-                                                    type='number'
-                                                    allowDecimals={true}
-                                                    onChange={(e) => handleAmountChange(e, 'multiplier')}
-                                                />
-                                            </div>
-                                            <div className='form_field field-pb'>
-                                                <CurrencyDropdown
-                                                    currency_list={currency_list}
-                                                    currency={currency}
-                                                    onUpdate={updateFormField}
-                                                    elementId='multiplier_currency'
-                                                />
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <div className='form_field field-pb'>
-                                            <TextFieldAddon
-                                                addonLabel={currency}
-                                                addOnPosition='right'
-                                                label={localize('Multiplier')}
-                                                value={multiplier}
-                                                type='number'
-                                                allowDecimals={true}
-                                                onChange={(e) => handleAmountChange(e, 'multiplier')}
-                                            />
-                                        </div>
-                                    )}
-                                </div>
-                            )}
                             {show_allow_equals && (
                                 <div className='quill-form-row allow-equals'>
                                     <Checkbox
