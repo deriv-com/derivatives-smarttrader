@@ -1,21 +1,21 @@
-name: publish_to_pages_staging
-description: Publish to cloudflare pages (Staging)
+name: Publish to Cloudflare Pages Staging
+description: Publish to cloudflare pages (staging)
 inputs:
   CLOUDFLARE_ACCOUNT_ID:
-    description: 'Cloudflare account id'
+    description: "Cloudflare account id"
     required: true
   CLOUDFLARE_API_TOKEN:
-    description: 'Cloudflare token'
+    description: "Cloudflare token"
     required: true
 runs:
   using: composite
   steps:
-  - name: Publish to cloudflare pages (staging)
-    env:
-      CLOUDFLARE_ACCOUNT_ID: ${{ inputs.CLOUDFLARE_ACCOUNT_ID }}
-      CLOUDFLARE_API_TOKEN: ${{ inputs.CLOUDFLARE_API_TOKEN }}
-    run: |-
-      cd dist
-      npx -y wrangler pages deploy . --project-name=deriv-binary-static-pages --branch=staging
-      echo "New staging website - http://staging.cf-pages-deriv-binary-static.deriv.com"
-    shell: bash
+    - name: Publish to cloudflare pages (staging)
+      env:
+        CLOUDFLARE_ACCOUNT_ID: ${{ inputs.CLOUDFLARE_ACCOUNT_ID }}
+        CLOUDFLARE_API_TOKEN: ${{ inputs.CLOUDFLARE_API_TOKEN }}
+      run: |-
+        cd dist
+        npx -y wrangler pages deploy . --project-name=derivatives-smarttrader-pages --branch=staging
+        echo "New staging website - http://staging.derivatives-smarttrader.pages.dev"
+      shell: bash
