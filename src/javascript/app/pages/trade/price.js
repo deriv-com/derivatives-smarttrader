@@ -5,7 +5,6 @@ const getStartDateNode     = require('./common_independent').getStartDateNode;
 const getTradingTimes      = require('./common_independent').getTradingTimes;
 const Contract             = require('./contract');
 const Defaults             = require('./defaults');
-const Client               = require('../../base/client');
 const BinarySocket         = require('../../base/socket');
 const formatMoney          = require('../../common/currency').formatMoney;
 const CommonFunctions      = require('../../../_common/common_functions');

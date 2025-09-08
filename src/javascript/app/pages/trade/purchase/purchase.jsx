@@ -15,7 +15,7 @@ import { parseData, triggerClick } from '../../../common/helpers';
 
 const Purchase = () => {
     const has_purchase_change  = usePurchaseChange();
-    const has_contract_change = useContractChange();
+    useContractChange();
     const amount_type = Defaults.get(PARAM_NAMES.AMOUNT_TYPE);
 
     const [data,setData] = useState({});
@@ -45,7 +45,6 @@ const Purchase = () => {
         }));
        
     }, [has_purchase_change]);
-
 
     useEffect(() => {
         document.body.style.overflow = show_popup ? 'hidden' : '';

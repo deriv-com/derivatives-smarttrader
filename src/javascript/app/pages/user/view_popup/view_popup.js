@@ -755,7 +755,8 @@ const ViewPopup = (() => {
 
         $container.prepend($('<div/>', { id: 'sell_bet_desc', class: 'popup_bet_desc drag-handle', text: longcode }));
         const $sections  = $('<div/>').append($('<div class="gr-row container"><div id="sell_details_chart_wrapper" class="gr-8 gr-12-p gr-12-m"></div><div id="sell_details_table" class="gr-4 gr-12-p gr-12-m"></div></div>'));
-        let [barrier_text, low_barrier_text] = localize(['Barrier', 'Low barrier']);
+        let barrier_text = localize('Barrier');
+        const low_barrier_text = localize('Low barrier');
         if (contract.barrier_count > 1) {
             barrier_text = localize('High barrier');
         } else if (/^DIGIT(MATCH|DIFF)$/.test(contract.contract_type)) {
