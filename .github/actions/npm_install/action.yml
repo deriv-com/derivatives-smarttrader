@@ -1,4 +1,4 @@
-name: npm_install
+name: NPM Install
 description: Install npm packages
 runs:
   using: composite
