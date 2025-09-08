@@ -1,6 +1,6 @@
 {
   "name": "smarttrader",
-  "version": "3.8.0",
+  "version": "0.0.1",
   "description": "Deriv SmartTrader",
   "scripts": {
     "test": "grunt test",
@@ -12,14 +12,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/deriv-com/smarttrader.git"
+    "url": "https://github.com/deriv-com/derivatives-smarttrader"
   },
   "author": "Deriv.com",
   "license": "Apache License 2.0",
   "bugs": {
-    "url": "https://github.com/deriv-com/smarttrader/issues"
+    "url": "https://github.com/deriv-com/derivatives-smarttrader/issues"
   },
-  "homepage": "https://github.com/deriv-com/smarttrader",
+  "homepage": "https://github.com/deriv-com/derivatives-smarttrader",
   "devDependencies": {
     "@babel/core": "7.24.0",
     "@babel/eslint-parser": "7.23.10",
@@ -32,7 +32,7 @@
     "@babel/preset-env": "^7.24.7",
     "@babel/preset-react": "7.23.3",
     "@babel/register": "7.23.7",
-    "@deriv-com/shiftai-cli": "^1.0.2",
+    "@deriv-com/shiftai-cli": "^1.0.7",
     "@svgr/webpack": "^8.1.0",
     "app-root-path": "2.0.1",
     "autoprefixer": "9.8.8",
