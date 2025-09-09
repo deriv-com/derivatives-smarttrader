@@ -94,8 +94,6 @@ const commonTrading = (() => {
             barrier = 'euro_atm';
         } else if (/overunder|evenodd|matchdiff/.test(form_name)) {
             name = 'digits';
-        } else if (/lookback/.test(form_name)) {
-            name = 'lookback';
         } else if (/reset/.test(form_name)) {
             name = 'reset';
         }
@@ -133,9 +131,6 @@ const commonTrading = (() => {
         UPORDOWN    : 'bottom',
         ONETOUCH    : 'top',
         NOTOUCH     : 'bottom',
-        LBFLOATCALL : 'middle',
-        LBFLOATPUT  : 'middle',
-        LBHIGHLOW   : 'middle',
         RESETCALL   : 'top',
         RESETPUT    : 'bottom',
         TICKHIGH    : 'top',
@@ -174,9 +169,6 @@ const commonTrading = (() => {
             'asian',
             ['digits',
                 ['matchdiff', 'evenodd', 'overunder'],
-            ],
-            ['lookback',
-                ['lookbackhigh', 'lookbacklow', 'lookbackhighlow'],
             ],
             'reset',
             'highlowticks',

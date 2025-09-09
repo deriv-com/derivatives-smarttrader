@@ -59,8 +59,6 @@ export const FormComponent = () => {
     const is_equal = Defaults.get(PARAM_NAMES.IS_EQUAL);
     const prediction = Defaults.get(PARAM_NAMES.PREDICTION);
     const selected_tick = Defaults.get(PARAM_NAMES.SELECTED_TICK);
-    const multiplier = Defaults.get(PARAM_NAMES.MULTIPLIER);
-
     const {
         start_dates,
         expiry_type_options,
@@ -83,9 +81,6 @@ export const FormComponent = () => {
         'evenodd',
         'overunder',
         'asian',
-        'lookbackhigh',
-        'lookbacklow',
-        'lookbackhighlow',
         'reset',
         'highlowticks',
         'runs',
@@ -323,90 +318,47 @@ export const FormComponent = () => {
                                     </div>
                                 </div>
                             )}
-                            {!['lookbackhigh', 'lookbacklow', 'lookbackhighlow'].includes(
-                                form_name
-                            ) && (
-                                <div className='quill-form-row'>
-                                    <div className='form_field field-pb'>
-                                        <DropdownComponent
-                                            options={payout_type_options}
-                                            value={findTextByValue(payout_type_options, amount_type)}
-                                            onUpdate={updateFormField}
-                                            elementId='amount_type'
-                                        />
-                                    </div>
-                                    {currency_list ? (
-                                        <>
-                                            <div className='form_field field-pb'>
-                                                <TextField
-                                                    value={getAmount()}
-                                                    type='number'
-                                                    allowDecimals={true}
-                                                    onChange={(e) => handleAmountChange(e, 'amount')}
-                                                />
-                                            </div>
-                                            <div className='form_field field-pb'>
-                                                <CurrencyDropdown
-                                                    currency_list={currency_list}
-                                                    currency={currency}
-                                                    onUpdate={updateFormField}
-                                                    elementId='currency'
-                                                />
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <div className='form_field field-pb'>
-                                            <TextFieldAddon
-                                                type='number'
-                                                allowDecimals
-                                                onChange={(e) => handleAmountChange(e, 'amount')}
-                                                value={getAmount()}
-                                                addonLabel={currency}
-                                                addOnPosition='right'
-                                            />
-                                        </div>
-                                    )}
+                            <div className='quill-form-row'>
+                                <div className='form_field field-pb'>
+                                    <DropdownComponent
+                                        options={payout_type_options}
+                                        value={findTextByValue(payout_type_options, amount_type)}
+                                        onUpdate={updateFormField}
+                                        elementId='amount_type'
+                                    />
                                 </div>
-                            )}
-                            {['lookbackhigh', 'lookbacklow', 'lookbackhighlow'].includes(
-                                form_name
-                            ) && (
-                                <div className='quill-form-row'>
-                                    {currency_list ? (
-                                        <>
-                                            <div className='form_field field-pb'>
-                                                <TextField
-                                                    value={multiplier}
-                                                    label={localize('Multiplier')}
-                                                    type='number'
-                                                    allowDecimals={true}
-                                                    onChange={(e) => handleAmountChange(e, 'multiplier')}
-                                                />
-                                            </div>
-                                            <div className='form_field field-pb'>
-                                                <CurrencyDropdown
-                                                    currency_list={currency_list}
-                                                    currency={currency}
-                                                    onUpdate={updateFormField}
-                                                    elementId='multiplier_currency'
-                                                />
-                                            </div>
-                                        </>
-                                    ) : (
+                                {currency_list ? (
+                                    <>
                                         <div className='form_field field-pb'>
-                                            <TextFieldAddon
-                                                addonLabel={currency}
-                                                addOnPosition='right'
-                                                label={localize('Multiplier')}
-                                                value={multiplier}
+                                            <TextField
+                                                value={getAmount()}
                                                 type='number'
                                                 allowDecimals={true}
-                                                onChange={(e) => handleAmountChange(e, 'multiplier')}
+                                                onChange={(e) => handleAmountChange(e, 'amount')}
                                             />
                                         </div>
-                                    )}
-                                </div>
-                            )}
+                                        <div className='form_field field-pb'>
+                                            <CurrencyDropdown
+                                                currency_list={currency_list}
+                                                currency={currency}
+                                                onUpdate={updateFormField}
+                                                elementId='currency'
+                                            />
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div className='form_field field-pb'>
+                                        <TextFieldAddon
+                                            type='number'
+                                            allowDecimals
+                                            onChange={(e) => handleAmountChange(e, 'amount')}
+                                            value={getAmount()}
+                                            addonLabel={currency}
+                                            addOnPosition='right'
+                                        />
+                                    </div>
+                                )}
+                            </div>
                             {show_allow_equals && (
                                 <div className='quill-form-row allow-equals'>
                                     <Checkbox

@@ -15,11 +15,10 @@ import { parseData, triggerClick } from '../../../common/helpers';
 
 const Purchase = () => {
     const has_purchase_change  = usePurchaseChange();
-    const has_contract_change = useContractChange();
+    useContractChange();
     const amount_type = Defaults.get(PARAM_NAMES.AMOUNT_TYPE);
 
     const [data,setData] = useState({});
-    const [is_look_back, setIsLookBack] = useState(false);
     const [show_popup, setShowPopup] = useState(false);
     const purchase_positions = ['top','bottom'];
     
@@ -46,15 +45,6 @@ const Purchase = () => {
         }));
        
     }, [has_purchase_change]);
-
-    useEffect(() => {
-        const form_name = Defaults.get(PARAM_NAMES.FORM_NAME);
-
-        const lookbacks = ['lookbacklow', 'lookbackhigh', 'lookbackhighlow'];
-
-        setIsLookBack(lookbacks.includes(form_name));
-      
-    }, [has_contract_change]);
 
     useEffect(() => {
         document.body.style.overflow = show_popup ? 'hidden' : '';
@@ -135,12 +125,8 @@ const Purchase = () => {
             <div className='quill-purchase-section'>
                 <Skeleton.Square rounded fullWidth height={30} />
                 <Skeleton.Square rounded fullWidth height={130} />
-                {!is_look_back && (
-                    <>
-                        <Skeleton.Square rounded fullWidth height={30} />
-                        <Skeleton.Square rounded fullWidth height={130} />
-                    </>
-                )}
+                <Skeleton.Square rounded fullWidth height={30} />
+                <Skeleton.Square rounded fullWidth height={130} />
             </div>);
     }
     
