@@ -42,25 +42,6 @@ const Trading = () => (
                                 <div id='contract_form_container' className='col'>
                                     <div id='contract_form_content' className='gr-gutter'>
                                         <form id='websocket_form'>
-                                            <div className='row' id='date_start_row'>
-                                                <div className='col form_label' id='start_time_label'>
-                                                    {it.L('Start time')}
-                                                </div>
-                                                <div className='big-col'>
-                                                    <select id='date_start' />
-                                                    <div id='time_start_row' className='invisible'>
-                                                        <input
-                                                            type='text'
-                                                            data-lpignore='true'
-                                                            id='time_start'
-                                                            autoComplete='off'
-                                                            readOnly='readonly'
-                                                            className='medium_width_input'
-                                                        />
-                                                        <span className='gr-gutter-left'>GMT</span>
-                                                    </div>
-                                                </div>
-                                            </div>
                                             <div className='row' id='expiry_row'>
                                                 <div className='col form_label'>
                                                     <select id='expiry_type' />

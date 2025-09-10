@@ -9,7 +9,6 @@ const Durations         = require('./duration');
 const GetTicks          = require('./get_ticks');
 const Price             = require('./price');
 const Reset             = require('./reset');
-const StartDates        = require('./starttime').StartDates;
 const Symbols           = require('./symbols');
 const Tick              = require('./tick');
 const NotAvailable      = require('./not-available.jsx');
@@ -29,7 +28,6 @@ const Process = (() => {
     const {
         AMOUNT,
         AMOUNT_TYPE,
-        DATE_START,
         DURATION_AMOUNT,
         DURATION_UNITS,
         CURRENCY,
@@ -284,8 +282,6 @@ const Process = (() => {
         // get updated formname
         Contract.details(Defaults.get(FORM_NAME));
 
-        StartDates.display();
-
         displayPrediction();
         refreshDropdown('#prediction');
         displaySelectedTick();
@@ -295,13 +291,7 @@ const Process = (() => {
             Reset.hideResetTime();
         }
 
-        let r1;
-        if (State.get('is_start_dates_displayed') && Defaults.get(DATE_START) && Defaults.get(DATE_START) !== 'now') {
-            r1 = Durations.onStartDateChange(Defaults.get(DATE_START));
-            if (!r1 || Defaults.get(EXPIRY_TYPE) === 'endtime') Durations.display();
-        } else {
-            Durations.display();
-        }
+        Durations.display();
 
         // needs to be called after durations are populated
         displayEquals();
@@ -440,7 +430,6 @@ const Process = (() => {
                 document.getSelection().empty(); // microsoft edge 18 automatically start selecting text when select expiry time after changing expiry type to end time
             }
         } else {
-            StartDates.enable();
             Durations.display();
             if (Defaults.get(DURATION_UNITS)) {
                 onDurationUnitChange(Defaults.get(DURATION_UNITS));

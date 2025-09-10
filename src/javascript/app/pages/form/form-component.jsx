@@ -46,8 +46,6 @@ export const FormComponent = () => {
 
     const form_name = Defaults.get(PARAM_NAMES.FORM_NAME);
     const expiry_type = Defaults.get(PARAM_NAMES.EXPIRY_TYPE);
-    const date_start = Defaults.get(PARAM_NAMES.DATE_START);
-    const time_start = Defaults.get(PARAM_NAMES.TIME_START);
     const duration_amount = Defaults.get(PARAM_NAMES.DURATION_AMOUNT);
     const duration_units = Defaults.get(PARAM_NAMES.DURATION_UNITS);
     const expiry_date = Defaults.get(PARAM_NAMES.EXPIRY_DATE);
@@ -60,7 +58,6 @@ export const FormComponent = () => {
     const prediction = Defaults.get(PARAM_NAMES.PREDICTION);
     const selected_tick = Defaults.get(PARAM_NAMES.SELECTED_TICK);
     const {
-        start_dates,
         expiry_type_options,
         duration_data,
         duration_options,
@@ -181,28 +178,6 @@ export const FormComponent = () => {
                             </div>
                         )}
                         <div className='quill-form-rows'>
-                            {['risefall', 'callputequal'].includes(form_name) && start_dates && date_start && (
-                                <div className='quill-form-row'>
-                                    <div className='form_field field-pb'>
-                                        <DropdownComponent
-                                            label={localize('Start Time')}
-                                            options={start_dates.options}
-                                            value={findTextByValue(start_dates.options, date_start)}
-                                            onUpdate={updateFormField}
-                                            elementId='date_start'
-                                        />
-                                    </div>
-                                    {date_start !== 'now' && (
-                                        <div className='form_field field-pb'>
-                                            <TimePickerDropdown
-                                                time={time_start}
-                                                onUpdate={updateFormField}
-                                                elementId='time_start'
-                                            />
-                                        </div>
-                                    )}
-                                </div>
-                            )}
                             {form_name !== 'highlowticks' && (
                                 <>
                                     <div className='quill-form-row'>
