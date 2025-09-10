@@ -6,10 +6,10 @@ runs:
     - name: restore_cache
       uses: actions/cache@v4
       with:
-        key: node-{{ checksum "package-lock.json" }}
-        path: UPDATE_ME
+        key: node-${{ hashFiles('package-lock.json') }}
+        path: node_modules
         restore-keys: |-
-          node-{{ checksum "package-lock.json" }}
+          node-${{ hashFiles('package-lock.json') }}
           node-
     - name: Install npm packages
       run: npm ci
@@ -18,4 +18,4 @@ runs:
       uses: actions/cache@v4
       with:
         path: node_modules
-        key: node-{{ checksum "package-lock.json" }}
+        key: node-${{ hashFiles('package-lock.json') }}
