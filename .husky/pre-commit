@@ -1,4 +1,3 @@
-#!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
 # ShiftAI Pre-commit Hook - Detect and strip AI markers
