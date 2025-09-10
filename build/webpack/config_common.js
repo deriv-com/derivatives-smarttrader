@@ -54,7 +54,14 @@ const commonConfig = (grunt) => ({
                         options: {
                             svgoConfig: {
                                 plugins: [
-                                    { removeTitle: false },
+                                    {
+                                        name  : 'preset-default',
+                                        params: {
+                                            overrides: {
+                                                removeTitle: false,
+                                            },
+                                        },
+                                    },
                                 ],
                                 floatPrecision: 2,
                             },
