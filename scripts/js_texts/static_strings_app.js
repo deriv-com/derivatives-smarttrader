@@ -38,6 +38,7 @@ module.exports = [
     'High/Low Ticks',
     'Higher/Lower',
     'In/Out',
+    'Lookbacks',
     'Matches/Differs',
     'Over/Under',
     'Reset Call/Reset Put',
