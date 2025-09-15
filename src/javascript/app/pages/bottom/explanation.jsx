@@ -19,7 +19,19 @@ export const Explanation = ({ explanation_only = false }) => {
         setFormName(null);
         
         setTimeout(() => {
-            setFormName(actual_form_name);
+            // [AI] - Add validation to ensure we have valid form name and data
+            if (
+                actual_form_name &&
+                contract_explanation_data &&
+                contract_explanation_data.explain &&
+                contract_explanation_data.explain[actual_form_name]
+            ) {
+                setFormName(actual_form_name);
+            } else {
+                // eslint-disable-next-line no-console
+                console.warn('Contract explanation data not available for:', actual_form_name);
+            }
+            // [/AI]
         }, 500);
        
     }, [has_contract_changes]);
@@ -31,9 +43,9 @@ export const Explanation = ({ explanation_only = false }) => {
     const Notes = () => (
         <>
             <strong>{localize('Note')}: </strong>
-            {contract_explanation_data.note[form_name].content.map((data, idx) => (
+            {contract_explanation_data.note[form_name]?.content?.map((data, idx) => (
                 <span key={idx}>{parse(data)}</span>
-            ))}
+            )) || <span>{localize('Note content not available')}</span>}
         </>
     );
 
@@ -105,11 +117,11 @@ export const Explanation = ({ explanation_only = false }) => {
                                     <Text size='lg' bold>{localize('Winning the contract')}</Text>
                                 </div>
                                 <div className='explanation-content'>
-                                    {contract_explanation_data.winning[form_name].content.map(
+                                    {contract_explanation_data.winning[form_name]?.content?.map(
                                         (data, idx) => (
                                             <Text key={idx}>{parse(data)}</Text>
                                         )
-                                    )}
+                                    ) || <Text>{localize('Explanation content not available')}</Text>}
                                 </div>
                                 
                             </div>
@@ -151,31 +163,31 @@ export const Explanation = ({ explanation_only = false }) => {
                 <div id='explanation_explain' className='gr-child'>
                     <div id={`explain_${form_name}`}  >
                         <div className='explanation-heading'>
-                            <Text size='lg' bold >{contract_explanation_data.explain[form_name].title}</Text>
+                            <Text size='lg' bold >{contract_explanation_data.explain[form_name]?.title || 'Contract Explanation'}</Text>
                         </div>
                         <div className='explanation-content'>
-                            {contract_explanation_data.explain[form_name].content.map(
+                            {contract_explanation_data.explain[form_name]?.content?.map(
                                 (data, idx) => (
                                     <Text key={idx}>{parse(data)}</Text>
                                 )
-                            )}
+                            ) || <Text>{localize('Explanation content not available')}</Text>}
                         </div>
                         
-                        {contract_explanation_data.explain[form_name].title_secondary && (
+                        {contract_explanation_data.explain[form_name]?.title_secondary && (
                             <div className='explanation-heading secondary-heading'>
                                 <Text size='lg' bold>
-                                    {contract_explanation_data.explain[form_name].title_secondary}
+                                    {contract_explanation_data.explain[form_name]?.title_secondary}
                                 </Text>
                             </div>
                         )}
                         
-                        {contract_explanation_data.explain[form_name].content_secondary && (
+                        {contract_explanation_data.explain[form_name]?.content_secondary && (
                             <div className='explanation-content'>
-                                {contract_explanation_data.explain[form_name].content_secondary.map(
+                                {contract_explanation_data.explain[form_name]?.content_secondary?.map(
                                     (data, idx) => (
                                         <Text key={idx}>{parse(data)}</Text>
                                     )
-                                )}
+                                ) || <Text>{localize('Secondary content not available')}</Text>}
                             </div>
                         )}
                        
@@ -184,7 +196,7 @@ export const Explanation = ({ explanation_only = false }) => {
 
                 {/* ========== Note ========== */}
                 {!explanation_only && (
-                    contract_explanation_data.note[form_name] && (
+                    contract_explanation_data.note?.[form_name] && (
                         <SectionMessage status='info' message={<Notes />} size='sm' />
                     )
                 )}
