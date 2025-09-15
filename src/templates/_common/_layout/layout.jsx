@@ -2,7 +2,6 @@ import React from 'react';
 import Head from './head.jsx';
 import Header from './header.jsx';
 // import MobileMenu from './mobile_menu.jsx';
-import WalletHeader from './wallet-header.jsx';
 // import Elevio from '../includes/elevio.jsx';
 import Gtm from '../includes/gtm.jsx';
 import LanguageMenuModal from '../components/language-menu-modal.jsx';
@@ -67,7 +66,6 @@ const Layout = () => {
                 <div id='msg_notification' className='notice-msg center-text' />
                 <div id='page-wrapper'>
                     <Header />
-                    <WalletHeader />
                     <div id='sso_loader_container' />
                     <div id='content-holder'>
                         {/* <MobileMenu /> */}

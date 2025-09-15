@@ -129,7 +129,7 @@ export const FormComponent = () => {
         setDefaultParams(id, e.target.value);
     };
 
-    const findTextByValue = (arr, value) => arr.find(item => item.value === value)?.text || null;
+    const findTextByValue = (arr, value) => arr?.find(item => item.value === value)?.text || null;
     
     const isEmpty = (obj) => Object.keys(obj).length === 0;
     if (isEmpty(trade_data)) {

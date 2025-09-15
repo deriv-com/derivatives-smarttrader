@@ -195,6 +195,11 @@ class Markets extends React.Component {
     };
 
     getCurrentUnderlying = () => {
+        // Add safety check for undefined underlying structure
+        if (!this.state.underlying || !this.state.underlying.name) {
+            return '';
+        }
+        
         const { underlying: { name: underlying } } = this.state;
         const max_char = window.innerWidth <= 767 ? 15 : 25;
         if (underlying.length > max_char) {

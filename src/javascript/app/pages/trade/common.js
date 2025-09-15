@@ -283,22 +283,26 @@ const commonTrading = (() => {
     const getDefaultMarket = () => {
         let mkt       = Defaults.get(MARKET);
         const markets = Symbols.markets(1);
+        const allMarkets = Symbols.markets();
+        
         if (!mkt || !markets[mkt]) {
-            const sorted_markets = Object.keys(Symbols.markets()).filter(v => markets[v].is_active)
+            const sorted_markets = Object.keys(allMarkets || {}).filter(v => allMarkets[v] && allMarkets[v].is_active)
                 .sort((a, b) => getMarketsOrder(a) - getMarketsOrder(b));
-            mkt                  = sorted_markets[0] || Object.keys(Symbols.markets())[0];
+            mkt = sorted_markets[0] || Object.keys(allMarkets || {})[0];
         }
         return mkt;
     };
 
-    // Order
+    // Order - Updated to include new API market names
     const market_order = {
-        basket_index   : 1,
-        forex          : 2,
-        synthetic_index: 3,
-        indices        : 4,
-        stocks         : 5,
-        commodities    : 6,
+        baskets         : 1,  // New API market name
+        commodity_basket: 2,  // New API market name
+        basket_index    : 3,
+        forex           : 4,
+        synthetic_index : 5,
+        indices         : 6,
+        stocks          : 7,
+        commodities     : 8,
     };
 
     const getMarketsOrder = market => market_order[market] || 100;

@@ -22,8 +22,8 @@ const ThirdPartyLinks = require('../../_common/third_party_links');
 const urlFor = require('../../_common/url').urlFor;
 const Url = require('../../_common/url');
 const createElement = require('../../_common/utility').createElement;
+const DevShortcuts = require('../../_common/dev_shortcuts');
 const SSOLoader = require('../pages/sso-loader.jsx');
-const NotAvailable = require('../pages/trade/not-available.jsx');
 
 const BinaryLoader = (() => {
     let container;
@@ -69,6 +69,7 @@ const BinaryLoader = (() => {
         }
         
         ThirdPartyLinks.init();
+        DevShortcuts.init();
 
     };
 
@@ -163,13 +164,8 @@ const BinaryLoader = (() => {
         }
         
         BinarySocket.wait('authorize').then(() => {
-            if (config.no_blocked_country && Client.isLoggedIn() && Client.isOptionsBlocked()) {
-                displayMessage(error_messages.options_blocked());
-            } else if (Client.isLoggedIn() && Client.isOfferingBlocked()) {
-                displayUnavailable({ body: error_messages.offerings_blocked() });
-            } else if (config.no_mf && Client.isLoggedIn() && Client.isAccountOfType('financial')) {
-                displayUnavailable({ body: localize('Unfortunately, this trading platform is not available for EU Deriv account. Please switch to a non-EU account to continue trading.') });
-            }
+            // Removed account type and regional restrictions - allow all account types
+            // Original restrictions removed: isOptionsBlocked(), isOfferingBlocked(), isAccountOfType('financial')
         });
 
         BinarySocket.setOnDisconnect(active_script.onDisconnect);
@@ -207,14 +203,7 @@ const BinaryLoader = (() => {
         }
     };
 
-    const displayUnavailable = (props) => {
-        const content = container.querySelector('#content .container');
-        if (!content) {
-            return;
-        }
-
-        NotAvailable.init({ title: localize('SmartTrader is unavailable for this account'), ...props });
-    };
+    // displayUnavailable function removed - no longer needed without account restrictions
 
     const handleNotAuthenticated = () => {
         const content = container.querySelector('#content');

@@ -11,6 +11,7 @@ const removeCookies      = require('../../_common/storage').removeCookies;
 const urlFor             = require('../../_common/url').urlFor;
 const applyToAllElements = require('../../_common/utility').applyToAllElements;
 const getPropertyValue   = require('../../_common/utility').getPropertyValue;
+const isEmptyObject      = require('../../_common/utility').isEmptyObject;
 const licenseID          = require('../../_common/utility').lc_licenseID;
 const clientID           = require('../../_common/utility').lc_clientID;
 
@@ -30,13 +31,29 @@ const Client = (() => {
         // const primary_bg_color_dark = 'primary-bg-color-dark';
         // const secondary_bg_color    = 'secondary-bg-color';
 
+        // eslint-disable-next-line no-console
+        console.log('👤 Client visibility check:', {
+            isLoggedIn       : ClientBase.isLoggedIn(),
+            loginid          : ClientBase.get('loginid'),
+            hasToken         : !!ClientBase.get('token'),
+            hasAccountsObject: !isEmptyObject(ClientBase.getAllAccountsObject()),
+        });
+        
         if (ClientBase.isLoggedIn()) {
+            // eslint-disable-next-line no-console
+            console.log('👤 Client is logged in, waiting for WebSocket responses...');
+            
             BinarySocket.wait('authorize', 'website_status', 'get_account_status', 'balance').then(() => {
+                // eslint-disable-next-line no-console
+                console.log('👤 All required WebSocket responses received, showing account UI...');
+                
                 // const client_logged_in = getElementById('client-logged-in');
                 // client_logged_in.classList.add('gr-centered');
 
                 applyToAllElements('.client_logged_in', (el) => {
                     el.setVisibility(1);
+                    // eslint-disable-next-line no-console
+                    console.log('✅ Made client_logged_in element visible:', el.className);
                 });
 
                 if (ClientBase.get('is_virtual')) applyToAllElements('.client_virtual', el => el.setVisibility(1), '', el_section);
@@ -93,6 +110,9 @@ const Client = (() => {
                 }
             });
         } else {
+            // eslint-disable-next-line no-console
+            console.log('👤 Client is NOT logged in, showing logged out UI...');
+            
             // applyToAllElements('.client_logged_in', (el) => {
             //     el.setVisibility(0);
             // }, '', el_section);
@@ -166,6 +186,17 @@ const Client = (() => {
     };
 
     const sendLogoutRequest = (show_login_page, redirect_to) => {
+        // Debug: Log logout request details especially during session token auth
+        const sessionToken = localStorage.getItem('session_token');
+        // eslint-disable-next-line no-console
+        console.log('🚪 sendLogoutRequest called:', {
+            show_login_page,
+            redirect_to,
+            hasSessionToken: !!sessionToken,
+            currentLoginId : ClientBase.get('loginid'),
+            stack          : new Error().stack,
+        });
+        
         if (show_login_page) {
             sessionStorage.setItem('showLoginPage', 1);
         }

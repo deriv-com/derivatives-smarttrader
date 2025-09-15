@@ -38,7 +38,19 @@ const getAppId = () => {
     const user_app_id   = ''; // you can insert Application ID of your registered application here
     const config_app_id = window.localStorage.getItem('config.app_id');
     const is_new_app    = /\/app\//.test(window.location.pathname);
+    
+    // Debug logging
+    // eslint-disable-next-line no-console
+    console.log('getAppId debug:', {
+        hostname: window.location.hostname,
+        config_app_id,
+        user_app_id,
+        is_new_app,
+    });
+    
     if (config_app_id) {
+        // eslint-disable-next-line no-console
+        console.log('Using config_app_id:', config_app_id);
         app_id = config_app_id;
     } else if (/desktop-app/i.test(window.location.href) || window.localStorage.getItem('config.is_desktop_app')) {
         window.localStorage.removeItem('config.default_app_id');
@@ -61,12 +73,20 @@ const getAppId = () => {
         app_id = user_app_id;
     } else if (/localhost/i.test(window.location.hostname)) {
         app_id = 23709;
+    } else if (/qa197\.deriv\.dev/i.test(window.location.hostname)) {
+        // eslint-disable-next-line no-console
+        console.log('Detected qa197.deriv.dev - setting app_id to 16929');
+        app_id = 16929; // QA server app_id
     } else {
         window.localStorage.removeItem('config.default_app_id');
         const current_domain = getCurrentBinaryDomain();
         // TODO: remove is_new_app && deriv.com check when repos are split
         app_id = (is_new_app && current_domain !== 'deriv.com') ? 22168 : (domain_app_ids[current_domain] || 22168);
     }
+    
+    // Final debug logging
+    // eslint-disable-next-line no-console
+    console.log('getAppId final result:', app_id);
     return app_id;
 };
 

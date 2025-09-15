@@ -11,7 +11,18 @@ const createElement         = require('../../../_common/utility').createElement;
 const localize              = require('../../../_common/localize').localize;
 
 const updateBalance = (response) => {
+    // eslint-disable-next-line no-console
+    console.log('💰 updateBalance called with:', {
+        hasResponse: !!response,
+        hasBalance : !!response?.balance,
+        hasError   : !!getPropertyValue(response, 'error'),
+        balance    : response?.balance,
+        error      : getPropertyValue(response, 'error'),
+    });
+    
     if (getPropertyValue(response, 'error')) {
+        // eslint-disable-next-line no-console
+        console.log('💰 updateBalance: Early return due to error');
         return;
     }
 
@@ -38,7 +49,22 @@ const updateBalance = (response) => {
 
     BinarySocket.wait('website_status').then(() => {
         const { accounts, balance, currency, loginid, total } = response.balance;
-        if (!currency) return;
+        
+        // eslint-disable-next-line no-console
+        console.log('💰 Balance data extracted:', {
+            accounts,
+            balance,
+            currency,
+            loginid,
+            total,
+            currentLoginId: Client.get('loginid'),
+        });
+        
+        if (!currency) {
+            // eslint-disable-next-line no-console
+            console.log('💰 updateBalance: No currency, returning early');
+            return;
+        }
         const updateBalanceByAccountId = async (account_id, updated_balance, account_currency) => {
             const el_balance_span = await waitForReadyElement(`.account__switcher-balance-${account_id}`);
             const reset_button    = createElement('button', { text: localize('Reset balance'), class: 'account__switcher-balance btn btn--secondary btn__small reset_btn' });
@@ -62,7 +88,25 @@ const updateBalance = (response) => {
                 }
 
                 if (is_current) {
-                    document.getElementById('header__acc-balance').innerHTML = display_balance;
+                    // eslint-disable-next-line no-console
+                    console.log('🎯 Updating header balance for current account:', {
+                        account_id,
+                        display_balance,
+                        updated_balance,
+                        account_currency,
+                        headerElement: !!document.getElementById('header__acc-balance'),
+                    });
+                    
+                    const headerElement = document.getElementById('header__acc-balance');
+                    if (headerElement) {
+                        headerElement.innerHTML = display_balance;
+                        // eslint-disable-next-line no-console
+                        console.log('✅ Header balance updated successfully:', display_balance);
+                    } else {
+                        // eslint-disable-next-line no-console
+                        console.error('❌ Header balance element not found!');
+                    }
+                    
                     Client.set('balance', updated_balance);
                     PortfolioInit.updateBalance();
                 }
