@@ -57,7 +57,6 @@ export const FormComponent = () => {
     const is_equal = Defaults.get(PARAM_NAMES.IS_EQUAL);
     const prediction = Defaults.get(PARAM_NAMES.PREDICTION);
     const selected_tick = Defaults.get(PARAM_NAMES.SELECTED_TICK);
-    const multiplier = Defaults.get(PARAM_NAMES.MULTIPLIER);
 
     const {
         expiry_type_options,
