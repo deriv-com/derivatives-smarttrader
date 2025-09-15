@@ -29,6 +29,7 @@ const CATEGORY_TYPES = {
     reset        : ['resetcall' , 'resetput'],
     highlowticks : ['highlowticks'],
     runs         : ['runs'],
+    lookback     : ['lookbackhigh', 'lookbacklow', 'lookbackhighlow'],
     callputspread: ['callputspread'],
 };
 
@@ -42,24 +43,28 @@ const CATEGORY_NAMES = {
     callputspread: 'Call Spread/Put Spread',
     highlowticks : 'High/Low Ticks',
     runs         : 'Only Ups/Only Downs',
+    lookback     : 'Lookbacks',
 };
 
 const CATEGORY_ITEMS = {
-    inout        : 'In/Out',
-    endsinout    : 'Ends Between/Ends Outside',
-    staysinout   : 'Stays Between/Goes Outside',
-    risefall     : 'Rise/Fall',
-    higherlower  : 'Higher/Lower',
-    touchnotouch : 'Touch/No Touch',
-    matchdiff    : 'Matches/Differs',
-    evenodd      : 'Even/Odd',
-    overunder    : 'Over/Under',
-    resetcall    : 'Reset Call',
-    resetput     : 'Reset Put',
-    highlowticks : 'High/Low Ticks',
-    asians       : 'Asians',
-    runs         : 'Only Ups/Only Downs',
-    callputspread: 'Call Spread/Put Spread',
+    inout          : 'In/Out',
+    endsinout      : 'Ends Between/Ends Outside',
+    staysinout     : 'Stays Between/Goes Outside',
+    risefall       : 'Rise/Fall',
+    higherlower    : 'Higher/Lower',
+    touchnotouch   : 'Touch/No Touch',
+    matchdiff      : 'Matches/Differs',
+    evenodd        : 'Even/Odd',
+    overunder      : 'Over/Under',
+    lookbackhigh   : 'High-Close',
+    lookbacklow    : 'Close-Low',
+    lookbackhighlow: 'High-Low',
+    resetcall      : 'Reset Call',
+    resetput       : 'Reset Put',
+    highlowticks   : 'High/Low Ticks',
+    asians         : 'Asians',
+    runs           : 'Only Ups/Only Downs',
+    callputspread  : 'Call Spread/Put Spread',
 };
 
 const Contract = (() => {
@@ -68,7 +73,6 @@ const Contract = (() => {
     let contract_details = {};
     let barriers         = {};
     let durations        = {};
-    let start_dates      = {};
 
     let open,
         close,
@@ -109,7 +113,6 @@ const Contract = (() => {
 
         if (!contracts) return;
 
-        start_dates = { has_spot: 0, list: [] };
         durations   = {};
         open        = contracts.open;
         close       = contracts.close;
@@ -134,12 +137,6 @@ const Contract = (() => {
                 }
             }
             if (form === contract_category) {
-                if (current_obj.forward_starting_options && current_obj.start_type === 'forward' && sessionStorage.formname !== 'higherlower') {
-                    start_dates.list = current_obj.forward_starting_options;
-                } else if (current_obj.start_type === 'spot') {
-                    start_dates.has_spot = 1;
-                }
-
                 const symbol = current_obj.underlying_symbol;
                 if (current_obj.barrier_category && current_obj.barrier_category !== 'non_financial') {
                     if (!getPropertyValue(barriers, symbol)) {
@@ -254,7 +251,6 @@ const Contract = (() => {
         close        : () => close,
         contracts    : () => contract_details,
         durations    : () => durations,
-        startDates   : () => start_dates,
         barriers     : () => barriers,
         contractType : () => contract_type,
         form         : () => form,

@@ -102,6 +102,19 @@ const Explanation = () => (
                 <p>{it.L('If you select "falls", you win the payout if the market price is lower than the entry spot.')}</p>
             </div>
 
+            <div id='winning_lookbacklow' className='invisible'>
+                <h3>{it.L('Pay-out')}</h3>
+                <p>{it.L('By purchasing the [_1]"Close-Low"[_2] contract, you\'ll win the multiplier times the difference between the [_1]close[_2] and [_1]low[_2] over the duration of the contract.', '<strong>', '</strong>')}</p>
+            </div>
+            <div id='winning_lookbackhigh' className='invisible'>
+                <h3>{it.L('Pay-out')}</h3>
+                <p>{it.L('By purchasing the [_1]"High-Close"[_2] contract, you\'ll win the multiplier times the difference between the [_1]high[_2] and [_1]close[_2] over the duration of the contract.', '<strong>', '</strong>')}</p>
+            </div>
+            <div id='winning_lookbackhighlow' className='invisible'>
+                <h3>{it.L('Pay-out')}</h3>
+                <p>{it.L('By purchasing the [_1]"High-Low"[_2] contract, you\'ll win the multiplier times the difference between the [_1]high[_2] and [_1]low[_2] over the duration of the contract.', '<strong>', '</strong>')}</p>
+            </div>
+
             <div id='winning_reset' className='invisible'>
                 <h3>{it.L('Winning the contract')}</h3>
                 <p>{it.L('If you select "Reset-Call", you win the payout if the exit spot is strictly higher than either the entry spot or the spot at reset time.')}</p>
@@ -196,6 +209,39 @@ const Explanation = () => (
                 <p>{it.L('The <strong>contract period</strong> is the period between the <strong>next tick</strong> after the <strong>start time</strong> and the <strong>end time</strong>.')}</p>
                 <p>{it.L('The <strong>start time</strong> is when the contract is processed by our servers.')}</p>
                 <p>{it.L('The <strong>end time</strong> is the selected number of minutes/hours after the <strong>start time</strong> (if less than one day in duration), or at the end of the trading day (if one day or more in duration).')}</p>
+            </div>
+
+            <div id='explain_lookbacklow' className='invisible'>
+                <h3>{it.L('High, Low and Close')}</h3>
+                <p>{it.L('The [_1]high[_2] is the highest point ever reached by the market during the contract period.', '<strong>','</strong>')}</p>
+                <p>{it.L('The [_1]low[_2] is the lowest point ever reached by the market during the contract period.', '<strong>','</strong>')}</p>
+                <p>{it.L('The [_1]close[_2] is the latest tick at or before the [_1]end time[_2]. If you selected a specific [_1]end time,[_2] the [_1]end time[_2] is the selected time.', '<strong>','</strong>')}</p>
+                <h3>{it.L('Contract period')}</h3>
+                <p>{it.L('The [_1]contract period[_2] is the period between the [_1]first tick[_2] (after start time) and the [_1]end time[_2].', '<strong>','</strong>')}</p>
+                <p>{it.L('The [_1]start time[_2] begins when the contract is processed by our servers.', '<strong>','</strong>')}</p>
+                <p>{it.L('The [_1]end time[_2] is the selected number of minutes/hours after the [_1]start time[_2].', '<strong>','</strong>')}</p>
+            </div>
+
+            <div id='explain_lookbackhigh' className='invisible'>
+                <h3>{it.L('High, Low and Close')}</h3>
+                <p>{it.L('The [_1]high[_2] is the highest point ever reached by the market during the contract period.', '<strong>','</strong>')}</p>
+                <p>{it.L('The [_1]low[_2] is the lowest point ever reached by the market during the contract period.', '<strong>','</strong>')}</p>
+                <p>{it.L('The [_1]close[_2] is the latest tick at or before the [_1]end time[_2]. If you selected a specific [_1]end time,[_2] the [_1]end time[_2] is the selected time.', '<strong>','</strong>')}</p>
+                <h3>{it.L('Contract period')}</h3>
+                <p>{it.L('The [_1]contract period[_2] is the period between the [_1]first tick[_2] (after start time) and the [_1]end time[_2].', '<strong>','</strong>')}</p>
+                <p>{it.L('The [_1]start time[_2] begins when the contract is processed by our servers.', '<strong>','</strong>')}</p>
+                <p>{it.L('The [_1]end time[_2] is the selected number of minutes/hours after the [_1]start time[_2].', '<strong>','</strong>')}</p>
+            </div>
+
+            <div id='explain_lookbackhighlow' className='invisible'>
+                <h3>{it.L('High, Low and Close')}</h3>
+                <p>{it.L('The [_1]high[_2] is the highest point ever reached by the market during the contract period.', '<strong>','</strong>')}</p>
+                <p>{it.L('The [_1]low[_2] is the lowest point ever reached by the market during the contract period.', '<strong>','</strong>')}</p>
+                <p>{it.L('The [_1]close[_2] is the latest tick at or before the [_1]end time[_2]. If you selected a specific [_1]end time,[_2] the [_1]end time[_2] is the selected time.', '<strong>','</strong>')}</p>
+                <h3>{it.L('Contract period')}</h3>
+                <p>{it.L('The [_1]contract period[_2] is the period between the [_1]first tick[_2] (after start time) and the [_1]end time[_2].', '<strong>','</strong>')}</p>
+                <p>{it.L('The [_1]start time[_2] begins when the contract is processed by our servers.', '<strong>','</strong>')}</p>
+                <p>{it.L('The [_1]end time[_2] is the selected number of minutes/hours after the [_1]start time[_2].', '<strong>','</strong>')}</p>
             </div>
 
             <div id='explain_reset' className='invisible'>

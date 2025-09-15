@@ -1,10 +1,12 @@
 const moment               = require('moment');
 const commonTrading        = require('./common');
 const displayPriceMovement = require('./common_independent').displayPriceMovement;
-const getStartDateNode     = require('./common_independent').getStartDateNode;
 const getTradingTimes      = require('./common_independent').getTradingTimes;
 const Contract             = require('./contract');
 const Defaults             = require('./defaults');
+const getLookBackFormula   = require('./lookback').getFormula;
+const isLookback           = require('./lookback').isLookback;
+const Client               = require('../../base/client');
 const BinarySocket         = require('../../base/socket');
 const formatMoney          = require('../../common/currency').formatMoney;
 const CommonFunctions      = require('../../../_common/common_functions');
@@ -39,8 +41,6 @@ const Price = (() => {
         };
 
         const contract_type = type_of_contract;
-        const start_date    = getStartDateNode();
-        const start_time    = CommonFunctions.getElementById('time_start');
         const underlying    = CommonFunctions.getElementById('underlying');
         const amount_type   = CommonFunctions.getElementById('amount_type');
         const currency      = CommonFunctions.getVisibleElement('currency');
@@ -56,7 +56,7 @@ const Price = (() => {
         const selected_tick = CommonFunctions.getElementById('selected_tick');
         const multiplier    = CommonFunctions.getElementById('multiplier');
 
-        if (payout && CommonFunctions.isVisible(payout) && payout.value) {
+        if (payout && CommonFunctions.isVisible(payout) && payout.value && !isLookback(type_of_contract)) {
             proposal.amount = parseFloat(payout.value);
         }
 
@@ -70,7 +70,8 @@ const Price = (() => {
             }
         }
 
-        if (amount_type && CommonFunctions.isVisible(amount_type) && amount_type.value) {
+        if (amount_type && CommonFunctions.isVisible(amount_type) && amount_type.value
+            && !isLookback(type_of_contract)) {
             proposal.basis = amount_type.value;
         }
 
@@ -84,13 +85,6 @@ const Price = (() => {
 
         if (underlying && underlying.value) {
             proposal.symbol = underlying.value;
-        }
-
-        if (start_date && CommonFunctions.isVisible(start_date) && start_date.value !== 'now') {
-            const time     = start_time.value.split(':');
-            const set_time = moment.utc(Number(start_date.value) * 1000).hour(time[0]).minute(time[1]);
-
-            proposal.date_start = set_time ? set_time.unix() : undefined;
         }
 
         if (expiry_type && CommonFunctions.isVisible(expiry_type) && expiry_type.value === 'duration') {
@@ -237,6 +231,7 @@ const Price = (() => {
             }
             CommonFunctions.elementTextContent(payout, `${localize('Payout')}: `);
             CommonFunctions.elementInnerHtml(payout_amount, data.payout ? formatMoney(currentCurrency, data.payout) : '-');
+            // Lookback multiplier
             CommonFunctions.elementTextContent(multiplier, `${localize('Multiplier')}: `);
             CommonFunctions.elementInnerHtml(contract_multiplier, data.multiplier ? formatMoney(currentCurrency, data.multiplier, false, 0, 2) : '-');
 
@@ -289,7 +284,15 @@ const Price = (() => {
             }
             comment.show();
             error.hide();
-            commonTrading.displayCommentPrice(comment, (currency.value || currency.getAttribute('value')), proposal.display_value, proposal.payout, position);
+            if (isLookback(type)) {
+                const multiplier_value = formatMoney(Client.get('currency'), proposal.multiplier, false, 3, 2);
+                CommonFunctions.elementInnerHtml(comment, `${localize('Payout')}: ${getLookBackFormula(type, multiplier_value)}`);
+                dataManager.setPurchase({
+                    [`${position}_comment`]: `${localize('Payout')}: ${getLookBackFormula(type, multiplier_value)}`,
+                });
+            } else {
+                commonTrading.displayCommentPrice(comment, (currency.value || currency.getAttribute('value')), proposal.display_value, proposal.payout, position);
+            }
             const old_price  = purchase.getAttribute('data-display_value');
             const old_payout = purchase.getAttribute('data-payout');
             if (amount) displayPriceMovement(amount, old_price, proposal.display_value,`${position}_amount_classname`);
@@ -370,6 +373,28 @@ const Price = (() => {
                     types = {
                         DIGITOVER : 1,
                         DIGITUNDER: 1,
+                    };
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        if (Contract.form() === 'lookback') {
+            switch (sessionStorage.getItem('formname')) {
+                case 'lookbackhigh':
+                    types = {
+                        LBFLOATPUT: 1,
+                    };
+                    break;
+                case 'lookbacklow':
+                    types = {
+                        LBFLOATCALL: 1,
+                    };
+                    break;
+                case 'lookbackhighlow':
+                    types = {
+                        LBHIGHLOW: 1,
                     };
                     break;
                 default:

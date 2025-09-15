@@ -30,7 +30,6 @@ const TradePage               = require('../pages/trade/tradepage');
 // const FinancialAssessment     = require('../pages/user/account/settings/financial_assessment');
 // const IPHistory               = require('../pages/user/account/settings/iphistory/iphistory');
 // const Limits                  = require('../pages/user/account/settings/limits/limits');
-// const SelfExclusion           = require('../pages/user/account/settings/self_exclusion');
 // const TwoFactorAuthentication = require('../pages/user/account/settings/two_factor_authentication');
 // const PersonalDetails         = require('../pages/user/account/settings/personal_details');
 // const professionalClient      = require('../pages/user/account/settings/professional_client');
@@ -117,7 +116,6 @@ const pages_config = {
     // regulation               : { module: Regulation },
     // reset_passwordws         : { module: ResetPassword,              not_authenticated: true },
     // securityws               : { module: Settings,                   is_authenticated: true },
-    // self_exclusionws         : { module: SelfExclusion,              is_authenticated: true, only_real: true },
     // settingsws               : { module: Settings,                   is_authenticated: true },
     // statementws              : { module: Statement,                  is_authenticated: true, needs_currency: true },
     // tnc_approvalws           : { module: TNCApproval,                is_authenticated: true, only_real: true },
