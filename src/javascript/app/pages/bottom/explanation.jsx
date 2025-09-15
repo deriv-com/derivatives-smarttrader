@@ -27,9 +27,6 @@ export const Explanation = ({ explanation_only = false }) => {
                 contract_explanation_data.explain[actual_form_name]
             ) {
                 setFormName(actual_form_name);
-            } else {
-                // eslint-disable-next-line no-console
-                console.warn('Contract explanation data not available for:', actual_form_name);
             }
             // [/AI]
         }, 500);

@@ -11,7 +11,7 @@ const removeCookies      = require('../../_common/storage').removeCookies;
 const urlFor             = require('../../_common/url').urlFor;
 const applyToAllElements = require('../../_common/utility').applyToAllElements;
 const getPropertyValue   = require('../../_common/utility').getPropertyValue;
-const isEmptyObject      = require('../../_common/utility').isEmptyObject;
+
 const licenseID          = require('../../_common/utility').lc_licenseID;
 const clientID           = require('../../_common/utility').lc_clientID;
 
@@ -30,14 +30,6 @@ const Client = (() => {
 
         // const primary_bg_color_dark = 'primary-bg-color-dark';
         // const secondary_bg_color    = 'secondary-bg-color';
-
-        // eslint-disable-next-line no-console
-        console.log('👤 Client visibility check:', {
-            isLoggedIn       : ClientBase.isLoggedIn(),
-            loginid          : ClientBase.get('loginid'),
-            hasToken         : !!ClientBase.get('token'),
-            hasAccountsObject: !isEmptyObject(ClientBase.getAllAccountsObject()),
-        });
         
         if (ClientBase.isLoggedIn()) {
             // eslint-disable-next-line no-console
@@ -110,9 +102,6 @@ const Client = (() => {
                 }
             });
         } else {
-            // eslint-disable-next-line no-console
-            console.log('👤 Client is NOT logged in, showing logged out UI...');
-            
             // applyToAllElements('.client_logged_in', (el) => {
             //     el.setVisibility(0);
             // }, '', el_section);

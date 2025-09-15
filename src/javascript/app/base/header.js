@@ -108,17 +108,90 @@ const Header = (() => {
         };
     }
 
+    // Define topbar detection function before onLoad
+    const waitForTopbarElements = () => {
+        const targetSelectors = ['topbar-help-centre', 'topbar-whatsapp', 'topbar-fullscreen'];
+        const attachedListeners = new Set();
+        
+        const checkAndBindElements = () => {
+            targetSelectors.forEach(selector => {
+                if (!attachedListeners.has(selector)) {
+                    const element = getElementById(selector);
+                    if (element) {
+                        switch (selector) {
+                            case 'topbar-help-centre':
+                                element.addEventListener('click', () => {
+                                    window.location = `https://www.deriv.${getTopLevelDomain()}/help-centre/`;
+                                });
+                                break;
+                            case 'topbar-whatsapp':
+                                element.addEventListener('click', () => {
+                                    window.open('https://wa.me/35699578341', '_blank');
+                                });
+                                break;
+                            case 'topbar-fullscreen':
+                                element.addEventListener('click', () => {
+                                    toggleFullscreen();
+                                });
+                                break;
+                            default:
+                                break;
+                        }
+                        attachedListeners.add(selector);
+                    }
+                }
+            });
+            
+            // If all elements are found, stop observing
+            if (attachedListeners.size === targetSelectors.length) {
+                if (observer) observer.disconnect();
+                return true;
+            }
+            return false;
+        };
+        
+        // Try immediately first
+        if (checkAndBindElements()) return;
+        
+        // Set up MutationObserver to watch for DOM changes
+        const observer = new MutationObserver(() => {
+            checkAndBindElements();
+        });
+        
+        // Start observing the document body for child additions
+        observer.observe(document.body, {
+            childList: true,
+            subtree  : true,
+        });
+        
+        // Also set up a fallback timeout check every 100ms for 5 seconds
+        let attempts = 0;
+        const maxAttempts = 50; // 5 seconds
+        const intervalCheck = setInterval(() => {
+            attempts++;
+            if (checkAndBindElements() || attempts >= maxAttempts) {
+                clearInterval(intervalCheck);
+            }
+        }, 100);
+    };
+
     const onLoad = async () => {
-        bindSvg();
-        updateLoginButtonsDisplay();
-    
-        await BinarySocket.wait('authorize', 'landing_company');
-    
-        await populateAccountsList();
-    
-        setHeaderUrls();
-        bindPlatform();
-        bindClick();
+        try {
+            bindSvg();
+            updateLoginButtonsDisplay();
+            
+            // Call topbar detection immediately - don't wait for WebSocket
+            waitForTopbarElements();
+            bindClick();
+            
+            await BinarySocket.wait('authorize', 'landing_company');
+            setHeaderUrls();
+            bindPlatform();
+
+        } catch (error) {
+            // eslint-disable-next-line no-console
+            console.error('Header.onLoad() error:', error);
+        }
     
         fullscreen_map.event.forEach((event) => {
             document.addEventListener(event, onFullScreen, false);
@@ -513,7 +586,9 @@ const Header = (() => {
     const bindClick = () => {
         updateLoginButtonsDisplay();
         const btn_login = getElementById('btn__login');
-        btn_login.addEventListener('click', loginOnClick);
+        if (btn_login) {
+            btn_login.addEventListener('click', loginOnClick);
+        }
 
         applyToAllElements('.logout', (el) => {
             el.addEventListener('click', logoutOnClick);
@@ -540,11 +615,17 @@ const Header = (() => {
             }
         };
 
-        hamburger_menu.addEventListener('click', () => showMobileMenu(true));
-        mobile_menu_close.addEventListener('click', () => showMobileMenu(false));
-        mobile_menu_livechat.addEventListener('click', async () => {
-            await Chat.open();
-        });
+        if (hamburger_menu) {
+            hamburger_menu.addEventListener('click', () => showMobileMenu(true));
+        }
+        if (mobile_menu_close) {
+            mobile_menu_close.addEventListener('click', () => showMobileMenu(false));
+        }
+        if (mobile_menu_livechat) {
+            mobile_menu_livechat.addEventListener('click', async () => {
+                await Chat.open();
+            });
+        }
 
         // Mobile Menu Livechat Icon
         mobile_menu__livechat_logo.src = Url.urlForStatic(
@@ -571,12 +652,9 @@ const Header = (() => {
             );
         mobile_platform_appstore_link.href = traders_hub_link;
 
-        // Log that wallet switcher functionality is disabled
+        // Note: wallet switcher functionality is disabled for single account mode
         if (Client.hasWalletsAccount()) {
-            // eslint-disable-next-line no-console
-            console.log(
-                'Wallet switcher UI removed - account switching functionality disabled'
-            );
+            // Wallet switcher UI removed - account switching functionality disabled
         }
 
         // Mobile reports menu
@@ -984,23 +1062,6 @@ const Header = (() => {
         );
         el_language_menu_close_btn.addEventListener('click', toggleLanguagePopup);
 
-        // Help center.
-        const topbar_help_center = getElementById('topbar-help-centre');
-        topbar_help_center.addEventListener(
-            'click',
-            () =>
-                (window.location = `https://www.deriv.${getTopLevelDomain()}/help-centre/`)
-        );
-
-        // WhatsApp.
-        const topbar_whatsapp = getElementById('topbar-whatsapp');
-        topbar_whatsapp.addEventListener('click', () =>
-            window.open('https://wa.me/35699578341', '_blank')
-        );
-
-        // Topbar fullscreen events.
-        const topbar_fullscreen = getElementById('topbar-fullscreen');
-        topbar_fullscreen.addEventListener('click', toggleFullscreen);
     };
 
     const toggleLanguagePopup = () => {

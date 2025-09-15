@@ -59,18 +59,13 @@ export const requestOauth2Logout = (onWSLogoutAndRedirect) => {
     }
 };
 
-export const requestSingleLogout = async (onWSLogoutAndRedirect) => {
+export const requestSingleLogout = async () =>
     // Simplified single logout - no TMB or OIDC checks
-    // eslint-disable-next-line no-console
-    console.log('requestSingleLogout: Skipping TMB/OIDC logout flows');
-    return Promise.resolve();
-};
+    Promise.resolve();
 
 export const requestSingleSignOn = async () => {
     // Simplified single sign-on - no TMB or OIDC authentication
     // Just mark SSO as finished to prevent blocking the application
-    // eslint-disable-next-line no-console
-    console.log('requestSingleSignOn: Skipping TMB/OIDC authentication flows, using token exchange instead');
     
     dataManager.setContract({ sso_finished: true });
     return Promise.resolve();

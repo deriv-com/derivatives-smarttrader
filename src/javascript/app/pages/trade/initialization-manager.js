@@ -94,12 +94,10 @@ const InitializationManager = (() => {
     /**
      * Force show the trading page (fallback mechanism)
      */
-    const forceShowPage = (reason = 'Fallback timeout') => {
+    const forceShowPage = () => {
         if (initializationState.forceShowCalled) return;
 
         initializationState.forceShowCalled = true;
-        // eslint-disable-next-line no-console
-        console.warn(`Force showing trading page: ${reason}`);
 
         // Clear fallback timer
         if (initializationState.fallbackTimer) {
@@ -191,9 +189,6 @@ const InitializationManager = (() => {
             forceShowCalled: false,
         };
 
-        // eslint-disable-next-line no-console
-        console.log('🚀 Starting robust trading page initialization');
-
         // Set fallback timer to ensure page always shows
         initializationState.fallbackTimer = setTimeout(() => {
             forceShowPage('Maximum initialization time exceeded');
@@ -231,12 +226,9 @@ const InitializationManager = (() => {
 
             // Step 4: Contracts will be loaded when user selects an underlying symbol
             // This is handled by processMarketUnderlying in the Process module
-            // eslint-disable-next-line no-console
-            console.log('Contracts will be loaded when user selects an underlying symbol');
 
             // Initialization completed successfully
-            // eslint-disable-next-line no-console
-            console.log('✅ Trading page initialization completed successfully');
+
             forceShowPage('Initialization completed');
         } catch (error) {
             // eslint-disable-next-line no-console

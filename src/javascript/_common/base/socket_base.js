@@ -253,18 +253,8 @@ const BinarySocketBase = (() => {
                 window._reloadIntercepted = true;
             }
             
-            // eslint-disable-next-line no-console
-            console.log('🚀 Socket onopen triggered, current URL:', window.location.href);
-            
             // Clear the token exchange flag for testing (temporary)
-            // eslint-disable-next-line no-console
-            console.log('🧹 Clearing token exchange flag for testing...');
             window._tokenExchangeCompleted = false;
-            
-            // Debug: Check current URL for token parameter BEFORE calling handler
-            const urlParams = new URLSearchParams(window.location.search);
-            const hasToken = urlParams.has('token');
-            const tokenValue = urlParams.get('token');
             
             // Clean up any existing temp accounts from localStorage
             const accounts = JSON.parse(localStorage.getItem('client.accounts') || '{}');
@@ -282,32 +272,8 @@ const BinarySocketBase = (() => {
                 }
             }
             
-            // eslint-disable-next-line no-console
-            console.log('🔍 Pre-exchange token check:', {
-                hasToken,
-                tokenLength     : tokenValue ? tokenValue.length : 0,
-                tokenPreview    : tokenValue ? `${tokenValue.substring(0, 10)}...` : null,
-                alreadyCompleted: !!window._tokenExchangeCompleted,
-            });
-            
             // Handle token exchange flow if token parameter exists in URL
             const tokenExchanged = await handleTokenExchangeIfNeeded();
-            
-            // eslint-disable-next-line no-console
-            console.log('🔄 Token exchange result:', tokenExchanged);
-            
-            // Debug logging
-            // eslint-disable-next-line no-console
-            console.log('Socket onopen: tokenExchanged =', tokenExchanged, 'isUsingSessionToken =', ClientBase.isUsingSessionToken(), 'isLoggedIn =', ClientBase.isLoggedIn());
-            
-            // Check localStorage state
-            // eslint-disable-next-line no-console
-            console.log('Current localStorage state:', {
-                hasSessionToken: !!localStorage.getItem('session_token'),
-                sessionToken   : `${localStorage.getItem('session_token')?.substring(0, 10)  }...`,
-                activeLoginId  : localStorage.getItem('active_loginid'),
-                clientAccounts : Object.keys(JSON.parse(localStorage.getItem('client.accounts') || '{}')),
-            });
             
             // Check for session token authentication first
             if (ClientBase.isUsingSessionToken() || tokenExchanged) {
@@ -326,8 +292,6 @@ const BinarySocketBase = (() => {
                 console.log('Using regular authorization');
                 send({ authorize: ClientBase.getAuthToken() }, { forced: true });
             } else {
-                // eslint-disable-next-line no-console
-                console.log('No authorization needed, sending buffered requests');
                 sendBufferedRequests();
             }
 
@@ -355,21 +319,10 @@ const BinarySocketBase = (() => {
                 console.log('⚠️  Token exchange already completed in this session, skipping');
                 return false;
             }
-            // eslint-disable-next-line no-console
-            console.log('🟢 No previous token exchange found, proceeding...');
             
             // Check URL for one-time token
             const urlParams = new URLSearchParams(window.location.search);
             const oneTimeToken = urlParams.get('token');
-
-            // eslint-disable-next-line no-console
-            console.log('🎯 handleTokenExchangeIfNeeded called:', {
-                hasOneTimeToken : !!oneTimeToken,
-                tokenLength     : oneTimeToken ? oneTimeToken.length : 0,
-                tokenPreview    : oneTimeToken ? `${oneTimeToken.substring(0, 10)}...` : null,
-                alreadyCompleted: !!window._tokenExchangeCompleted,
-                currentUrl      : window.location.href,
-            });
 
             if (oneTimeToken) {
                 // eslint-disable-next-line no-console
@@ -416,9 +369,6 @@ const BinarySocketBase = (() => {
                     console.error('❌ Error exchanging token:', error);
                     return false;
                 }
-            } else {
-                // eslint-disable-next-line no-console
-                console.log('📭 No token found in URL, skipping token exchange');
             }
             
             return false; // No token found or exchange failed

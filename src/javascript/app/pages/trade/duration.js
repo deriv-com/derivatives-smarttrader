@@ -169,8 +169,7 @@ const Durations = (() => {
                 amount: 1,
                 unit  : 't', // default to ticks
             };
-            // eslint-disable-next-line no-console
-            console.warn('Duration list is empty or invalid, using fallback values');
+            
         }
 
         has_end_date = 0;

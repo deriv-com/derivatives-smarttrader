@@ -51,13 +51,6 @@ const Process = (() => {
         // If response is provided (from InitializationManager), use it directly
         // Otherwise, make the API call (fallback for direct calls)
         const processResponse = (apiResponse) => {
-            // eslint-disable-next-line no-console
-            console.log('processResponse called with:', {
-                hasResponse     : !!apiResponse,
-                hasActiveSymbols: !!(apiResponse && apiResponse.active_symbols),
-                symbolsLength   : apiResponse && apiResponse.active_symbols ? apiResponse.active_symbols.length : 0,
-                error           : apiResponse && apiResponse.error ? apiResponse.error : null,
-            });
 
             // Check for API errors first
             if (apiResponse && apiResponse.error) {
@@ -72,8 +65,6 @@ const Process = (() => {
 
             // Removed country/EU restrictions - allow all accounts to access SmartTrader
             if (apiResponse && apiResponse.active_symbols && apiResponse.active_symbols.length) {
-                // eslint-disable-next-line no-console
-                console.log('Processing', apiResponse.active_symbols.length, 'active symbols');
                 
                 // populate the Symbols object
                 Symbols.details(apiResponse);
@@ -87,8 +78,7 @@ const Process = (() => {
                 processMarket();
             } else {
                 // Show generic error if no active symbols are available
-                // eslint-disable-next-line no-console
-                console.warn('No active symbols found in response:', apiResponse);
+
                 NotAvailable.init({
                     title: localize('No trading symbols available'),
                     body : localize('There are currently no trading symbols available. Please try again later.'),

@@ -39,15 +39,6 @@ const getAppId = () => {
     const config_app_id = window.localStorage.getItem('config.app_id');
     const is_new_app    = /\/app\//.test(window.location.pathname);
     
-    // Debug logging
-    // eslint-disable-next-line no-console
-    console.log('getAppId debug:', {
-        hostname: window.location.hostname,
-        config_app_id,
-        user_app_id,
-        is_new_app,
-    });
-    
     if (config_app_id) {
         // eslint-disable-next-line no-console
         console.log('Using config_app_id:', config_app_id);
@@ -85,8 +76,7 @@ const getAppId = () => {
     }
     
     // Final debug logging
-    // eslint-disable-next-line no-console
-    console.log('getAppId final result:', app_id);
+
     return app_id;
 };
 

@@ -21,11 +21,7 @@ const DevShortcuts = (() => {
         
         document.addEventListener('keydown', handleKeyDown);
         isInitialized = true;
-        
-        // eslint-disable-next-line no-console
-        console.log('Development shortcuts enabled:');
-        // eslint-disable-next-line no-console
-        console.log('  Cmd/Ctrl + Shift + D: Switch to QA server (qa197.deriv.dev)');
+
     };
 
     /**
