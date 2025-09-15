@@ -4,7 +4,7 @@ const Highchart                = require('../../trade/charts/highchart');
 const Callputspread            = require('../../trade/callputspread');
 const Defaults                 = require('../../trade/defaults');
 const DigitDisplay             = require('../../trade/digit_trade');
-const Lookback                 = require('../../trade/lookback');
+// Removed lookback import as lookback functionality has been removed
 const Reset                    = require('../../trade/reset');
 const TickDisplay              = require('../../trade/tick_trade');
 const Clock                    = require('../../../base/clock');
@@ -114,9 +114,7 @@ const ViewPopup = (() => {
             EXPIRYMISS  : localize('Ends Outside'),
             EXPIRYRANGE : localize('Ends Between'),
             EXPIRYRANGEE: localize('Ends Between'),
-            LBFLOATCALL : localize('Close-Low'),
-            LBFLOATPUT  : localize('High-Close'),
-            LBHIGHLOW   : localize('High-Low'),
+            // Removed lookback contract type display mappings
             RANGE       : localize('Stays Between'),
             RESETCALL   : localize('Reset Call'),
             RESETPUT    : localize('Reset Put'),
@@ -144,18 +142,11 @@ const ViewPopup = (() => {
         containerSetText('trade_details_contract_type', ContractTypeDisplay()[contract.contract_type]);
         containerSetText('trade_details_purchase_price', formatMoney(contract.currency, contract.buy_price));
         containerSetText('trade_details_multiplier', formatMoney(contract.currency, multiplier, false, 3, 2));
-        if (Lookback.isLookback(contract.contract_type)) {
-            containerSetText('trade_details_payout', Lookback.getFormula(contract.contract_type, formatMoney(contract.currency, multiplier, false, 3, 2)));
-            dataManager.setPurchase({
-                cd_payout: Lookback.getFormula(contract.contract_type,
-                    formatMoney(contract.currency, multiplier, false, 3, 2)),
-            });
-        } else {
-            containerSetText('trade_details_payout', formatMoney(contract.currency, contract.payout));
-            dataManager.setPurchase({
-                cd_payout: formatMoney(contract.currency, contract.payout),
-            });
-        }
+        // Removed lookback-specific payout logic
+        containerSetText('trade_details_payout', formatMoney(contract.currency, contract.payout));
+        dataManager.setPurchase({
+            cd_payout: formatMoney(contract.currency, contract.payout),
+        });
         Clock.setExternalTimer(updateTimers);
         update();
         ViewPopupUI.repositionConfirmation();
@@ -164,10 +155,7 @@ const ViewPopup = (() => {
             cd_contract_type : ContractTypeDisplay()[contract.contract_type],
             cd_purchase_price: formatMoney(contract.currency, contract.buy_price),
             cd_multiplier    : formatMoney(contract.currency, multiplier, false, 3, 2),
-            cd_payout        : Lookback.isLookback(contract.contract_type) ?
-                Lookback.getFormula(contract.contract_type,
-                    formatMoney(contract.currency, multiplier, false, 3, 2))
-                :  formatMoney(contract.currency, contract.payout),
+            cd_payout        : formatMoney(contract.currency, contract.payout),
 
         });
     };
@@ -480,21 +468,13 @@ const ViewPopup = (() => {
                 cd_end_date : epochToDateTime(contract.sell_time),
             });
         }
-        if (Lookback.isLookback(contract.contract_type)) {
-            containerSetText('trade_details_spot_label', localize('Close'));
-            containerSetText('trade_details_spottime_label', localize('Close time'));
-            dataManager.setPurchase({
-                cd_spot_label     : localize('Close'),
-                cd_spot_time_label: localize('Close time'),
-            });
-        } else {
-            containerSetText('trade_details_spot_label', localize('Exit spot'));
-            containerSetText('trade_details_spottime_label', localize('Exit spot time'));
-            dataManager.setPurchase({
-                cd_spot_label     : localize('Exit spot'),
-                cd_spot_time_label: localize('Exit spot time'),
-            });
-        }
+        // Removed lookback-specific spot label logic
+        containerSetText('trade_details_spot_label', localize('Exit spot'));
+        containerSetText('trade_details_spottime_label', localize('Exit spot time'));
+        dataManager.setPurchase({
+            cd_spot_label     : localize('Exit spot'),
+            cd_spot_time_label: localize('Exit spot time'),
+        });
 
         // show validation error if contract is not settled yet
         if (!(contract.is_settleable && !contract.is_sold)) {
@@ -505,7 +485,7 @@ const ViewPopup = (() => {
         sellSetVisibility(false);
         // don't show for contracts that are manually sold before starting
         // Hide audit table for Lookback
-        if (contract.audit_details && !Lookback.isLookback(contract.contract_type) &&
+        if (contract.audit_details &&
             (!contract.exit_tick_time || contract.exit_tick_time > contract.date_start)) {
             initAuditTable(0);
         }
@@ -781,11 +761,9 @@ const ViewPopup = (() => {
 
         $container.prepend($('<div/>', { id: 'sell_bet_desc', class: 'popup_bet_desc drag-handle', text: longcode }));
         const $sections  = $('<div/>').append($('<div class="gr-row container"><div id="sell_details_chart_wrapper" class="gr-8 gr-12-p gr-12-m"></div><div id="sell_details_table" class="gr-4 gr-12-p gr-12-m"></div></div>'));
-        let [barrier_text, low_barrier_text] = localize(['Barrier', 'Low barrier']);
-        if (Lookback.isLookback(contract.contract_type)) {
-            [barrier_text, low_barrier_text] =
-                Lookback.getBarrierLabel(contract.contract_type, contract.barrier_count);
-        } else if (contract.barrier_count > 1) {
+        let barrier_text = localize('Barrier');
+        const low_barrier_text = localize('Low barrier');
+        if (contract.barrier_count > 1) {
             barrier_text = localize('High barrier');
         } else if (/^DIGIT(MATCH|DIFF)$/.test(contract.contract_type)) {
             barrier_text = localize('Target');
@@ -793,7 +771,7 @@ const ViewPopup = (() => {
             barrier_text = localize('Selected tick');
         }
 
-        const should_show_entry_spot = !Lookback.isLookback(contract.contract_type) && !/digit/i.test(contract.contract_type);
+        const should_show_entry_spot = !/digit/i.test(contract.contract_type);
         const should_show_barrier = !/runhigh|runlow/i.test(contract.contract_type);
         $sections.find('#sell_details_table').append($(
             `<table>
@@ -808,7 +786,7 @@ const ViewPopup = (() => {
             ${Reset.isReset(contract.contract_type) ? createRow(localize('Reset barrier'), '', 'trade_details_reset_barrier', true) : ''}
             ${(contract.barrier_count > 1 ? createRow(low_barrier_text, '', 'trade_details_barrier_low', true) : '')}
             ${createRow(Callputspread.isCallputspread(contract.contract_type) ? localize('Maximum payout') : localize('Potential payout'), '', 'trade_details_payout')}
-            ${multiplier && Lookback.isLookback(contract.contract_type) ? createRow(localize('Multiplier'), '', 'trade_details_multiplier') : ''}
+            // Removed lookback-specific multiplier row
             ${createRow(localize('Purchase price'), '', 'trade_details_purchase_price')}
             </tbody>
             <th colspan="2" id="barrier_change" class="invisible">${localize('Barrier change')}</th>

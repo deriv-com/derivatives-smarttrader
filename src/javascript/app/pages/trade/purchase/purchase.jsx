@@ -48,11 +48,8 @@ const Purchase = () => {
     }, [has_purchase_change]);
 
     useEffect(() => {
-        const form_name = Defaults.get(PARAM_NAMES.FORM_NAME);
-
-        const lookbacks = ['lookbacklow', 'lookbackhigh', 'lookbackhighlow'];
-
-        setIsLookBack(lookbacks.includes(form_name));
+        // Removed lookback detection as lookback functionality has been removed
+        setIsLookBack(false);
       
     }, [has_contract_change]);
 
