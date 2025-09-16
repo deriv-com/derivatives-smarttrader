@@ -7,8 +7,7 @@ const BinarySocket = require('./socket');
 const AuthClient = require('../../_common/auth');
 const TMB = require('../../_common/tmb');
 const showHidePulser = require('../common/account_opening').showHidePulser;
-const updateTotal = require('../pages/user/update_total');
-const GTM = require('../../_common/base/gtm');
+
 const Login = require('../../_common/base/login');
 const SocketCache = require('../../_common/base/socket_cache');
 // const elementInnerHtml         = require('../../_common/common_functions').elementInnerHtml;
@@ -18,13 +17,12 @@ const Url = require('../../_common/url');
 const applyToAllElements = require('../../_common/utility').applyToAllElements;
 const Language = require('../../_common/language');
 const createElement = require('../../_common/utility').createElement;
-const findParent = require('../../_common/utility').findParent;
+
 const getTopLevelDomain = require('../../_common/utility').getTopLevelDomain;
 const getPlatformSettings =
-  require('../../../templates/_common/brand.config').getPlatformSettings;
+      require('../../../templates/_common/brand.config').getPlatformSettings;
 
-const mapCurrencyName =
-  require('../../_common/base/currency_base').mapCurrencyName;
+const formatMoney = require('../common/currency').formatMoney;
 
 const isEuCountry = require('../common/country_base').isEuCountry;
 const DerivLiveChat = require('../pages/livechat.jsx');
@@ -175,6 +173,49 @@ const Header = (() => {
         }, 100);
     };
 
+    // Modern account info setup for single-account mode (matching bot project)
+    const setupSingleAccountHeader = () => {
+        if (!Client.isLoggedIn()) return;
+        
+        BinarySocket.wait('authorize', 'balance').then(() => {
+            const currency = Client.get('currency');
+            const loginid = Client.get('loginid');
+            const balance = Client.get('balance') || 0;
+            const isVirtual = Client.get('is_virtual');
+            
+            if (currency && loginid) {
+                // Set account icon
+                const getIcon = () => {
+                    if (!isVirtual) return currency ? currency.toLowerCase() : 'unknown';
+                    return 'virtual';
+                };
+                
+                const icon = Url.urlForStatic(
+                    `${header_icon_base_path}ic-currency-${getIcon()}.svg?${process.env.BUILD_HASH}`
+                );
+                
+                // Set account icon
+                const iconElement = getElementById('header__acc-icon');
+                if (iconElement) {
+                    iconElement.src = icon;
+                }
+                
+                // Set account type (Real/Demo)
+                const accountTypeElement = getElementById('header__acc-type');
+                if (accountTypeElement) {
+                    accountTypeElement.textContent = isVirtual ? 'Demo' : 'Real';
+                }
+                
+                // Set balance if not already set by updateBalance
+                const balanceElement = getElementById('header__acc-balance');
+                if (balanceElement && (!balanceElement.innerHTML || balanceElement.innerHTML.trim() === '')) {
+                    const display_balance = formatMoney(currency, balance);
+                    balanceElement.innerHTML = display_balance;
+                }
+            }
+        });
+    };
+
     const onLoad = async () => {
         try {
             bindSvg();
@@ -186,6 +227,9 @@ const Header = (() => {
             // Call topbar detection immediately - don't wait for WebSocket
             waitForTopbarElements();
             bindClick();
+            
+            // Set up header account info for single-account mode immediately
+            setupSingleAccountHeader();
             
             await BinarySocket.wait('authorize', 'landing_company');
             bindPlatform();
@@ -1169,405 +1213,6 @@ const Header = (() => {
         await AuthClient.requestOauth2Logout(Client.sendLogoutRequest);
     };
 
-    const bindHeaders = () => {
-        const high_risk_accounts_accordion_header =
-      getElementById('high_risk_accounts');
-        const low_risk_non_eu_accordion_header = getElementById(
-            'low_risk_accounts_non_eu'
-        );
-        const low_risk_eu_accordion_header = getElementById('low_risk_accounts_eu');
-        const low_risk_eu_container = getElementById(
-            'account__switcher-accordion-eu'
-        );
-        const is_mf_account = Client.get('loginid').startsWith('MF');
-        const all_login_ids = Client.getAllLoginids();
-        const has_mf_account = all_login_ids.some((loginid) =>
-            loginid.startsWith('MF')
-        );
-
-        if (Client.isHighRisk() && is_mf_account) {
-            high_risk_accounts_accordion_header.style.display = 'none';
-            low_risk_eu_accordion_header.style.display = 'flex';
-            low_risk_eu_container.style.display = 'block';
-            $('<div class="account__switcher-seperator" />').insertBefore(
-                '#account__switcher-accordion-eu'
-            );
-        } else if (Client.isHighRisk() || isEuCountry()) {
-            high_risk_accounts_accordion_header.style.display = 'flex';
-            low_risk_non_eu_accordion_header.style.display = 'none';
-            low_risk_eu_accordion_header.style.display = 'none';
-            low_risk_eu_container.style.display = 'none';
-        } else if (Client.isLowRisk() && !has_mf_account) {
-            low_risk_non_eu_accordion_header.style.display = 'none';
-            high_risk_accounts_accordion_header.style.display = 'flex';
-            low_risk_eu_container.style.display = 'none';
-        } else if (Client.isLowRisk()) {
-            high_risk_accounts_accordion_header.style.display = 'none';
-            low_risk_non_eu_accordion_header.style.display = 'flex';
-            low_risk_eu_accordion_header.style.display = 'flex';
-            $('<div class="account__switcher-seperator" />').insertBefore(
-                '#account__switcher-accordion-eu'
-            );
-        }
-    };
-
-    const populateAccountsList = () => {
-        if (!Client.isLoggedIn() || Client.hasWalletsAccount()) {
-            return Promise.resolve();
-        }
-        return BinarySocket.wait(
-            'authorize',
-            'website_status',
-            'balance',
-            'landing_company',
-            'get_account_status'
-        ).then(() => {
-            bindHeaders();
-            
-            const non_eu_real_accounts = [];
-            const eu_real_accounts = [];
-            const demo_accounts = [];
-            
-            const loginid_non_eu_real_select = createElement('div');
-            const loginid_eu_real_select = createElement('div');
-            const loginid_demo_select = createElement('div');
-            
-            Client.getAllLoginids().forEach((loginid) => {
-                if (
-                    !Client.get('is_disabled', loginid) &&
-          Client.get('token', loginid)
-                ) {
-                    const is_mf_account = loginid.startsWith('MF');
-                    const is_non_eu = loginid.startsWith('CR');
-                    const is_real = /undefined|gaming|financial/.test(
-                        Client.getAccountType(loginid)
-                    ); // this function only returns virtual/gaming/financial types
-                    const currency = Client.get('currency', loginid);
-                    const balance = Client.get('balance', loginid) || 0;
-                    let currencyName = mapCurrencyName(currency);
-
-                    const getIcon = () => {
-                        if (is_real) return currency ? currency.toLowerCase() : 'unknown';
-                        return 'virtual';
-                    };
-                    const icon = Url.urlForStatic(
-                        `${header_icon_base_path}ic-currency-${getIcon()}.svg?${
-                            process.env.BUILD_HASH
-                        }`
-                    );
-                    const current_active_login = Client.get('loginid');
-                    const is_current = loginid === current_active_login;
-
-                    if (is_current) {
-                        // default account
-                        // applyToAllElements('.account-type', (el) => { elementInnerHtml(el, localized_type); });
-                        // applyToAllElements('.account-id', (el) => { elementInnerHtml(el, loginid); });
-                        applyToAllElements('#header__acc-icon', (el) => {
-                            el.src = icon;
-                        });
-                    }
-                    if (current_active_login.startsWith('MF') && currency === 'EUR') {
-                        currencyName = localize('Multipliers');
-                    }
-
-                    const accountData = {
-                        loginid,
-                        is_mf_account,
-                        is_non_eu,
-                        is_real,
-                        currency,
-                        currencyName,
-                        icon,
-                        is_current,
-                        balance: parseFloat(balance) || 0,
-                    };
-
-                    if (is_non_eu) {
-                        non_eu_real_accounts.push(accountData);
-                    } else if (is_mf_account && !isEuCountry()) {
-                        eu_real_accounts.push(accountData);
-                    } else if (is_mf_account && isEuCountry()) {
-                        non_eu_real_accounts.push(accountData);
-                    } else {
-                        demo_accounts.push(accountData);
-                    }
-                }
-            });
-
-            non_eu_real_accounts.sort((a, b) => {
-                const balanceA = Number(a.balance) || 0;
-                const balanceB = Number(b.balance) || 0;
-                return balanceB - balanceA;
-            });
-            eu_real_accounts.sort((a, b) => {
-                const balanceA = Number(a.balance) || 0;
-                const balanceB = Number(b.balance) || 0;
-                return balanceB - balanceA;
-            });
-
-            const createAccountElement = (accountData) => {
-                const { loginid, currency, currencyName, icon, is_current, is_real } =
-          accountData;
-
-                const account = createElement('div', {
-                    class: `account__switcher-acc ${
-                        is_current ? 'account__switcher-acc--active' : ''
-                    }`,
-                    'data-value': loginid,
-                });
-                const account_icon = createElement('img', { src: icon });
-                const account_detail = createElement('span', {
-                    text: is_real ? currencyName || localize('Real') : localize('Demo'),
-                });
-                const account_loginid = createElement('div', {
-                    class: 'account__switcher-loginid',
-                    text : loginid,
-                });
-                const account_balance = createElement('span', {
-                    class: `account__switcher-balance account__switcher-balance-${loginid}`,
-                });
-
-                if (!currency) {
-                    $('#header__acc-balance').html(
-                        createElement('p', { text: localize('No currency assigned') })
-                    );
-                    account_balance.html(
-                        createElement('span', {
-                            text : localize('No currency selected'),
-                            class: 'no-currency',
-                        })
-                    );
-                    $('.account__switcher-select_currencies').css('display', 'block');
-                }
-
-                account_detail.appendChild(account_loginid);
-                account.appendChild(account_icon);
-                account.appendChild(account_detail);
-                account.appendChild(account_balance);
-
-                return account;
-            };
-
-            non_eu_real_accounts.forEach((accountData) => {
-                loginid_non_eu_real_select.appendChild(
-                    createAccountElement(accountData)
-                );
-            });
-
-            eu_real_accounts.forEach((accountData) => {
-                loginid_eu_real_select.appendChild(createAccountElement(accountData));
-            });
-
-            demo_accounts.forEach((accountData) => {
-                loginid_demo_select.appendChild(createAccountElement(accountData));
-            });
-
-            applyToAllElements('#account__switcher-non-eu-list', (el) => {
-                // Clear existing accounts to prevent duplicates
-                el.innerHTML = '';
-                el.insertBefore(loginid_non_eu_real_select, el.firstChild);
-                applyToAllElements(
-                    'div.account__switcher-acc',
-                    (ele) => {
-                        ele.removeEventListener('click', loginIDOnClick);
-                        ele.addEventListener('click', loginIDOnClick);
-                    },
-                    '',
-                    el
-                );
-                bindAccordion('#account__switcher-accordion-non-eu');
-            });
-            applyToAllElements('#account__switcher-eu-list', (el) => {
-                // Clear existing accounts to prevent duplicates
-                el.innerHTML = '';
-                el.insertBefore(loginid_eu_real_select, el.firstChild);
-                applyToAllElements(
-                    'div.account__switcher-acc',
-                    (ele) => {
-                        ele.removeEventListener('click', loginIDOnClick);
-                        ele.addEventListener('click', loginIDOnClick);
-                    },
-                    '',
-                    el
-                );
-                bindAccordion('#account__switcher-accordion-eu');
-            });
-            applyToAllElements('#account__switcher-demo-list', (el) => {
-                // Clear existing accounts to prevent duplicates
-                el.innerHTML = '';
-                el.insertBefore(loginid_demo_select, el.firstChild);
-                applyToAllElements(
-                    'div.account__switcher-acc',
-                    (ele) => {
-                        ele.removeEventListener('click', loginIDOnClick);
-                        ele.addEventListener('click', loginIDOnClick);
-                    },
-                    '',
-                    el
-                );
-                bindAccordion('#account__switcher-accordion-demo');
-            });
-            
-            bindTabs();
-        });
-    };
-
-    const bindTabs = () => {
-        try {
-            const all_login_ids = Client.getAllLoginids();
-            const real_accounts = all_login_ids.filter(
-                (loginid) => !/^VRT/.test(loginid)
-            );
-            const has_real_account = real_accounts.length > 0;
-            const has_mf_account = all_login_ids.some((loginid) =>
-                loginid.startsWith('MF')
-            );
-            const has_non_eu_account = all_login_ids.some((loginid) =>
-                loginid.startsWith('CR')
-            );
-            const has_multiple_CR_accounts =
-        all_login_ids.filter((loginid) => loginid.startsWith('CR')).length > 1;
-            const current_active_login = Client.get('loginid');
-            const manage_acc_btn = document.getElementById(
-                'account__switcher-manage'
-            );
-            const new_account_adder_deriv = document.getElementById(
-                'account__switcher-new-account-deriv'
-            );
-            const new_account_adder_eu = document.getElementById(
-                'account__switcher-new-account-eu'
-            );
-            const traders_hub_link = document.getElementById('account__switcher-cfd');
-            const account_switcher_seperator =
-        document.getElementById('cfd-link-seperator');
-            const multiplier_text = localize('Multipliers');
-            const account_header = document.querySelectorAll(
-                '.header__accounts-multiple'
-            );
-            const is_callback_page = window.location.pathname.includes('callback');
-            let is_virtual;
-            if (current_active_login) {
-                is_virtual = current_active_login.startsWith('VRTC');
-            }
-            const showTradersHubLink = (show) => {
-                if (traders_hub_link.style) {
-                    traders_hub_link.style.display = show ? 'flex' : 'none';
-                }
-                if (account_switcher_seperator.style) {
-                    account_switcher_seperator.style.display = show ? 'block' : 'none';
-                }
-            };
-
-            account_header.forEach((header) => {
-                header.innerText += has_multiple_CR_accounts
-                    ? localize('accounts')
-                    : localize('account');
-            });
-
-            if (current_active_login.startsWith('MF')) {
-                $(
-                    `<span class="header__acc-display-text">${multiplier_text}</span>`
-                ).insertAfter('#header__acc-balance');
-            }
-        
-            if (has_real_account && !is_callback_page) showTradersHubLink(true);
-            if (is_virtual && !is_callback_page) showTradersHubLink(true);
-            if (is_virtual || !has_real_account) {
-                manage_acc_btn.style.visibility = 'hidden';
-            }
-            if (has_real_account && !is_virtual) {
-                manage_acc_btn.style.visibility = 'visible';
-            }
-            // Account adder logic
-            new_account_adder_deriv.style.display = 'flex';
-            new_account_adder_eu.style.display = 'flex';
-            if (has_real_account) {
-                if (has_mf_account && has_non_eu_account) {
-                    new_account_adder_deriv.style.display = 'none';
-                    new_account_adder_eu.style.display = 'none';
-                } else if (has_mf_account && !has_non_eu_account) {
-                    new_account_adder_eu.style.display = 'none';
-                } else if (!has_mf_account && has_non_eu_account) {
-                    new_account_adder_deriv.style.display = 'none';
-                }
-            }
-    
-            $('#acc_tabs').tabs({
-                active: is_virtual ? 1 : 0,
-                event : 'click',
-                activate(ui) {
-                    updateTotal();
-                    const defaultOpenedTab = is_virtual ? '#demo_tab' : '#real_tab';
-                    const currentTab = ui.currentTarget
-                        ? ui.currentTarget.hash
-                        : defaultOpenedTab;
-                    if (currentTab === '#demo_tab') {
-                        manage_acc_btn.style.visibility = 'hidden';
-                        showTradersHubLink(true);
-                    } else if (
-                        currentTab === '#real_tab' &&
-            has_real_account &&
-            !is_virtual
-                    ) {
-                        manage_acc_btn.style.visibility = 'visible';
-                    } else if (currentTab === '#real_tab' && !has_real_account) {
-                        showTradersHubLink(false);
-                    }
-                },
-            });
-        } catch (error) {
-            if (window.location.pathname.includes('/callback')) {
-                const account_param =
-          Url.param('account') || SessionStore.get('account');
-                window.location.replace(
-                    `${window.location.protocol}//${window.location.hostname}${
-                        account_param ? `?account=${account_param}` : ''
-                    }`
-                );
-            }
-        }
-    };
-
-    const bindAccordion = (selector) => {
-        $(selector).accordion({
-            heightStyle: 'content',
-            collapsible: true,
-            active     : 0,
-        });
-    };
-
-    const loginIDOnClick = (e) => {
-        e.preventDefault();
-        const el_loginid = findParent(e.target, 'div.account__switcher-acc');
-        const acc_switcher_active = el_loginid?.classList.contains('account__switcher-acc--active');
-
-        if (el_loginid && !acc_switcher_active) {
-            el_loginid.setAttribute('disabled', 'disabled');
-            switchLoginid(el_loginid.getAttribute('data-value'));
-        } else {
-            const account_switcher_dropdown = getElementById('account__switcher-dropdown');
-            if (account_switcher_dropdown) {
-                account_switcher_dropdown.classList.remove('account__switcher-dropdown--show');
-            }
-        }
-    };
-
-    const switchLoginid = (loginid) => {
-        if (!loginid || loginid.length === 0) return;
-        const token = Client.get('token', loginid);
-        if (!token || token.length === 0) {
-            Client.sendLogoutRequest(true);
-            return;
-        }
-
-        sessionStorage.setItem('active_tab', '1');
-        // set local storage
-        GTM.setLoginFlag('account_switch');
-        Client.set('loginid', loginid);
-        SocketCache.clear();
-        setTimeout(() => window.location.reload(), 0);
-    };
-
     const upgradeMessageVisibility = () => {
         BinarySocket.wait(
             'authorize',
@@ -1694,18 +1339,8 @@ const Header = (() => {
                     el.setVisibility(0);
                 });
             }
-            showHideNewAccount(upgrade_info);
-        });
-    };
 
-    const showHideNewAccount = (upgrade_info) => {
-        if (upgrade_info.can_upgrade || upgrade_info.can_open_multi) {
-            $('#account__switcher-add').addClass('account__switcher-add--active');
-            // changeAccountsText(1, localize('Create Account'));
-        } else {
-            $('#account__switcher-add').removeClass('account__switcher-add--active');
-            // changeAccountsText(0, localize('Accounts List'));
-        }
+        });
     };
 
     const displayNotification = ({
@@ -1796,127 +1431,9 @@ const Header = (() => {
         });
     };
 
-    let isPopulating = false;
-    
-    const resortAccountsByBalance = async () => {
-        const config = {
-            containerIds: [
-                'account__switcher-non-eu-list',
-                'account__switcher-eu-list',
-                'account__switcher-demo-list',
-            ],
-            accountSelector : '.account__switcher-acc',
-            balanceSelector : '.account__switcher-balance',
-            populateFunction: populateAccountsList,
-        };
-        
-        const checkAccountsExist = () => {
-            const hasAccountsInContainers = config.containerIds.some(
-                (containerId) => {
-                    const container = document.getElementById(containerId);
-                    if (container) {
-                        const accountElements = container.querySelectorAll(
-                            config.accountSelector
-                        );
-                        return accountElements.length > 0;
-                    }
-                    return false;
-                }
-            );
-            
-            if (hasAccountsInContainers) {
-                return true;
-            }
-            
-            const allAccountElements = document.querySelectorAll(
-                config.accountSelector
-            );
-            return allAccountElements.length > 0;
-        };
-        
-        if (isPopulating) {
-            return;
-        }
-        
-        if (!checkAccountsExist()) {
-            isPopulating = true;
-            
-            try {
-                await config.populateFunction();
-                await new Promise((resolve) => {
-                    setTimeout(resolve, 100);
-                });
-                
-                if (!checkAccountsExist()) {
-                    return;
-                }
-            } catch (error) {
-                return;
-            } finally {
-                isPopulating = false;
-            }
-        }
-        
-        const parseBalanceFromText = (balanceText) => {
-            if (!balanceText) return 0;
-            const numericString = balanceText.replace(/[^\d.-]/g, '');
-            const numericValue = parseFloat(numericString) || 0;
-            return numericValue;
-        };
-
-        const sortAccountContainer = (containerId) => {
-            const container = document.getElementById(containerId);
-            if (!container) {
-                return false;
-            }
-
-            const accountElements = Array.from(
-                container.querySelectorAll(config.accountSelector)
-            );
-            if (accountElements.length === 0) {
-                return false;
-            }
-
-            const accountsWithBalance = accountElements.map((element) => {
-                const loginid = element.getAttribute('data-value');
-                const balanceElement = element.querySelector(config.balanceSelector);
-                const balanceText = balanceElement
-                    ? balanceElement.textContent.trim()
-                    : '';
-                const numericBalance = parseBalanceFromText(balanceText);
-                
-                return {
-                    element,
-                    loginid,
-                    balanceText,
-                    numericBalance,
-                };
-            });
-
-            accountsWithBalance.sort((a, b) => b.numericBalance - a.numericBalance);
-
-            const firstAccount = accountsWithBalance[0];
-            if (!firstAccount) return false;
-            
-            const parentContainer = firstAccount.element.parentNode;
-
-            accountsWithBalance.forEach((accountData) => {
-                parentContainer.appendChild(accountData.element);
-            });
-
-            return true;
-        };
-
-        config.containerIds.forEach((containerId) => {
-            sortAccountContainer(containerId);
-        });
-    };
-
     return {
         onLoad,
         onUnload,
-        populateAccountsList,
-        resortAccountsByBalance,
         upgradeMessageVisibility,
         displayNotification,
         hideNotification,
