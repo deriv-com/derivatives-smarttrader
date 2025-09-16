@@ -77,22 +77,9 @@ const BinarySocketGeneral = (() => {
                     const isSessionTokenAuth = sessionToken && response.authorize;
                     const currentLoginId = Client.get('loginid');
                     
-                    // eslint-disable-next-line no-console
-                    console.log('Authorize response handling:', {
-                        hasSessionToken     : !!sessionToken,
-                        hasAuthorizeResponse: !!response.authorize,
-                        currentLoginId,
-                        isSessionTokenAuth,
-                    });
-                    
                     // Handle session token authentication (new user login via token exchange)
                     if (isSessionTokenAuth && !currentLoginId) {
-                        // eslint-disable-next-line no-console
-                        console.log('Using session token authorization path');
                         Client.responseAuthorizeSessionToken(response);
-                        
-                        // eslint-disable-next-line no-console
-                        console.log('💰 Sending balance request for session token auth...');
                         BinarySocket.send({ balance: 1, account: 'all', subscribe: 1 });
                         BinarySocket.send({ get_settings: 1 });
                         BinarySocket.send({ get_account_status: 1 });
@@ -113,12 +100,6 @@ const BinarySocketGeneral = (() => {
                         LocalStore.remove('signup_device');
                     } else if (response.authorize.loginid !== currentLoginId && !isSessionTokenAuth) {
                         // Don't logout during session token authentication - the loginid mismatch is expected
-                        // eslint-disable-next-line no-console
-                        console.log('⚠️ Authorize loginid mismatch, triggering logout:', {
-                            responseLoginId: response.authorize.loginid,
-                            currentLoginId,
-                            isSessionTokenAuth,
-                        });
                         Client.sendLogoutRequest(true);
                     } else {
                         Client.responseAuthorize(response);
@@ -144,8 +125,6 @@ const BinarySocketGeneral = (() => {
                 }
                 break;
             case 'balance':
-                // eslint-disable-next-line no-console
-                console.log('💰 Balance response received:', JSON.stringify(response, null, 2));
                 updateBalance(response);
                 break;
             case 'logout':

@@ -288,8 +288,6 @@ const BinarySocketBase = (() => {
                 }
             } else if (ClientBase.isLoggedIn() && !isLoginPages()) {
                 // Regular logged-in user authorization
-                // eslint-disable-next-line no-console
-                console.log('Using regular authorization');
                 send({ authorize: ClientBase.getAuthToken() }, { forced: true });
             } else {
                 sendBufferedRequests();

@@ -232,9 +232,6 @@ const ClientBase = (() => {
         const authorize = response.authorize;
         
         // Simplified single-account authentication
-        // eslint-disable-next-line no-console
-        console.log('responseAuthorize: Processing single-account authorization', authorize);
-        
         // Set current loginid first
         current_loginid = authorize.loginid;
         
@@ -285,14 +282,6 @@ const ClientBase = (() => {
         Cookies.set('client_information', JSON.stringify(client_information), {
             domain: currentDomain,
             path  : '/',
-        });
-        
-        // eslint-disable-next-line no-console
-        console.log('responseAuthorize: Single-account setup complete', {
-            loginid   : authorize.loginid,
-            currency  : authorize.currency,
-            is_virtual: !!authorize.is_virtual,
-            balance   : authorize.balance,
         });
     };
 
