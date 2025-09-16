@@ -313,8 +313,6 @@ const BinarySocketBase = (() => {
         const handleTokenExchangeIfNeeded = async () => {
             // Prevent multiple token exchanges in the same session
             if (window._tokenExchangeCompleted) {
-                // eslint-disable-next-line no-console
-                console.log('⚠️  Token exchange already completed in this session, skipping');
                 return false;
             }
             
@@ -323,8 +321,6 @@ const BinarySocketBase = (() => {
             const oneTimeToken = urlParams.get('token');
 
             if (oneTimeToken) {
-                // eslint-disable-next-line no-console
-                console.log('✅ One-time token found, proceeding with exchange...');
                 // Remove token from URL immediately for security
                 const url = new URL(window.location.href);
                 url.searchParams.delete('token');

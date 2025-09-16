@@ -124,8 +124,6 @@ const InitializationManager = (() => {
     const markStepCompleted = (stepId) => {
         initializationState.completedSteps.add(stepId);
         initializationState.failedSteps.delete(stepId); // Remove from failed if it was there
-        // eslint-disable-next-line no-console
-        console.log(`✅ Initialization step completed: ${stepId}`);
     };
 
     /**

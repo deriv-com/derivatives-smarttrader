@@ -11,18 +11,7 @@ const createElement         = require('../../../_common/utility').createElement;
 const localize              = require('../../../_common/localize').localize;
 
 const updateBalance = (response) => {
-    // eslint-disable-next-line no-console
-    console.log('💰 updateBalance called with:', {
-        hasResponse: !!response,
-        hasBalance : !!response?.balance,
-        hasError   : !!getPropertyValue(response, 'error'),
-        balance    : response?.balance,
-        error      : getPropertyValue(response, 'error'),
-    });
-    
     if (getPropertyValue(response, 'error')) {
-        // eslint-disable-next-line no-console
-        console.log('💰 updateBalance: Early return due to error');
         return;
     }
 
@@ -50,19 +39,7 @@ const updateBalance = (response) => {
     BinarySocket.wait('website_status').then(() => {
         const { accounts, balance, currency, loginid, total } = response.balance;
         
-        // eslint-disable-next-line no-console
-        console.log('💰 Balance data extracted:', {
-            accounts,
-            balance,
-            currency,
-            loginid,
-            total,
-            currentLoginId: Client.get('loginid'),
-        });
-        
         if (!currency) {
-            // eslint-disable-next-line no-console
-            console.log('💰 updateBalance: No currency, returning early');
             return;
         }
         const updateBalanceByAccountId = async (account_id, updated_balance, account_currency) => {
@@ -100,11 +77,6 @@ const updateBalance = (response) => {
                     const headerElement = document.getElementById('header__acc-balance');
                     if (headerElement) {
                         headerElement.innerHTML = display_balance;
-                        // eslint-disable-next-line no-console
-                        console.log('✅ Header balance updated successfully:', display_balance);
-                    } else {
-                        // eslint-disable-next-line no-console
-                        console.error('❌ Header balance element not found!');
                     }
                     
                     Client.set('balance', updated_balance);

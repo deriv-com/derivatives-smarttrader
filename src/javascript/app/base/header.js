@@ -180,12 +180,14 @@ const Header = (() => {
             bindSvg();
             updateLoginButtonsDisplay();
             
+            // Set navigation URLs immediately - don't wait for WebSocket
+            setHeaderUrls();
+            
             // Call topbar detection immediately - don't wait for WebSocket
             waitForTopbarElements();
             bindClick();
             
             await BinarySocket.wait('authorize', 'landing_company');
-            setHeaderUrls();
             bindPlatform();
 
         } catch (error) {
