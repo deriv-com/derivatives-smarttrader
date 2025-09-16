@@ -137,10 +137,10 @@ Reloading in 1.5 seconds...`,
             hostname === 'localhost' ||
             hostname === '127.0.0.1' ||
             hostname.includes('staging') ||
-            hostname.includes('test') ||
             hostname.includes('dev') ||
-            // Enable for any non-production domain for development purposes
-            !hostname.includes('smarttrader.deriv.com')
+            hostname.startsWith('127.') ||
+            hostname.startsWith('192.168.') ||
+            hostname.startsWith('10.')
         );
     };
 
