@@ -64,18 +64,12 @@ const getAppId = () => {
         app_id = user_app_id;
     } else if (/localhost/i.test(window.location.hostname)) {
         app_id = 23709;
-    } else if (/qa197\.deriv\.dev/i.test(window.location.hostname)) {
-        // eslint-disable-next-line no-console
-        console.log('Detected qa197.deriv.dev - setting app_id to 16929');
-        app_id = 16929; // QA server app_id
     } else {
         window.localStorage.removeItem('config.default_app_id');
         const current_domain = getCurrentBinaryDomain();
         // TODO: remove is_new_app && deriv.com check when repos are split
         app_id = (is_new_app && current_domain !== 'deriv.com') ? 22168 : (domain_app_ids[current_domain] || 22168);
     }
-    
-    // Final debug logging
 
     return app_id;
 };
