@@ -16,6 +16,6 @@ runs:
         CLOUDFLARE_API_TOKEN: ${{ inputs.CLOUDFLARE_API_TOKEN }}
       run: |-
         cd dist
-        npx -y wrangler pages deploy . --project-name=derivatives-smarttrader-pages --branch=staging
+        npx -y wrangler pages deploy . --project-name=derivatives-smarttrader --branch=staging
         echo "New staging website - http://staging.derivatives-smarttrader.pages.dev"
       shell: bash
