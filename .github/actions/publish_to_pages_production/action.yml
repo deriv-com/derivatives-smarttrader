@@ -1,4 +1,4 @@
-name: publish_to_pages_production
+name: Publish to Cloudflare Pages Production
 description: Publish to cloudflare pages (production)
 inputs:
   CLOUDFLARE_ACCOUNT_ID:
@@ -14,9 +14,8 @@ runs:
       env:
         CLOUDFLARE_ACCOUNT_ID: ${{ inputs.CLOUDFLARE_ACCOUNT_ID }}
         CLOUDFLARE_API_TOKEN: ${{ inputs.CLOUDFLARE_API_TOKEN }}
-      run: |
-        npm i wrangler@3.1.0
-        cd packages/core
-        npx wrangler pages deploy dist/ --project-name=derivatives-smarttrader --branch=production
+      run: |-
+        cd dist
+        npx -y wrangler pages deploy . --project-name=derivatives-smarttrader --branch=production
         echo "New website - http://derivatives-smarttrader.pages.dev"
       shell: bash
