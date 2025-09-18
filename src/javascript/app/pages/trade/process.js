@@ -7,7 +7,6 @@ const Contract          = require('./contract');
 const Defaults          = require('./defaults');
 const Durations         = require('./duration');
 const GetTicks          = require('./get_ticks');
-const Lookback          = require('./lookback');
 const Price             = require('./price');
 const Reset             = require('./reset');
 const Symbols           = require('./symbols');
@@ -287,7 +286,7 @@ const Process = (() => {
         refreshDropdown('#prediction');
         displaySelectedTick();
         refreshDropdown('#selected_tick');
-        Lookback.display();
+        // Removed Lookback.display() call as lookback functionality has been removed
 
         if (!Reset.isReset(Defaults.get(FORM_NAME))) {
             Reset.hideResetTime();

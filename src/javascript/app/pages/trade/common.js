@@ -94,8 +94,7 @@ const commonTrading = (() => {
             barrier = 'euro_atm';
         } else if (/overunder|evenodd|matchdiff/.test(form_name)) {
             name = 'digits';
-        } else if (/lookback/.test(form_name)) {
-            name = 'lookback';
+        // Removed lookback form name detection as lookback functionality has been removed
         } else if (/reset/.test(form_name)) {
             name = 'reset';
         }
@@ -133,9 +132,7 @@ const commonTrading = (() => {
         UPORDOWN    : 'bottom',
         ONETOUCH    : 'top',
         NOTOUCH     : 'bottom',
-        LBFLOATCALL : 'middle',
-        LBFLOATPUT  : 'middle',
-        LBHIGHLOW   : 'middle',
+        // Removed lookback barrier position mappings as lookback functionality has been removed
         RESETCALL   : 'top',
         RESETPUT    : 'bottom',
         TICKHIGH    : 'top',
@@ -175,9 +172,7 @@ const commonTrading = (() => {
             ['digits',
                 ['matchdiff', 'evenodd', 'overunder'],
             ],
-            ['lookback',
-                ['lookbackhigh', 'lookbacklow', 'lookbackhighlow'],
-            ],
+            // Removed lookback contract group as lookback functionality has been removed
             'reset',
             'highlowticks',
             ['runs', ['runs']],

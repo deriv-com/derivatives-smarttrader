@@ -29,7 +29,7 @@ const CATEGORY_TYPES = {
     reset        : ['resetcall' , 'resetput'],
     highlowticks : ['highlowticks'],
     runs         : ['runs'],
-    lookback     : ['lookbackhigh', 'lookbacklow', 'lookbackhighlow'],
+    // Removed lookback contract forms as lookback functionality has been removed
     callputspread: ['callputspread'],
 };
 
@@ -43,28 +43,26 @@ const CATEGORY_NAMES = {
     callputspread: 'Call Spread/Put Spread',
     highlowticks : 'High/Low Ticks',
     runs         : 'Only Ups/Only Downs',
-    lookback     : 'Lookbacks',
+    // Removed lookback display name as lookback functionality has been removed
 };
 
 const CATEGORY_ITEMS = {
-    inout          : 'In/Out',
-    endsinout      : 'Ends Between/Ends Outside',
-    staysinout     : 'Stays Between/Goes Outside',
-    risefall       : 'Rise/Fall',
-    higherlower    : 'Higher/Lower',
-    touchnotouch   : 'Touch/No Touch',
-    matchdiff      : 'Matches/Differs',
-    evenodd        : 'Even/Odd',
-    overunder      : 'Over/Under',
-    lookbackhigh   : 'High-Close',
-    lookbacklow    : 'Close-Low',
-    lookbackhighlow: 'High-Low',
-    resetcall      : 'Reset Call',
-    resetput       : 'Reset Put',
-    highlowticks   : 'High/Low Ticks',
-    asians         : 'Asians',
-    runs           : 'Only Ups/Only Downs',
-    callputspread  : 'Call Spread/Put Spread',
+    inout        : 'In/Out',
+    endsinout    : 'Ends Between/Ends Outside',
+    staysinout   : 'Stays Between/Goes Outside',
+    risefall     : 'Rise/Fall',
+    higherlower  : 'Higher/Lower',
+    touchnotouch : 'Touch/No Touch',
+    matchdiff    : 'Matches/Differs',
+    evenodd      : 'Even/Odd',
+    overunder    : 'Over/Under',
+    // Removed lookback form names as lookback functionality has been removed
+    resetcall    : 'Reset Call',
+    resetput     : 'Reset Put',
+    highlowticks : 'High/Low Ticks',
+    asians       : 'Asians',
+    runs         : 'Only Ups/Only Downs',
+    callputspread: 'Call Spread/Put Spread',
 };
 
 const Contract = (() => {

@@ -70,15 +70,7 @@ export const Explanation = ({ explanation_only = false }) => {
             image1: 'over.svg',
             image2: 'under.svg',
         },
-        lookbackhigh: {
-            image1: 'high-close.svg',
-        },
-        lookbacklow: {
-            image1: 'close-low.svg',
-        },
-        lookbackhighlow: {
-            image1: 'high-low.svg',
-        },
+        // Removed lookback image mappings as lookback functionality has been removed
         reset: {
             image1: 'reset-call.svg',
             image2: 'reset-put.svg',

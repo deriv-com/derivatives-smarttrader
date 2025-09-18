@@ -4,9 +4,8 @@ const displayPriceMovement = require('./common_independent').displayPriceMovemen
 const getTradingTimes      = require('./common_independent').getTradingTimes;
 const Contract             = require('./contract');
 const Defaults             = require('./defaults');
-const getLookBackFormula   = require('./lookback').getFormula;
-const isLookback           = require('./lookback').isLookback;
-const Client               = require('../../base/client');
+// Removed lookback imports as lookback functionality has been removed
+// Removed unused Client import
 const BinarySocket         = require('../../base/socket');
 const formatMoney          = require('../../common/currency').formatMoney;
 const CommonFunctions      = require('../../../_common/common_functions');
@@ -54,24 +53,15 @@ const Price = (() => {
         const low_barrier   = CommonFunctions.getElementById('barrier_low');
         const prediction    = CommonFunctions.getElementById('prediction');
         const selected_tick = CommonFunctions.getElementById('selected_tick');
-        const multiplier    = CommonFunctions.getElementById('multiplier');
+        // Removed multiplier variable as lookback functionality has been removed
 
-        if (payout && CommonFunctions.isVisible(payout) && payout.value && !isLookback(type_of_contract)) {
+        if (payout && CommonFunctions.isVisible(payout) && payout.value) {
             proposal.amount = parseFloat(payout.value);
         }
 
-        if (multiplier && CommonFunctions.isVisible(multiplier) && multiplier.value) {
-            const multiplier_value = parseFloat(multiplier.value);
-            proposal.multiplier = multiplier_value;
-            if (multiplier_value > 1000) {
-                proposal.error = {
-                    message: localize('Maximum multiplier of 1000.'),
-                };
-            }
-        }
+        // Removed multiplier handling as lookback functionality has been removed
 
-        if (amount_type && CommonFunctions.isVisible(amount_type) && amount_type.value
-            && !isLookback(type_of_contract)) {
+        if (amount_type && CommonFunctions.isVisible(amount_type) && amount_type.value) {
             proposal.basis = amount_type.value;
         }
 
@@ -173,13 +163,12 @@ const Price = (() => {
             $(container).fadeIn(200);
         }
 
-        const h4                  = container.getElementsByClassName('contract_heading')[0];
-        const amount              = container.getElementsByClassName('contract_amount')[0];
-        const payout_amount       = container.getElementsByClassName('contract_payout')[0];
-        const contract_multiplier = container.getElementsByClassName('contract_multiplier')[0];
-        const stake               = container.getElementsByClassName('stake')[0];
-        const payout              = container.getElementsByClassName('payout')[0];
-        const multiplier          = container.getElementsByClassName('multiplier')[0];
+        const h4            = container.getElementsByClassName('contract_heading')[0];
+        const amount        = container.getElementsByClassName('contract_amount')[0];
+        const payout_amount = container.getElementsByClassName('contract_payout')[0];
+        const stake         = container.getElementsByClassName('stake')[0];
+        const payout        = container.getElementsByClassName('payout')[0];
+        // Removed contract_multiplier and multiplier variables as lookback functionality has been removed
         const purchase            = container.getElementsByClassName('purchase_button')[0];
         const description         = container.getElementsByClassName('contract_description')[0];
         const longcode            = container.getElementsByClassName('contract_longcode')[0];
@@ -231,14 +220,11 @@ const Price = (() => {
             }
             CommonFunctions.elementTextContent(payout, `${localize('Payout')}: `);
             CommonFunctions.elementInnerHtml(payout_amount, data.payout ? formatMoney(currentCurrency, data.payout) : '-');
-            // Lookback multiplier
-            CommonFunctions.elementTextContent(multiplier, `${localize('Multiplier')}: `);
-            CommonFunctions.elementInnerHtml(contract_multiplier, data.multiplier ? formatMoney(currentCurrency, data.multiplier, false, 0, 2) : '-');
+            // Removed multiplier display logic as lookback functionality has been removed
 
             dataManager.setPurchase({
                 [`${position}_amount`]       : data.display_value ? formatMoney(currentCurrency, data.display_value, true) : '-',
                 [`${position}_payout_amount`]: data.payout ? formatMoney(currentCurrency, data.payout, true) : '-',
-                [`${position}_multiplier`]   : data.multiplier ? formatMoney(currentCurrency, data.multiplier, true, 0, 2) : '-',
                 currency                     : getCurrencyDisplayCode(currentCurrency),
             });
 
@@ -284,15 +270,8 @@ const Price = (() => {
             }
             comment.show();
             error.hide();
-            if (isLookback(type)) {
-                const multiplier_value = formatMoney(Client.get('currency'), proposal.multiplier, false, 3, 2);
-                CommonFunctions.elementInnerHtml(comment, `${localize('Payout')}: ${getLookBackFormula(type, multiplier_value)}`);
-                dataManager.setPurchase({
-                    [`${position}_comment`]: `${localize('Payout')}: ${getLookBackFormula(type, multiplier_value)}`,
-                });
-            } else {
-                commonTrading.displayCommentPrice(comment, (currency.value || currency.getAttribute('value')), proposal.display_value, proposal.payout, position);
-            }
+            // Removed lookback-specific comment price logic
+            commonTrading.displayCommentPrice(comment, (currency.value || currency.getAttribute('value')), proposal.display_value, proposal.payout, position);
             const old_price  = purchase.getAttribute('data-display_value');
             const old_payout = purchase.getAttribute('data-payout');
             if (amount) displayPriceMovement(amount, old_price, proposal.display_value,`${position}_amount_classname`);
@@ -380,27 +359,7 @@ const Price = (() => {
             }
         }
 
-        if (Contract.form() === 'lookback') {
-            switch (sessionStorage.getItem('formname')) {
-                case 'lookbackhigh':
-                    types = {
-                        LBFLOATPUT: 1,
-                    };
-                    break;
-                case 'lookbacklow':
-                    types = {
-                        LBFLOATCALL: 1,
-                    };
-                    break;
-                case 'lookbackhighlow':
-                    types = {
-                        LBHIGHLOW: 1,
-                    };
-                    break;
-                default:
-                    break;
-            }
-        }
+        // Removed lookback-specific pricing logic as lookback functionality has been removed
 
         processForgetProposalOpenContract();
         processForgetProposals().then(() => {

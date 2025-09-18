@@ -2,8 +2,7 @@ const moment                   = require('moment');
 const Contract                 = require('./contract');
 const hidePriceOverlay         = require('./common').hidePriceOverlay;
 const countDecimalPlaces       = require('./common_independent').countDecimalPlaces;
-const getLookBackFormula       = require('./lookback').getFormula;
-const isLookback               = require('./lookback').isLookback;
+// Removed lookback imports as lookback functionality has been removed
 const processPriceRequest      = require('./price').processPriceRequest;
 const DigitTicker              = require('./digit_ticker');
 const TickDisplay              = require('./tick_trade');
@@ -202,12 +201,7 @@ const Purchase = (() => {
             });
 
             const currency = Client.get('currency');
-            let formula, multiplier;
-            const { contract_type } = passthrough;
-            if (isLookback(contract_type)) {
-                multiplier = formatMoney(currency, passthrough.multiplier, false, 3, 2);
-                formula    = getLookBackFormula(contract_type, multiplier);
-            }
+            // Removed unused variables and lookback-specific logic
 
             payout_value = +receipt.payout;
             cost_value   = receipt.buy_price;
@@ -220,27 +214,18 @@ const Purchase = (() => {
                 pr_table_cost_value: formatMoney(currency, cost_value),
             });
 
-            if (isLookback(contract_type)) {
-                CommonFunctions.elementInnerHtml(payout, `${localize('Potential Payout')} <p>${formula}</p>`);
-                dataManager.setPurchase({
-                    pr_table_payout      : localize('Potential Payout'),
-                    pr_table_payout_value: formula,
-                    pr_show_table_profit : false,
-                });
-                profit.setVisibility(0);
-            } else {
-                profit.setVisibility(1);
-                CommonFunctions.elementInnerHtml(payout, `${localize('Potential Payout')} <p>${formatMoney(currency, payout_value)}</p>`);
-                CommonFunctions.elementInnerHtml(profit, `${localize('Potential Profit')} <p>${potential_profit_value}</p>`);
+            // Removed lookback-specific payout logic
+            profit.setVisibility(1);
+            CommonFunctions.elementInnerHtml(payout, `${localize('Potential Payout')} <p>${formatMoney(currency, payout_value)}</p>`);
+            CommonFunctions.elementInnerHtml(profit, `${localize('Potential Profit')} <p>${potential_profit_value}</p>`);
 
-                dataManager.setPurchase({
-                    pr_table_payout      : localize('Potential Payout'),
-                    pr_table_payout_value: formatMoney(currency, payout_value),
-                    pr_table_profit      : localize('Potential Profit'),
-                    pr_table_profit_value: potential_profit_value,
-                    pr_show_table_profit : true,
-                });
-            }
+            dataManager.setPurchase({
+                pr_table_payout      : localize('Potential Payout'),
+                pr_table_payout_value: formatMoney(currency, payout_value),
+                pr_table_profit      : localize('Potential Profit'),
+                pr_table_profit_value: potential_profit_value,
+                pr_show_table_profit : true,
+            });
 
             updateValues.updateContractBalance(receipt.balance_after);
 
