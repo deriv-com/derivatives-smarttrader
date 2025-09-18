@@ -17,11 +17,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "18.x"
-          cache: "npm"
+      - name: Setup Node
+        uses: "./.github/actions/setup_node"
 
       - name: Install Dependencies
         uses: "./.github/actions/npm_install"
