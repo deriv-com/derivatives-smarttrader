@@ -11,6 +11,7 @@ const removeCookies      = require('../../_common/storage').removeCookies;
 const urlFor             = require('../../_common/url').urlFor;
 const applyToAllElements = require('../../_common/utility').applyToAllElements;
 const getPropertyValue   = require('../../_common/utility').getPropertyValue;
+
 const licenseID          = require('../../_common/utility').lc_licenseID;
 const clientID           = require('../../_common/utility').lc_clientID;
 
@@ -29,7 +30,7 @@ const Client = (() => {
 
         // const primary_bg_color_dark = 'primary-bg-color-dark';
         // const secondary_bg_color    = 'secondary-bg-color';
-
+        
         if (ClientBase.isLoggedIn()) {
             BinarySocket.wait('authorize', 'website_status', 'get_account_status', 'balance').then(() => {
                 // const client_logged_in = getElementById('client-logged-in');
@@ -166,6 +167,17 @@ const Client = (() => {
     };
 
     const sendLogoutRequest = (show_login_page, redirect_to) => {
+        // Debug: Log logout request details especially during session token auth
+        const sessionToken = localStorage.getItem('session_token');
+        // eslint-disable-next-line no-console
+        console.log('🚪 sendLogoutRequest called:', {
+            show_login_page,
+            redirect_to,
+            hasSessionToken: !!sessionToken,
+            currentLoginId : ClientBase.get('loginid'),
+            stack          : new Error().stack,
+        });
+        
         if (show_login_page) {
             sessionStorage.setItem('showLoginPage', 1);
         }

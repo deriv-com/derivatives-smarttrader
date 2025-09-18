@@ -168,8 +168,8 @@ const Contract = (() => {
 
                 const type = current_obj.contract_type;
                 if (!getPropertyValue(contract_type[contract_category], type)) {
-                    contract_type[contract_category][type] =
-                        localize(current_obj.contract_display /* localize-ignore */); // handled in static_strings_app.js
+                    const display_text = current_obj.contract_display || current_obj.contract_type || type;
+                    contract_type[contract_category][type] = localize(display_text /* localize-ignore */);
                 }
             }
         });
@@ -192,10 +192,18 @@ const Contract = (() => {
     const getContractCategories = () => {
         const contracts           = Contract.contracts().contracts_for;
         const contract_categories = {};
+        
+        // Check if contracts are available
+        if (!contracts.available) {
+            return contract_categories;
+        }
+        
         contracts.available.forEach((current_obj) => {
             const contract_category = current_obj.contract_category;
             const contract_barrier  = current_obj.barrier_category;
-            const contract_display  = current_obj.contract_category_display;
+            const contract_display  = current_obj.contract_category_display ||
+                                       current_obj.contract_display ||
+                                       contract_category;
             const current_contract  = { category: contract_category, barrier: contract_barrier };
             if (contract_category && !getPropertyValue(contract_categories, current_contract)) {
                 /* eslint-disable max-len */

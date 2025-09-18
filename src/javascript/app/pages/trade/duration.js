@@ -157,10 +157,20 @@ const Durations = (() => {
             duration_options,
         });
 
-        smallest_duration = {
-            amount: duration_list[list[0]].dataset.minimum,
-            unit  : list[0],
-        };
+        // Safety check for duration list
+        if (list.length > 0 && duration_list[list[0]] && duration_list[list[0]].dataset) {
+            smallest_duration = {
+                amount: duration_list[list[0]].dataset.minimum,
+                unit  : list[0],
+            };
+        } else {
+            // Fallback values
+            smallest_duration = {
+                amount: 1,
+                unit  : 't', // default to ticks
+            };
+            
+        }
 
         has_end_date = 0;
         for (let k = 0; k < list.length; k++) {

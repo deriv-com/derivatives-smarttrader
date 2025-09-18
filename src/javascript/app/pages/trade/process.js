@@ -16,7 +16,6 @@ const BinarySocket       = require('../../base/socket');
 const dataManager       = require('../../common/data_manager.js').default;
 const getMinPayout      = require('../../common/currency').getMinPayout;
 const isCryptocurrency  = require('../../common/currency').isCryptocurrency;
-const isEuCountry       = require('../../common/country_base').isEuCountry;
 const elementInnerHtml  = require('../../../_common/common_functions').elementInnerHtml;
 const getElementById    = require('../../../_common/common_functions').getElementById;
 const getVisibleElement = require('../../../_common/common_functions').getVisibleElement;
@@ -51,7 +50,21 @@ const Process = (() => {
         // If response is provided (from InitializationManager), use it directly
         // Otherwise, make the API call (fallback for direct calls)
         const processResponse = (apiResponse) => {
-            if (!isEuCountry() && apiResponse.active_symbols && apiResponse.active_symbols.length) {
+
+            // Check for API errors first
+            if (apiResponse && apiResponse.error) {
+                // eslint-disable-next-line no-console
+                console.error('Active symbols API error:', apiResponse.error);
+                NotAvailable.init({
+                    title: localize('API Error'),
+                    body : localize(`Error loading market data: ${  apiResponse.error.message || 'Unknown error'}`),
+                });
+                return;
+            }
+
+            // Removed country/EU restrictions - allow all accounts to access SmartTrader
+            if (apiResponse && apiResponse.active_symbols && apiResponse.active_symbols.length) {
+                
                 // populate the Symbols object
                 Symbols.details(apiResponse);
 
@@ -62,10 +75,13 @@ const Process = (() => {
 
                 commonTrading.displayMarkets();
                 processMarket();
-            } else if (country === 'gb' || country === 'im') {
-                NotAvailable.init({ title: localize('SmartTrader is unavailable for this account'), body: localize('Sorry, options trading isn\'t available in the United Kingdom and the Isle of Man.') });
             } else {
-                NotAvailable.init({ title: localize('SmartTrader is unavailable for this account'), body: localize('Unfortunately, this trading platform is not available for EU Deriv account. Please switch to a non-EU account to continue trading.') });
+                // Show generic error if no active symbols are available
+
+                NotAvailable.init({
+                    title: localize('No trading symbols available'),
+                    body : localize('There are currently no trading symbols available. Please try again later.'),
+                });
             }
         };
 
@@ -74,7 +90,15 @@ const Process = (() => {
             processResponse(response);
         } else {
             // Fallback: make API call directly (for backward compatibility)
-            BinarySocket.send({ active_symbols: 'brief' }).then(processResponse).catch((error) => {
+            // Use 'full' instead of 'brief' and add debug logging
+            // eslint-disable-next-line no-console
+            console.log('Requesting active_symbols for unauthenticated user...');
+            
+            BinarySocket.send({ active_symbols: 'brief' }).then((apiResponse) => {
+                // eslint-disable-next-line no-console
+                console.log('Active symbols response:', apiResponse);
+                processResponse(apiResponse);
+            }).catch((error) => {
                 // eslint-disable-next-line no-console
                 console.error('Failed to load active symbols:', error);
                 // Show error state but don't block the page
@@ -100,7 +124,12 @@ const Process = (() => {
             market = commonTrading.getDefaultMarket();
             Defaults.set(MARKET, market);
         }
-        if ((!symbol || !Symbols.underlyings()[market][symbol])) {
+        
+        // Add safety check before accessing market data
+        const marketData = Symbols.underlyings()[market];
+        if (!marketData) {
+            symbol = undefined;
+        } else if ((!symbol || !marketData[symbol])) {
             symbol = undefined;
         }
 
@@ -223,7 +252,7 @@ const Process = (() => {
         const default_open_symbol = await Symbols.getDefaultOpenSymbol(active_symbols);
 
         Defaults.set(MARKET, default_open_symbol.market);
-        Defaults.set(UNDERLYING, default_open_symbol.symbol);
+        Defaults.set(UNDERLYING, default_open_symbol.underlying_symbol);
     };
 
     /*

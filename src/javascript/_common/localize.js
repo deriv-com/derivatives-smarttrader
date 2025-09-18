@@ -14,6 +14,11 @@ const Localize = (() => {
     const doLocalize = (txt, params) => {
         let text = txt;
 
+        // Safety check for undefined/null text
+        if (!text || typeof text !== 'string') {
+            return txt || '';
+        }
+
         const index = text.replace(/[\s|.]/g, '_');
 
         const lang = urlLang().toUpperCase();

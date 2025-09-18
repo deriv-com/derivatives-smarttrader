@@ -61,7 +61,6 @@ const TradePage = (() => {
                     });
                 }
             }
-            Header.displayAccountStatus();
             Client.activateByClientType('trading_socket_container');
 
             // Start robust initialization process

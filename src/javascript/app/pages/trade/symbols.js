@@ -28,6 +28,7 @@ const Symbols = (() => {
 
     const details = (data) => {
         const all_symbols  = data.active_symbols;
+        
         trade_markets      = ActiveSymbols.getMarkets(all_symbols);
         trade_markets_list = ActiveSymbols.getMarketsList(all_symbols);
         trade_underlyings  = ActiveSymbols.getTradeUnderlyings(all_symbols);
@@ -54,7 +55,7 @@ const Symbols = (() => {
     const isSymbolOpen = symbol => symbol.exchange_is_open === 1;
 
     const findSymbol = async (active_symbols, symbol) => {
-        const first_symbol = active_symbols.find(item => item.symbol === symbol && isSymbolOpen(item));
+        const first_symbol = active_symbols.find(item => item.underlying_symbol === symbol && isSymbolOpen(item));
         const is_symbol_offered = await isSymbolOffered(first_symbol);
 
         if (is_symbol_offered) return first_symbol;
@@ -63,7 +64,7 @@ const Symbols = (() => {
     };
 
     const isSymbolOffered = async symbol_info => {
-        const response = await BinarySocket.send({ contracts_for: symbol_info.symbol });
+        const response = await BinarySocket.send({ contracts_for: symbol_info.underlying_symbol });
         
         return !(getPropertyValue(response, ['error', 'code']) === 'InvalidSymbol');
     };
@@ -88,7 +89,7 @@ const Symbols = (() => {
             (await findFirstSymbol(active_symbols, /random_index/)) ||
             (await findFirstSymbol(active_symbols, /major_pairs/));
 
-        if (default_open_symbol) return default_open_symbol.symbol;
+        if (default_open_symbol) return default_open_symbol;
 
         return active_symbols.find(symbol_info => symbol_info.submarket === 'major_pairs');
     };

@@ -115,14 +115,18 @@ const ActiveSymbols = (() => {
         if (isEmptyObject(submarket.symbols)) {
             submarket.symbols = {};
             all_symbols.forEach((symbol) => {
-                submarket.symbols[symbol.symbol] = {
-                    display    : symbol.display_name,
-                    symbol_type: symbol.symbol_type,
-                    is_active  : !symbol.is_trading_suspended && symbol.exchange_is_open,
-                    pip        : symbol.pip,
-                    market     : symbol.market !== 'synthetic_index' ? symbol.market : symbol.subgroup,
-                    submarket  : symbol.submarket,
-                };
+                // Use underlying_symbol instead of symbol (API structure changed)
+                const symbolKey = symbol.underlying_symbol || symbol.symbol;
+                if (symbolKey) {
+                    submarket.symbols[symbolKey] = {
+                        display    : symbol.display_name || symbolKey,
+                        symbol_type: symbol.underlying_symbol_type || symbol.symbol_type,
+                        is_active  : !symbol.is_trading_suspended && symbol.exchange_is_open,
+                        pip        : symbol.pip_size || symbol.pip,
+                        market     : symbol.market !== 'synthetic_index' ? symbol.market : symbol.subgroup,
+                        submarket  : symbol.submarket,
+                    };
+                }
             });
         }
         return clone(submarket.symbols);
