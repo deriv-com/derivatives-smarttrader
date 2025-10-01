@@ -50,11 +50,7 @@ const MobileMenu = () => (
                         <div className='mobile__platform-switcher-text'>{it.L('Account Settings')}</div>
                         <img id='mobile__platform-switcher-icon-arrowright' className='mobile__platform-switcher-icon-right' />
                     </div>
-                    <div id='mobile__platform-switcher-item-cashier' className='mobile__platform-switcher-item client_logged_in invisible'>
-                        <img className='mobile__platform-switcher-icon cashier-icon' src='../images/pages/header/ic-cashier.svg' alt='Cashier' />
-                        <div className='mobile__platform-switcher-text'>{it.L('Cashier')}</div>
-                        <img id='mobile__platform-switcher-icon-arrowright' className='mobile__platform-switcher-icon-right' />
-                    </div>
+
                     <div className='mobile__platform-switcher-item'>
                         <a href='https://deriv.com/help-centre' target='_blank' rel='noopener noreferrer'>
                             <img className='mobile__platform-switcher-icon help-center-icon' src='../images/pages/header/ic-help-center.svg' alt='Help center' />
@@ -101,34 +97,7 @@ const MobileMenu = () => (
                     </a>
                 </div>
             </div>
-            <div id='mobile__menu-content-submenu-cashier' className='mobile__menu-content-submenu mobile__menu-content client_logged_in invisible'>
-                <div id='mobile__menu-content-submenu-cashier-header' className='mobile__menu-content-submenu-header mobile__platform-switcher-item'>
-                    <img id='mobile__menu-content-submenu-cashier-icon-back' className='mobile__menu-content-submenu-icon' />
-                    <div className='mobile__menu-content-submenu-header-text' >{it.L('Cashier')}</div>
-                </div>
-                <div className='mobile__menu-content-submenu-lists'>
-                    <a href='https://app.deriv.com/cashier/deposit' className='mobile__menu-content-submenu-item mobile__platform-switcher-item'>
-                        <img className='mobile__menu-content-submenu-icon' src='../images/pages/header/ic-deposit.svg' alt='Deposit' />
-                        <div className='mobile__menu-content-submenu-item-text'>{it.L('Deposit')}</div>
-                    </a>
-                    <a href='https://app.deriv.com/cashier/withdrawal' className='mobile__menu-content-submenu-item mobile__platform-switcher-item'>
-                        <img className='mobile__menu-content-submenu-icon' src='../images/pages/header/ic-withdrawal.svg' alt='Withdrawal' />
-                        <div className='mobile__menu-content-submenu-item-text'>{it.L('Withdrawal')}</div>
-                    </a>
-                    <a href='https://app.deriv.com/cashier/payment-agent' className='mobile__menu-content-submenu-item mobile__platform-switcher-item'>
-                        <img className='mobile__menu-content-submenu-icon' src='../images/pages/header/ic-payment-agents.svg' alt='Payment agents' />
-                        <div className='mobile__menu-content-submenu-item-text'>{it.L('Payment agents')}</div>
-                    </a>
-                    <a href='https://app.deriv.com/cashier/account-transfer' className='mobile__menu-content-submenu-item mobile__platform-switcher-item'>
-                        <img className='mobile__menu-content-submenu-icon' src='../images/pages/header/ic-transfer.svg' alt='Transfer' />
-                        <div className='mobile__menu-content-submenu-item-text'>{it.L('Transfer')}</div>
-                    </a>
-                    <a href='https://app.deriv.com/cashier/p2p' className='mobile__menu-content-submenu-item mobile__platform-switcher-item'>
-                        <img className='mobile__menu-content-submenu-icon' src='../images/pages/header/ic-p2p.svg' alt='Deriv P2P' />
-                        <div className='mobile__menu-content-submenu-item-text'>{it.L('Deriv P2P')}</div>
-                    </a>
-                </div>
-            </div>
+
             <div id='mobile__menu-content-submenu-account-settings' className='mobile__menu-content-submenu mobile__menu-content client_logged_in invisible'>
                 <div id='mobile__menu-content-submenu-account-settings-header' className='mobile__menu-content-submenu-header mobile__platform-switcher-item'>
                     <img id='mobile__menu-content-submenu-account-settings-icon-back' className='mobile__menu-content-submenu-icon' />

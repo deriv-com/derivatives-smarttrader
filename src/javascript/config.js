@@ -38,7 +38,10 @@ const getAppId = () => {
     const user_app_id   = ''; // you can insert Application ID of your registered application here
     const config_app_id = window.localStorage.getItem('config.app_id');
     const is_new_app    = /\/app\//.test(window.location.pathname);
+    
     if (config_app_id) {
+        // eslint-disable-next-line no-console
+        console.log('Using config_app_id:', config_app_id);
         app_id = config_app_id;
     } else if (/desktop-app/i.test(window.location.href) || window.localStorage.getItem('config.is_desktop_app')) {
         window.localStorage.removeItem('config.default_app_id');
@@ -67,6 +70,7 @@ const getAppId = () => {
         // TODO: remove is_new_app && deriv.com check when repos are split
         app_id = (is_new_app && current_domain !== 'deriv.com') ? 22168 : (domain_app_ids[current_domain] || 22168);
     }
+
     return app_id;
 };
 

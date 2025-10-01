@@ -73,11 +73,37 @@ const BinarySocketGeneral = (() => {
                     }
                     Client.sendLogoutRequest(is_active_tab);
                 } else if (!isLoginPages() && !/authorize/.test(State.get('skip_response'))) {
-                    if (response.authorize.loginid !== Client.get('loginid')) {
+                    const sessionToken = localStorage.getItem('session_token');
+                    const isSessionTokenAuth = sessionToken && response.authorize;
+                    const currentLoginId = Client.get('loginid');
+                    
+                    // Handle session token authentication (new user login via token exchange)
+                    if (isSessionTokenAuth && !currentLoginId) {
+                        Client.responseAuthorizeSessionToken(response);
+                        BinarySocket.send({ balance: 1, subscribe: 1 });
+                        BinarySocket.send({ get_settings: 1 });
+                        BinarySocket.send({ get_account_status: 1 });
+                        BinarySocket.send({ payout_currencies: 1 });
+                        BinarySocket.send({ mt5_login_list: 1 });
+                        SubscriptionManager.subscribe('transaction', { transaction: 1, subscribe: 1 }, () => false);
+                        const clients_country = response.authorize.country || Client.get('residence');
+                        setResidence(clients_country);
+                        // for logged in clients send landing company with IP address as residence
+                        if (!clients_country) {
+                            BinarySocket.send({ landing_company: State.getResponse('website_status.clients_country') });
+                        }
+                        if (!Client.get('is_virtual')) {
+                            BinarySocket.send({ get_self_exclusion: 1 });
+                        }
+                        BinarySocket.sendBuffered();
+                        LocalStore.remove('date_first_contact');
+                        LocalStore.remove('signup_device');
+                    } else if (response.authorize.loginid !== currentLoginId && !isSessionTokenAuth) {
+                        // Don't logout during session token authentication - the loginid mismatch is expected
                         Client.sendLogoutRequest(true);
                     } else {
                         Client.responseAuthorize(response);
-                        BinarySocket.send({ balance: 1, account: 'all', subscribe: 1 });
+                        BinarySocket.send({ balance: 1, subscribe: 1 });
                         BinarySocket.send({ get_settings: 1 });
                         BinarySocket.send({ get_account_status: 1 });
                         BinarySocket.send({ payout_currencies: 1 });
