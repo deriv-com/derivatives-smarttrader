@@ -202,6 +202,33 @@ body .header, .wallet__header {
         &-login, &-signup {
             margin-right: 17px;
         }
+        &-logout {
+            margin-left: 8px;
+            border: none !important;
+            box-shadow: none !important;
+            
+            &:hover, &:focus, &:active {
+                border: none !important;
+                box-shadow: none !important;
+            }
+        }
+    }
+    
+    // Loading state during token exchange
+    &.loading {
+        opacity: 0.7;
+        pointer-events: none;
+        
+        &::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+        }
     }
     &__menu {
         &-acc {

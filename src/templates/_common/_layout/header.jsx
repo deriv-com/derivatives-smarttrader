@@ -58,6 +58,9 @@ const Header = () => (
                                 </div>
                             </div>
                         </div>
+                        <button id='btn__logout' className='btn btn--tertiary header__btn-logout' title={it.L('Log out')}>
+                            {it.L('Log out')}
+                        </button>
                     </div>
                 </div>
             </div>

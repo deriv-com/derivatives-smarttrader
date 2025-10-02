@@ -36,7 +36,9 @@ const RemoteConfig = (() => {
     };
 
     const getRemoteConfig = async (enabled = false) => {
-        isEnabled = enabled;
+        // Only enable remote config in production/staging environments
+        const isProductionOrStaging = process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging';
+        isEnabled = enabled && isProductionOrStaging;
         if (isEnabled) {
             await fetchAndUpdateData();
         }

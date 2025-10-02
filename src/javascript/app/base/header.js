@@ -6,7 +6,6 @@ const Client = require('./client');
 const BinarySocket = require('./socket');
 const AuthClient = require('../../_common/auth');
 const TMB = require('../../_common/tmb');
-const showHidePulser = require('../common/account_opening').showHidePulser;
 
 const Login = require('../../_common/base/login');
 const SocketCache = require('../../_common/base/socket_cache');
@@ -24,7 +23,6 @@ const getPlatformSettings =
 
 const formatMoney = require('../common/currency').formatMoney;
 
-const isEuCountry = require('../common/country_base').isEuCountry;
 const DerivLiveChat = require('../pages/livechat.jsx');
 const {
     default: isHubEnabledCountry,
@@ -279,18 +277,10 @@ const Header = (() => {
     };
 
     const setHeaderUrls = () => {
-        const url_add_account_dynamic = document.getElementById(
-            'url-add-account-dynamic'
-        );
         const btn__signup = getElementById('btn__signup');
         const static_url = Url.getStaticUrl();
         const signup_url = `${static_url}/signup/`;
         btn__signup.href = signup_url;
-
-        if (isEuCountry()) {
-            url_add_account_dynamic.classList.remove('url-add-account');
-            url_add_account_dynamic.classList.add('url-add-account-multiplier');
-        }
 
         applyToAllElements('.url-wallet-apps', (el) => {
             el.href = isHubEnabledCountry()
@@ -639,6 +629,12 @@ const Header = (() => {
         applyToAllElements('.logout', (el) => {
             el.addEventListener('click', logoutOnClick);
         });
+
+        // Logout button in header
+        const btn_logout = getElementById('btn__logout');
+        if (btn_logout) {
+            btn_logout.addEventListener('click', logoutOnClick);
+        }
         // Mobile menu
         const mobile_menu_overlay = getElementById('mobile__container');
         const mobile_menu = getElementById('mobile__menu');
@@ -1319,9 +1315,6 @@ const Header = (() => {
                         );
                     });
                 }
-                if (/accounts/.test(window.location.href)) {
-                    showHidePulser(0);
-                }
             } else if (show_upgrade_msg) {
                 getElementById('virtual-wrapper').setVisibility(0);
                 const upgrade_url =
@@ -1330,10 +1323,6 @@ const Header = (() => {
               : Object.values(upgrade_info.upgrade_links)[0];
                 showUpgrade(upgrade_url, upgrade_link_txt);
                 showUpgradeBtn(upgrade_url, upgrade_btn_txt);
-
-                if (/new_account/.test(window.location.href)) {
-                    showHidePulser(0);
-                }
             } else {
                 applyToAllElements(upgrade_msg, (el) => {
                     el.setVisibility(0);

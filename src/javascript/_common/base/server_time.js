@@ -27,7 +27,9 @@ const ServerTime = (() => {
     };
 
     const timeCounter = (response) => {
-        if (response.error) return;
+        if (response.error) {
+            return;
+        }
 
         if (!clock_started) {
             init();

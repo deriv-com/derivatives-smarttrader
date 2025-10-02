@@ -287,6 +287,9 @@ const TMB = (() => {
             LocalStore.remove('client.accounts');
             LocalStore.remove('active_loginid');
             
+            // Clear session token
+            localStorage.removeItem('session_token');
+            
             // Clear session storage
             SessionStore.remove('active_loginid');
             SessionStore.remove('account');

@@ -68,8 +68,8 @@ const getDecimalPlaces = (currency) => (
     currencies_config[currency] ? getPropertyValue(currencies_config, [currency, 'fractional_digits']) : calcDecimalPlaces(currency)
 );
 
-const setCurrencies = (website_status) => {
-    currencies_config = website_status.currencies_config;
+const setCurrencies = (landing_company) => {
+    currencies_config = landing_company?.currencies_config || {};
 };
 
 // (currency in crypto_config) is a back-up in case website_status doesn't include the currency config, in some cases where it's disabled

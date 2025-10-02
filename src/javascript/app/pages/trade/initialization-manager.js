@@ -196,11 +196,8 @@ const InitializationManager = (() => {
             // Step 1: Wait for authorization (already handled by TradePage)
             markStepCompleted('authorize');
 
-            // Step 2: Set default currency (USD fallback since payout_currencies API removed)
-            State.set(['response', 'payout_currencies'], ['USD']);
-            if (callbacks.onPayoutCurrenciesLoaded) {
-                callbacks.onPayoutCurrenciesLoaded();
-            }
+            // Step 2: Payout currencies removed - no longer supported in new API
+            // Currency handling now uses default currencies
 
             // Step 3: Load active symbols
             let activeSymbolsResult = null;

@@ -195,7 +195,7 @@ const Page = (() => {
             Login.redirectToLogin();
         }
         if (Client.isLoggedIn()) {
-            BinarySocket.wait('authorize', 'website_status', 'get_account_status').then(() => {
+            BinarySocket.wait('authorize', 'get_account_status').then(() => {
                 RealityCheck.onLoad();
                 Menu.init();
             });
@@ -212,8 +212,10 @@ const Page = (() => {
         }
         TrafficSource.setData();
 
-        BinarySocket.wait('authorize', 'website_status', 'landing_company').then(() => {
-            const is_uk_residence = (Client.get('residence') === 'gb' || State.getResponse('website_status.clients_country') === 'gb');
+        BinarySocket.wait('authorize').then(() => {
+            const is_uk_residence = (Client.get('residence') === 'gb' ||
+                                   State.getResponse('authorize.country') === 'gb' ||
+                                   Client.get('landing_company_shortcode') === 'gb');
             if (is_uk_residence || Client.get('landing_company_shortcode') === 'iom') {
                 getElementById('gamstop_uk_display').setVisibility(1);
             }

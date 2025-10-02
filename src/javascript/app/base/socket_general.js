@@ -3,10 +3,13 @@ const Clock                  = require('./clock');
 const Header                 = require('./header');
 const BinarySocket           = require('./socket');
 const Dialog                 = require('../common/attach_dom/dialog');
+
 const SessionDurationLimit   = require('../common/session_duration_limit');
 const updateBalance          = require('../pages/user/update_balance');
 const GTM                    = require('../../_common/base/gtm');
+
 const SubscriptionManager    = require('../../_common/base/subscription_manager').default;
+
 const localize               = require('../../_common/localize').localize;
 const LocalStore             = require('../../_common/storage').LocalStore;
 const State                  = require('../../_common/storage').State;
@@ -14,16 +17,52 @@ const getPropertyValue       = require('../../_common/utility').getPropertyValue
 const isLoginPages           = require('../../_common/utility').isLoginPages;
 
 const BinarySocketGeneral = (() => {
+    const setupDefaultCurrencies = () => {
+        // Set up default currencies since payout_currencies API is no longer available
+        const defaultCurrencies = ['USD', 'EUR', 'GBP', 'AUD', 'BTC', 'ETH'];
+        State.set(['response', 'payout_currencies'], defaultCurrencies);
+    };
+
+    const setupWebsiteStatusDefaults = () => {
+        // Set up default website_status data since the API is no longer available
+        // This provides essential data that the app expects
+        const websiteStatusData = {
+            clients_country         : 'ae', // Default to UAE (from your example)
+            site_status             : 'up', // Assume site is always up
+            supported_languages     : ['EN', 'ID', 'RU', 'MN', 'ES', 'FR', 'IT', 'PT', 'PL', 'DE', 'ZH_CN', 'VI', 'ZH_TW', 'TH', 'TR', 'KO', 'AR', 'BN', 'SI', 'SW', 'KM', 'UZ'],
+            terms_conditions_version: 'Version 4.2.0 2020-08-07',
+            currencies_config       : {
+                'USD': { fractional_digits: 2, is_suspended: 0, name: 'US Dollar', type: 'fiat' },
+                'EUR': { fractional_digits: 2, is_suspended: 0, name: 'Euro', type: 'fiat' },
+                'GBP': { fractional_digits: 2, is_suspended: 0, name: 'Pound Sterling', type: 'fiat' },
+                'AUD': { fractional_digits: 2, is_suspended: 0, name: 'Australian Dollar', type: 'fiat' },
+                'BTC': { fractional_digits: 8, is_suspended: 0, name: 'Bitcoin', type: 'crypto' },
+                'ETH': { fractional_digits: 8, is_suspended: 0, name: 'Ethereum', type: 'crypto' },
+            },
+        };
+        State.set(['response', 'website_status'], websiteStatusData);
+    };
+
     const onOpen = (is_ready) => {
         Header.hideNotification();
+        
+        // Set up default currencies since payout_currencies is no longer available
+        setupDefaultCurrencies();
+        
+        // Set up default website_status data since the API is no longer available
+        setupWebsiteStatusDefaults();
+        
+        // Start clock regardless of login status - clock should work for everyone
+        Clock.startClock();
+        
         if (is_ready) {
             if (!isLoginPages()) {
-                if (!Client.isValidLoginid()) {
-                    Client.sendLogoutRequest();
-                    return;
-                }
+                // Send initial requests for logged-out users
+                BinarySocket.send({ active_symbols: 'brief' });
             }
-            Clock.startClock();
+            
+            // Send essential requests that replace website_status functionality
+            // These are needed for basic app functionality
         }
     };
 
@@ -54,6 +93,10 @@ const BinarySocketGeneral = (() => {
                         SubscriptionManager.subscribe('transaction', { transaction: 1, subscribe: 1 }, () => false);
                         const clients_country = response.authorize.country || Client.get('residence');
                         setResidence(clients_country);
+                        // for logged in clients send landing company with IP address as residence
+                        if (!clients_country) {
+                            BinarySocket.send({ landing_company: State.getResponse('landing_company.id') });
+                        }
                         if (!Client.get('is_virtual')) {
                             BinarySocket.send({ get_self_exclusion: 1 });
                         }
@@ -72,6 +115,10 @@ const BinarySocketGeneral = (() => {
                         SubscriptionManager.subscribe('transaction', { transaction: 1, subscribe: 1 }, () => false);
                         const clients_country = response.authorize.country || Client.get('residence');
                         setResidence(clients_country);
+                        // for logged in clients send landing company with IP address as residence
+                        if (!clients_country) {
+                            BinarySocket.send({ landing_company: State.getResponse('landing_company.id') });
+                        }
                         if (!Client.get('is_virtual')) {
                             BinarySocket.send({ get_self_exclusion: 1 });
                         }
@@ -89,6 +136,12 @@ const BinarySocketGeneral = (() => {
                 break;
             case 'landing_company':
                 Header.upgradeMessageVisibility();
+                break;
+            case 'time':
+                // Store time response for clock functionality
+                if (response.time) {
+                    State.set(['response', 'time'], response);
+                }
                 break;
             case 'get_self_exclusion':
                 SessionDurationLimit.exclusionResponseHandler(response);

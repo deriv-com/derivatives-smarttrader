@@ -7,13 +7,12 @@ const BinarySocket          = require('../../base/socket');
 const formatMoney           = require('../../common/currency').formatMoney;
 const getPropertyValue      = require('../../../_common/utility').getPropertyValue;
 
-// [AI]
 const updateBalance = (response) => {
     if (getPropertyValue(response, 'error')) {
         return;
     }
 
-    BinarySocket.wait('website_status').then(() => {
+    BinarySocket.wait('authorize').then(() => {
         const { balance, currency, loginid } = response.balance;
         
         if (!currency || !loginid) {

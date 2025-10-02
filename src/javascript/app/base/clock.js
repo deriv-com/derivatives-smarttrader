@@ -12,6 +12,9 @@ const Clock = (() => {
 
     const onTimeUpdated = () => {
         const server_time = ServerTime.get();
+        if (!server_time) {
+            return;
+        }
         window.time = server_time;
 
         const time_str = `${server_time.format('YYYY-MM-DD HH:mm:ss')} GMT`;

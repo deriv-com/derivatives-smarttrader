@@ -55,23 +55,9 @@
     }
 
     function openWSAndGetLanguage(cb) {
-        var ws = new WebSocket('wss://frontend.derivws.com/websockets/v3?app_id=1&brand=binary');
-
-        ws.onopen = function() {
-            ws.send(JSON.stringify({ website_status: 1 }));
-        };
-
-        ws.onmessage = function(msg) {
-            var response = JSON.parse(msg.data);
-            if (response.msg_type === 'website_status') {
-                var lang;
-                if (!response.error && response.hasOwnProperty('website_status')) {
-                    lang = getLanguage(response.website_status.clients_country);
-                }
-                ws.close();
-                return cb(lang);
-            }
-        };
+        // Use default language fallback
+        var lang = 'EN'; // Default to English
+        return cb(lang);
     }
 
     var lang = getCookieItem('language');
