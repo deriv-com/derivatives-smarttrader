@@ -22,15 +22,12 @@ const ServerTime = (() => {
     };
 
     const requestTime = () => {
-        console.log('ServerTime: Sending time request...');
         performance_request_time = performance.now();
         BinarySocket.send({ time: 1 }).then(timeCounter);
     };
 
     const timeCounter = (response) => {
-        console.log('ServerTime: Time response received:', response);
         if (response.error) {
-            console.error('ServerTime: Time request error:', response.error);
             return;
         }
 
@@ -42,7 +39,6 @@ const ServerTime = (() => {
         clearInterval(update_time_interval);
 
         const start_timestamp = response.time;
-        console.log('ServerTime: Processing time:', start_timestamp);
         const performance_response_time = performance.now();
         const time_taken = performance_response_time - performance_request_time;
         const server_time_at_response = ((start_timestamp * 1000) + time_taken);

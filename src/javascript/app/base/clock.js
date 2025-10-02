@@ -7,21 +7,17 @@ const Clock = (() => {
     let fncExternalTimer;
     const el_clock_selector = '.gmt-clock';
     const startClock = () => {
-        console.log('Clock: Starting clock...');
         ServerTime.init(onTimeUpdated);
     };
 
     const onTimeUpdated = () => {
         const server_time = ServerTime.get();
-        console.log('Clock: onTimeUpdated called, server_time:', server_time);
         if (!server_time) {
-            console.warn('Clock: ServerTime.get() returned undefined');
             return;
         }
         window.time = server_time;
 
         const time_str = `${server_time.format('YYYY-MM-DD HH:mm:ss')} GMT`;
-        console.log('Clock: Updating clock with:', time_str);
         applyToAllElements(el_clock_selector, (el) => {
             elementInnerHtml(el, time_str);
         });

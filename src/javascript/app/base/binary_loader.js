@@ -52,9 +52,7 @@ const BinaryLoader = (() => {
 
         SSOLoader.init();
         Client.init();
-        console.log('BinaryLoader: About to initialize NetworkMonitor...');
         NetworkMonitor.init();
-        console.log('BinaryLoader: NetworkMonitor initialized');
         DerivBanner.chooseBanner();
         container = getElementById('content-holder');
         container.addEventListener('binarypjax:before', beforeContentChange);

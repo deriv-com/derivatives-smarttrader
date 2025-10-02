@@ -234,13 +234,11 @@ const BinarySocketBase = (() => {
         config.wsEvent('init');
 
         if (isClose() || availability.is_updating) {
-            console.log('Creating WebSocket connection to:', socket_url);
             binary_socket = new WebSocket(socket_url);
             State.set('response', {});
         }
 
         binary_socket.onopen = async () => {
-            console.log('WebSocket connection opened');
             config.wsEvent('open');
             
             // Debug: Intercept reload calls to trace source
@@ -461,7 +459,6 @@ const BinarySocketBase = (() => {
         };
 
         binary_socket.onclose = () => {
-            console.log('WebSocket connection closed');
             sent_requests.clear();
             clearTimeouts();
             config.wsEvent('close');
@@ -473,7 +470,7 @@ const BinarySocketBase = (() => {
         };
 
         binary_socket.onerror = (error) => {
-            console.error('WebSocket error:', error);
+            // WebSocket error occurred
         };
     };
 

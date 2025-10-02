@@ -44,7 +44,6 @@ const BinarySocketGeneral = (() => {
     };
 
     const onOpen = (is_ready) => {
-        console.log('WebSocket onOpen called, is_ready:', is_ready);
         Header.hideNotification();
         
         // Set up default currencies since payout_currencies is no longer available
@@ -54,16 +53,10 @@ const BinarySocketGeneral = (() => {
         setupWebsiteStatusDefaults();
         
         // Start clock regardless of login status - clock should work for everyone
-        console.log('Starting clock from onOpen...');
         Clock.startClock();
         
         if (is_ready) {
             if (!isLoginPages()) {
-                if (!Client.isValidLoginid()) {
-                    Client.sendLogoutRequest();
-                    return;
-                }
-              
                 // Send initial requests for logged-out users
                 BinarySocket.send({ active_symbols: 'brief' });
             }
