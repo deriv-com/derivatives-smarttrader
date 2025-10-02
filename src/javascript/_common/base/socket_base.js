@@ -68,7 +68,6 @@ const BinarySocketBase = (() => {
     const no_duplicate_requests = [
         'authorize',
         'get_settings',
-        'residence_list',
         'landing_company',
         'asset_index',
     ];

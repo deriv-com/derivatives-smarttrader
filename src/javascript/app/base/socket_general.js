@@ -63,7 +63,6 @@ const BinarySocketGeneral = (() => {
             
             // Send essential requests that replace website_status functionality
             // These are needed for basic app functionality
-            BinarySocket.send({ residence_list: 1 }); // Get residence list for country detection
         }
     };
 
@@ -141,12 +140,6 @@ const BinarySocketGeneral = (() => {
                 break;
             case 'landing_company':
                 Header.upgradeMessageVisibility();
-                break;
-            case 'residence_list':
-                // Store residence list for country detection
-                if (response.residence_list) {
-                    State.set(['response', 'residence_list'], response.residence_list);
-                }
                 break;
             case 'time':
                 // Store time response for clock functionality

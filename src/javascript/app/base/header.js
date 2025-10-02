@@ -6,7 +6,6 @@ const Client = require('./client');
 const BinarySocket = require('./socket');
 const AuthClient = require('../../_common/auth');
 const TMB = require('../../_common/tmb');
-const showHidePulser = require('../common/account_opening').showHidePulser;
 
 const Login = require('../../_common/base/login');
 const SocketCache = require('../../_common/base/socket_cache');
@@ -1310,9 +1309,6 @@ const Header = (() => {
                         );
                     });
                 }
-                if (/accounts/.test(window.location.href)) {
-                    showHidePulser(0);
-                }
             } else if (show_upgrade_msg) {
                 getElementById('virtual-wrapper').setVisibility(0);
                 const upgrade_url =
@@ -1321,10 +1317,6 @@ const Header = (() => {
               : Object.values(upgrade_info.upgrade_links)[0];
                 showUpgrade(upgrade_url, upgrade_link_txt);
                 showUpgradeBtn(upgrade_url, upgrade_btn_txt);
-
-                if (/new_account/.test(window.location.href)) {
-                    showHidePulser(0);
-                }
             } else {
                 applyToAllElements(upgrade_msg, (el) => {
                     el.setVisibility(0);

@@ -7791,8 +7791,6 @@ msgstr ""
 msgid "Please select a value"
 msgstr ""
 
-msgid "Please select a value for account_opening_reason."
-msgstr ""
 
 msgid "Please select at least one scope"
 msgstr ""
