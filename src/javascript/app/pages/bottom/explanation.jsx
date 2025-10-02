@@ -19,7 +19,6 @@ export const Explanation = ({ explanation_only = false }) => {
         setFormName(null);
         
         setTimeout(() => {
-            // [AI] - Add validation to ensure we have valid form name and data
             if (
                 actual_form_name &&
                 contract_explanation_data &&
@@ -28,7 +27,6 @@ export const Explanation = ({ explanation_only = false }) => {
             ) {
                 setFormName(actual_form_name);
             }
-            // [/AI]
         }, 500);
        
     }, [has_contract_changes]);

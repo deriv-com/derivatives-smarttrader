@@ -99,7 +99,7 @@ const BinaryLoader = (() => {
         // Make sure content is properly loaded or visible before scrolling to anchor.
         ContentVisibility.init().then(() => {
             BinarySocket.wait('authorize', 'landing_company').then(() => {
-                GTM.pushDataLayer({ event: 'page_load' }); // [AI] website_status.clients_country no longer available
+                GTM.pushDataLayer({ event: 'page_load' });
 
                 // reroute LiveChat group
                 LiveChat.rerouteGroup();

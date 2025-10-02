@@ -89,14 +89,12 @@ const BinarySocketGeneral = (() => {
                         BinarySocket.send({ balance: 1, subscribe: 1 });
                         BinarySocket.send({ get_settings: 1 });
                         BinarySocket.send({ get_account_status: 1 });
-                        // [AI] payout_currencies removed - no longer supported in new API
                         BinarySocket.send({ mt5_login_list: 1 });
                         SubscriptionManager.subscribe('transaction', { transaction: 1, subscribe: 1 }, () => false);
                         const clients_country = response.authorize.country || Client.get('residence');
                         setResidence(clients_country);
                         // for logged in clients send landing company with IP address as residence
                         if (!clients_country) {
-                            // [AI] website_status.clients_country no longer available, use landing_company.id instead
                             BinarySocket.send({ landing_company: State.getResponse('landing_company.id') });
                         }
                         if (!Client.get('is_virtual')) {
@@ -113,14 +111,12 @@ const BinarySocketGeneral = (() => {
                         BinarySocket.send({ balance: 1, subscribe: 1 });
                         BinarySocket.send({ get_settings: 1 });
                         BinarySocket.send({ get_account_status: 1 });
-                        // [AI] payout_currencies removed - no longer supported in new API
                         BinarySocket.send({ mt5_login_list: 1 });
                         SubscriptionManager.subscribe('transaction', { transaction: 1, subscribe: 1 }, () => false);
                         const clients_country = response.authorize.country || Client.get('residence');
                         setResidence(clients_country);
                         // for logged in clients send landing company with IP address as residence
                         if (!clients_country) {
-                            // [AI] website_status.clients_country no longer available, use landing_company.id instead
                             BinarySocket.send({ landing_company: State.getResponse('landing_company.id') });
                         }
                         if (!Client.get('is_virtual')) {
@@ -147,7 +143,6 @@ const BinarySocketGeneral = (() => {
                     State.set(['response', 'time'], response);
                 }
                 break;
-            // [AI] payout_currencies handler removed - no longer supported in new API
             case 'get_self_exclusion':
                 SessionDurationLimit.exclusionResponseHandler(response);
                 break;

@@ -88,8 +88,6 @@ const ContentVisibility = (() => {
         };
     };
 
-    // [AI] isEuCountry function removed - no longer needed
-
     const isMT5FinRule = (rule) => /^mt5fin:/.test(rule);
 
     const parseMT5FinRule = (rule) => rule.match(/^mt5fin:(.+)$/)[1];
