@@ -16,6 +16,17 @@ const ClientBase = (() => {
     let current_loginid;
 
     const init = () => {
+        // Check if session token exists - if not, clear everything
+        const sessionToken = localStorage.getItem('session_token');
+        if (!sessionToken) {
+            // eslint-disable-next-line no-console
+            console.log('🧹 No session token found, clearing all session data');
+            clearAllAccounts();
+            LocalStore.remove('active_loginid');
+            SessionStore.remove('active_loginid');
+            return;
+        }
+        
         const url_params = new URLSearchParams(window.location.search);
         const account_currency = url_params.get('account') || SessionStore.get('account');
         client_object = getAllAccountsObject();
@@ -58,11 +69,22 @@ const ClientBase = (() => {
         }
     };
 
-    const isLoggedIn = () => (
-        !isEmptyObject(getAllAccountsObject()) &&
-        get('loginid') &&
-        get('token')
-    );
+    const isLoggedIn = () => {
+        // Session is dependent on session_token in localStorage
+        const sessionToken = localStorage.getItem('session_token');
+        if (!sessionToken) {
+            // If no session token, clear everything and return false
+            clearAllAccounts();
+            LocalStore.remove('active_loginid');
+            SessionStore.remove('active_loginid');
+            return false;
+        }
+        
+        // If we have session token, check if we have valid account data
+        return !isEmptyObject(getAllAccountsObject()) &&
+               get('loginid') &&
+               get('token');
+    };
 
     const isValidLoginid = () => {
         if (!isLoggedIn()) return true;
@@ -340,8 +362,8 @@ const ClientBase = (() => {
         LocalStore.setObject(storage_key, accounts);
         LocalStore.set('active_loginid', authorize.loginid);
         
-        // Clean up session token from localStorage now that it's stored in account
-        cleanupSessionToken();
+        // Keep session token in localStorage for session persistence
+        // Don't call cleanupSessionToken() as we need it for session state
         
         // eslint-disable-next-line no-console
         console.log('responseAuthorizeSessionToken: Single-account session token setup complete', {
@@ -683,17 +705,12 @@ const ClientBase = (() => {
 
     /**
      * Clean up session token after successful authorization
+     * NOTE: This function is deprecated - we now keep session_token for session persistence
      */
     const cleanupSessionToken = () => {
-        const sessionToken = localStorage.getItem('session_token');
         // eslint-disable-next-line no-console
-        console.log('cleanupSessionToken: Removing session_token:', !!sessionToken);
-        
-        // Remove session token as it's now stored properly in client accounts
-        localStorage.removeItem('session_token');
-        
-        // eslint-disable-next-line no-console
-        console.log('cleanupSessionToken: Cleanup complete');
+        console.log('cleanupSessionToken: DEPRECATED - keeping session_token for session persistence');
+        // Do not remove session_token as it's needed for session state management
     };
 
     return {

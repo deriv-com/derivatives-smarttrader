@@ -6,6 +6,7 @@ const ClientBase       = require('./client_base');
 const SocketCache      = require('./socket_cache');
 const getLanguage      = require('../language').get;
 const State            = require('../storage').State;
+const getElementById   = require('../common_functions').getElementById;
 const cloneObject      = require('../utility').cloneObject;
 const getPropertyValue = require('../utility').getPropertyValue;
 const isEmptyObject    = require('../utility').isEmptyObject;
@@ -22,18 +23,16 @@ const isLoginPages     = require('../utility').isLoginPages;
  */
 const getServerInfo = () => {
     // Use the same server URL logic as the main WebSocket connection
-    const serverUrl = LocalStorageUtils.getValue(LocalStorageConstants.configServerURL) ||
-                     localStorage.getItem('config.server_url') ||
-                     getSocketURL().replace(/^wss?:\/\//, ''); // Extract domain from main socket URL
+    let serverUrl = LocalStorageUtils.getValue(LocalStorageConstants.configServerURL) ||
+                   localStorage.getItem('config.server_url');
+    
+    if (!serverUrl) {
+        // Extract domain from main socket URL and remove the /websockets/v3 part
+        const mainSocketURL = getSocketURL();
+        serverUrl = mainSocketURL.replace(/^wss?:\/\//, '').replace(/\/websockets\/v3.*$/, '');
+    }
+    
     const lang = LocalStorageUtils.getValue(LocalStorageConstants.i18nLanguage) || 'en';
-
-    // Debug: Log server info
-    // eslint-disable-next-line no-console
-    console.log('🌐 getServerInfo result:', {
-        serverUrl,
-        mainSocketURL  : getSocketURL(),
-        configServerURL: localStorage.getItem('config.server_url'),
-    });
 
     return {
         lang,
@@ -319,6 +318,12 @@ const BinarySocketBase = (() => {
             const oneTimeToken = urlParams.get('token');
 
             if (oneTimeToken) {
+                // Show loading state in header during token exchange
+                const header = getElementById('header');
+                if (header) {
+                    header.classList.add('loading');
+                }
+                
                 // Remove token from URL immediately for security
                 const url = new URL(window.location.href);
                 url.searchParams.delete('token');
@@ -359,6 +364,13 @@ const BinarySocketBase = (() => {
                 } catch (error) {
                     // eslint-disable-next-line no-console
                     console.error('❌ Error exchanging token:', error);
+                    
+                    // Remove loading state from header on error
+                    const headerElement = getElementById('header');
+                    if (headerElement) {
+                        headerElement.classList.remove('loading');
+                    }
+                    
                     return false;
                 }
             }
@@ -468,7 +480,7 @@ const BinarySocketBase = (() => {
             }
         };
 
-        binary_socket.onerror = (error) => {
+        binary_socket.onerror = () => {
             // WebSocket error occurred
         };
     };

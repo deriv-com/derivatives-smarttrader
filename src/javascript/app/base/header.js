@@ -629,6 +629,12 @@ const Header = (() => {
         applyToAllElements('.logout', (el) => {
             el.addEventListener('click', logoutOnClick);
         });
+
+        // Logout button in header
+        const btn_logout = getElementById('btn__logout');
+        if (btn_logout) {
+            btn_logout.addEventListener('click', logoutOnClick);
+        }
         // Mobile menu
         const mobile_menu_overlay = getElementById('mobile__container');
         const mobile_menu = getElementById('mobile__menu');

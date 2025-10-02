@@ -147,6 +147,13 @@ const Client = (() => {
             currentLoginId : ClientBase.get('loginid'),
             stack          : new Error().stack,
         });
+
+        // Clear session token immediately
+        if (sessionToken) {
+            localStorage.removeItem('session_token');
+            // eslint-disable-next-line no-console
+            console.log('🧹 Cleared session_token during logout');
+        }
         
         if (show_login_page) {
             sessionStorage.setItem('showLoginPage', 1);
@@ -209,6 +216,8 @@ const Client = (() => {
         // clear elev.io session storage
         sessionStorage.removeItem('_elevaddon-6app');
         sessionStorage.removeItem('_elevaddon-6create');
+        // clear session token
+        localStorage.removeItem('session_token');
         // clear trading session
         const { MARKET, UNDERLYING } = Defaults.PARAM_NAMES;
         Defaults.remove(MARKET, UNDERLYING);
