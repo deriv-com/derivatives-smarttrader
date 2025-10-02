@@ -15,7 +15,11 @@ const displayCurrencies = () => {
         return;
     }
 
-    const currencies = State.getResponse('payout_currencies');
+    // Use USD fallback since payout_currencies API is deprecated
+    let currencies = State.getResponse('payout_currencies');
+    if (!currencies || !Array.isArray(currencies) || currencies.length === 0) {
+        currencies = ['USD']; // Fallback to USD
+    }
 
     if (currencies && currencies.length > 1) {
         $currency.html(Currency.getCurrencyList(currencies).html());
