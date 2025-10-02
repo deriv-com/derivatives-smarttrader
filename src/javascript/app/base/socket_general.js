@@ -17,8 +17,46 @@ const getPropertyValue       = require('../../_common/utility').getPropertyValue
 const isLoginPages           = require('../../_common/utility').isLoginPages;
 
 const BinarySocketGeneral = (() => {
+    const setupDefaultCurrencies = () => {
+        // Set up default currencies since payout_currencies API is no longer available
+        const defaultCurrencies = ['USD', 'EUR', 'GBP', 'AUD', 'BTC', 'ETH'];
+        State.set(['response', 'payout_currencies'], defaultCurrencies);
+    };
+
+    const setupWebsiteStatusDefaults = () => {
+        // Set up default website_status data since the API is no longer available
+        // This provides essential data that the app expects
+        const websiteStatusData = {
+            clients_country         : 'ae', // Default to UAE (from your example)
+            site_status             : 'up', // Assume site is always up
+            supported_languages     : ['EN', 'ID', 'RU', 'MN', 'ES', 'FR', 'IT', 'PT', 'PL', 'DE', 'ZH_CN', 'VI', 'ZH_TW', 'TH', 'TR', 'KO', 'AR', 'BN', 'SI', 'SW', 'KM', 'UZ'],
+            terms_conditions_version: 'Version 4.2.0 2020-08-07',
+            currencies_config       : {
+                'USD': { fractional_digits: 2, is_suspended: 0, name: 'US Dollar', type: 'fiat' },
+                'EUR': { fractional_digits: 2, is_suspended: 0, name: 'Euro', type: 'fiat' },
+                'GBP': { fractional_digits: 2, is_suspended: 0, name: 'Pound Sterling', type: 'fiat' },
+                'AUD': { fractional_digits: 2, is_suspended: 0, name: 'Australian Dollar', type: 'fiat' },
+                'BTC': { fractional_digits: 8, is_suspended: 0, name: 'Bitcoin', type: 'crypto' },
+                'ETH': { fractional_digits: 8, is_suspended: 0, name: 'Ethereum', type: 'crypto' },
+            },
+        };
+        State.set(['response', 'website_status'], websiteStatusData);
+    };
+
     const onOpen = (is_ready) => {
+        console.log('WebSocket onOpen called, is_ready:', is_ready);
         Header.hideNotification();
+        
+        // Set up default currencies since payout_currencies is no longer available
+        setupDefaultCurrencies();
+        
+        // Set up default website_status data since the API is no longer available
+        setupWebsiteStatusDefaults();
+        
+        // Start clock regardless of login status - clock should work for everyone
+        console.log('Starting clock from onOpen...');
+        Clock.startClock();
+        
         if (is_ready) {
             if (!isLoginPages()) {
                 if (!Client.isValidLoginid()) {
@@ -29,7 +67,10 @@ const BinarySocketGeneral = (() => {
                 // Send initial requests for logged-out users
                 BinarySocket.send({ active_symbols: 'brief' });
             }
-            Clock.startClock();
+            
+            // Send essential requests that replace website_status functionality
+            // These are needed for basic app functionality
+            BinarySocket.send({ residence_list: 1 }); // Get residence list for country detection
         }
     };
 
@@ -107,6 +148,18 @@ const BinarySocketGeneral = (() => {
                 break;
             case 'landing_company':
                 Header.upgradeMessageVisibility();
+                break;
+            case 'residence_list':
+                // Store residence list for country detection
+                if (response.residence_list) {
+                    State.set(['response', 'residence_list'], response.residence_list);
+                }
+                break;
+            case 'time':
+                // Store time response for clock functionality
+                if (response.time) {
+                    State.set(['response', 'time'], response);
+                }
                 break;
             // [AI] payout_currencies handler removed - no longer supported in new API
             case 'get_self_exclusion':

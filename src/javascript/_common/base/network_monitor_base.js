@@ -41,6 +41,7 @@ const NetworkMonitorBase = (() => {
         updateUI;
 
     const init = (socket_general_functions, fncUpdateUI) => {
+        console.log('NetworkMonitorBase.init called');
         updateUI  = fncUpdateUI;
         ws_config = Object.assign({ wsEvent, isOnline }, socket_general_functions);
 
@@ -51,7 +52,9 @@ const NetworkMonitorBase = (() => {
             navigator.onLine = true;
         }
 
+        console.log('isOnline():', isOnline());
         if (isOnline()) {
+            console.log('Calling BinarySocket.init with config:', ws_config);
             BinarySocket.init(ws_config);
         }
 
