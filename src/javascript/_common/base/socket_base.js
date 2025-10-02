@@ -70,7 +70,6 @@ const BinarySocketBase = (() => {
         'get_settings',
         'residence_list',
         'landing_company',
-        'payout_currencies',
         'asset_index',
     ];
 
@@ -210,7 +209,8 @@ const BinarySocketBase = (() => {
 
         if (isReady() && !availability.is_down && config.isOnline() && binary_socket.readyState === 1) {
             is_disconnect_called = false;
-            if (!getPropertyValue(data, 'passthrough') && !getPropertyValue(data, 'verify_email')) {
+            // Don't add passthrough to time API calls - they should only have req_id and time
+            if (!getPropertyValue(data, 'passthrough') && !getPropertyValue(data, 'verify_email') && !getPropertyValue(data, 'time')) {
                 data.passthrough = {};
             }
 
@@ -436,7 +436,7 @@ const BinarySocketBase = (() => {
                 const msg_type = response.msg_type;
 
                 // store in State
-                if (!getPropertyValue(response, ['echo_req', 'subscribe']) || /balance|website_status/.test(msg_type)) {
+                if (!getPropertyValue(response, ['echo_req', 'subscribe']) || /balance/.test(msg_type)) {
                     State.set(['response', msg_type], cloneObject(response));
                 }
                 // resolve the send promise
