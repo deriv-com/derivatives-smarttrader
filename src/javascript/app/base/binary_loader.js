@@ -98,8 +98,8 @@ const BinaryLoader = (() => {
 
         // Make sure content is properly loaded or visible before scrolling to anchor.
         ContentVisibility.init().then(() => {
-            BinarySocket.wait('authorize', 'website_status', 'landing_company').then(() => {
-                GTM.pushDataLayer({ event: 'page_load' }); // we need website_status.clients_country
+            BinarySocket.wait('authorize', 'landing_company').then(() => {
+                GTM.pushDataLayer({ event: 'page_load' }); // [AI] website_status.clients_country no longer available
 
                 // reroute LiveChat group
                 LiveChat.rerouteGroup();
@@ -173,9 +173,9 @@ const BinaryLoader = (() => {
 
     const loadActiveScript = (config) => {
         if (active_script && typeof active_script.onLoad === 'function') {
-            // only pages that call formatMoney should wait for website_status
+            // Currency formatting will use fallback data sources
             if (config.needs_currency) {
-                BinarySocket.wait('website_status').then(() => {
+                BinarySocket.wait('authorize').then(() => {
                     active_script.onLoad();
                 });
             } else {

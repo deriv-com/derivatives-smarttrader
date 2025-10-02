@@ -24,7 +24,6 @@ const getPlatformSettings =
 
 const formatMoney = require('../common/currency').formatMoney;
 
-const isEuCountry = require('../common/country_base').isEuCountry;
 const DerivLiveChat = require('../pages/livechat.jsx');
 const {
     default: isHubEnabledCountry,
@@ -279,18 +278,10 @@ const Header = (() => {
     };
 
     const setHeaderUrls = () => {
-        const url_add_account_dynamic = document.getElementById(
-            'url-add-account-dynamic'
-        );
         const btn__signup = getElementById('btn__signup');
         const static_url = Url.getStaticUrl();
         const signup_url = `${static_url}/signup/`;
         btn__signup.href = signup_url;
-
-        if (isEuCountry()) {
-            url_add_account_dynamic.classList.remove('url-add-account');
-            url_add_account_dynamic.classList.add('url-add-account-multiplier');
-        }
 
         applyToAllElements('.url-wallet-apps', (el) => {
             el.href = isHubEnabledCountry()

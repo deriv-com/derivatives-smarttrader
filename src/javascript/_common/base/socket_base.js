@@ -70,7 +70,6 @@ const BinarySocketBase = (() => {
         'get_settings',
         'residence_list',
         'landing_company',
-        'payout_currencies',
         'asset_index',
     ];
 
@@ -436,7 +435,7 @@ const BinarySocketBase = (() => {
                 const msg_type = response.msg_type;
 
                 // store in State
-                if (!getPropertyValue(response, ['echo_req', 'subscribe']) || /balance|website_status/.test(msg_type)) {
+                if (!getPropertyValue(response, ['echo_req', 'subscribe']) || /balance|website_status|time/.test(msg_type)) {
                     State.set(['response', msg_type], cloneObject(response));
                 }
                 // resolve the send promise

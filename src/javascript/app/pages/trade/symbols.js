@@ -47,7 +47,7 @@ const Symbols = (() => {
                 // if we disable a symbol in API, pipsize won't be available
                 // but we can still draw historical trades' charts
                 // so we should handle getting undefined from this function
-                resolve(countDecimalPlaces(getPropertyValue(market[underlying], ['pip'])));
+                resolve(countDecimalPlaces(getPropertyValue(market[underlying], ['pip']) || getPropertyValue(market[underlying], ['pip_size'])));
             });
         })
     );

@@ -35,10 +35,9 @@ const InitializationManager = (() => {
 
     // Initialization steps with dependencies
     const INIT_STEPS = {
-        AUTHORIZE        : { id: 'authorize', name: 'Authorization', dependencies: [] },
-        PAYOUT_CURRENCIES: { id: 'payout_currencies', name: 'Currency Setup', dependencies: ['authorize'] },
-        ACTIVE_SYMBOLS   : { id: 'active_symbols', name: 'Market Data', dependencies: ['authorize'] },
-        CONTRACTS        : { id: 'contracts', name: 'Contract Loading', dependencies: ['active_symbols'] },
+        AUTHORIZE     : { id: 'authorize', name: 'Authorization', dependencies: [] },
+        ACTIVE_SYMBOLS: { id: 'active_symbols', name: 'Market Data', dependencies: ['authorize'] },
+        CONTRACTS     : { id: 'contracts', name: 'Contract Loading', dependencies: ['active_symbols'] },
     };
 
     /**
@@ -196,17 +195,8 @@ const InitializationManager = (() => {
             // Step 1: Wait for authorization (already handled by TradePage)
             markStepCompleted('authorize');
 
-            // Step 2: Load payout currencies
-            try {
-                await executeStep('payout_currencies', () =>
-                    BinarySocket.send({ payout_currencies: 1 }, { forced: true }));
-                if (callbacks.onPayoutCurrenciesLoaded) {
-                    callbacks.onPayoutCurrenciesLoaded();
-                }
-            } catch (error) {
-                // eslint-disable-next-line no-console
-                console.warn('Payout currencies failed, continuing with defaults');
-            }
+            // Step 2: Payout currencies removed - no longer supported in new API
+            // Currency handling now uses default currencies
 
             // Step 3: Load active symbols
             let activeSymbolsResult = null;

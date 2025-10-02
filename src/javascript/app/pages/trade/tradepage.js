@@ -49,7 +49,10 @@ const TradePage = (() => {
 
         // Use robust initialization manager for API-dependent initialization
         BinarySocket.wait('authorize').then(() => {
-            const country = State.getResponse('authorize.country') || State.getResponse('website_status.clients_country');
+            const country = State.getResponse('authorize.country') ||
+                           Client.get('residence') ||
+                           State.getResponse('landing_company.id') ||
+                           'gb'; // Default fallback
 
             // Handle virtual account setup
             if (Client.get('is_virtual')) {

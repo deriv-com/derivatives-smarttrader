@@ -27,32 +27,15 @@ const Client = (() => {
     const activateByClientType = (section_id) => {
         // const topbar_class = getElementById('topbar').classList;
         const el_section   = section_id ? getElementById(section_id) : document.body;
-
-        // const primary_bg_color_dark = 'primary-bg-color-dark';
-        // const secondary_bg_color    = 'secondary-bg-color';
         
         if (ClientBase.isLoggedIn()) {
-            BinarySocket.wait('authorize', 'website_status', 'get_account_status', 'balance').then(() => {
-                // const client_logged_in = getElementById('client-logged-in');
-                // client_logged_in.classList.add('gr-centered');
+            BinarySocket.wait('authorize', 'get_account_status', 'balance').then(() => {
 
                 applyToAllElements('.client_logged_in', (el) => {
                     el.setVisibility(1);
                 });
 
                 if (ClientBase.get('is_virtual')) applyToAllElements('.client_virtual', el => el.setVisibility(1), '', el_section);
-
-                // if (ClientBase.get('is_virtual')) {
-                //     applyToAllElements('.client_virtual', (el) => { el.setVisibility(1); }, '', el_section);
-                //     topbar_class.add(secondary_bg_color);
-                //     topbar_class.remove(primary_bg_color_dark);
-                // } else {
-                //     applyToAllElements('.client_real', (el) => {
-                //         el.setVisibility(1);
-                //     }, '', el_section);
-                //     topbar_class.add(primary_bg_color_dark);
-                //     topbar_class.remove(secondary_bg_color);
-                // }
 
                 applyToAllElements('.is-login', (el) => {
                     el.style.display = 'inherit';
@@ -94,25 +77,12 @@ const Client = (() => {
                 }
             });
         } else {
-            // applyToAllElements('.client_logged_in', (el) => {
-            //     el.setVisibility(0);
-            // }, '', el_section);
-            // applyToAllElements('#client-logged-in', (el) => {
-            //     el.setVisibility(0);
-            // }, '', el_section);
-            // getElementById('topbar-msg').setVisibility(0);
-            // getElementById('menu-top').classList.remove('smaller-font', 'top-nav-menu');
-
             applyToAllElements('.client_logged_out', (el) => {
                 el.setVisibility(1);
             }, '', el_section);
-            // topbar_class.add(primary_bg_color_dark);
-            // topbar_class.remove(secondary_bg_color);
-
             applyToAllElements('.is-login', (el) => {
                 el.style.display = 'none';
             });
-            // .is-logout container is already visible by default, no need to show it again
             
             // EXPLICIT CLEANUP: Always remove skeleton loaders first for logout scenarios
             applyToAllElements('.skeleton-btn-login, .skeleton-btn-signup', (el) => {

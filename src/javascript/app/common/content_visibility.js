@@ -1,6 +1,5 @@
 const Client           = require('../base/client');
 const BinarySocket     = require('../base/socket');
-const State            = require('../../_common/storage').State;
 
 /*
     data-show attribute controls element visibility based on
@@ -43,7 +42,6 @@ const State            = require('../../_common/storage').State;
 */
 
 const mt_company_rule      = 'mtcompany';
-const eu_country_rule      = 'eucountry';
 const options_blocked_rule = 'optionsblocked';
 
 const ContentVisibility = (() => {
@@ -51,7 +49,7 @@ const ContentVisibility = (() => {
 
     const init = () =>
         new Promise(resolve => {
-            BinarySocket.wait('authorize', 'landing_company', 'website_status').then(() => {
+            BinarySocket.wait('authorize').then(() => {
                 resolve();
             });
         })
@@ -90,18 +88,7 @@ const ContentVisibility = (() => {
         };
     };
 
-    const isEuCountry = () => {
-        const eu_shortcode_regex  = /^(maltainvest|malta|iom)$/;
-        const eu_excluded_regex   = /^mt$/;
-        const financial_shortcode = State.getResponse('landing_company.financial_company.shortcode');
-        const gaming_shortcode    = State.getResponse('landing_company.gaming_company.shortcode');
-        const clients_country     = Client.get('residence') || State.getResponse('website_status.clients_country');
-        return (
-            (financial_shortcode || gaming_shortcode) ?
-                (eu_shortcode_regex.test(financial_shortcode) || eu_shortcode_regex.test(gaming_shortcode)) :
-                eu_excluded_regex.test(clients_country)
-        );
-    };
+    // [AI] isEuCountry function removed - no longer needed
 
     const isMT5FinRule = (rule) => /^mt5fin:/.test(rule);
 
@@ -120,24 +107,14 @@ const ContentVisibility = (() => {
         } = parseAttributeString(attr_str);
         const rule_set = new Set(names);
 
-        const is_eu_country           = isEuCountry();
         const rule_set_has_current    = rule_set.has(current_landing_company_shortcode);
         const rule_set_has_mt         = rule_set.has(mt_company_rule);
-        const rule_set_has_eu_country = rule_set.has(eu_country_rule);
         const options_blocked         = rule_set.has(options_blocked_rule);
 
         let show_element = false;
 
         if (client_has_mt_company && rule_set_has_mt) show_element = !is_exclude;
         else if (is_exclude !== rule_set_has_current) show_element = true;
-        if (rule_set_has_eu_country && is_eu_country) show_element = !is_exclude;
-        else if (is_eu_country && current_landing_company_shortcode === 'default') { // for logged out EU clients, check if IP landing company matches
-            const financial_shortcode = State.getResponse('landing_company.financial_company.shortcode');
-            const gaming_shortcode    = State.getResponse('landing_company.gaming_company.shortcode');
-            if (rule_set.has(financial_shortcode) || rule_set.has(gaming_shortcode)) {
-                show_element = !is_exclude;
-            }
-        }
 
         // Check if list of mt5fin_company_shortcodes is array type and filter with defined mt5fin rules
         if (Array.isArray(arr_mt5fin_shortcodes)) {

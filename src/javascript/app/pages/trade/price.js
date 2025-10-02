@@ -74,7 +74,7 @@ const Price = (() => {
         }
 
         if (underlying && underlying.value) {
-            proposal.symbol = underlying.value;
+            proposal.underlying_symbol = underlying.value;
         }
 
         if (expiry_type && CommonFunctions.isVisible(expiry_type) && expiry_type.value === 'duration') {

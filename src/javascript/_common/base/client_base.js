@@ -373,7 +373,7 @@ const ClientBase = (() => {
 
     const shouldAcceptTnc = () => {
         if (get('is_virtual')) return false;
-        const website_tnc_version = State.getResponse('website_status.terms_conditions_version');
+        const website_tnc_version = State.getResponse('landing_company.terms_conditions_version');
         const client_tnc_status   = State.getResponse('get_settings.client_tnc_status');
         return typeof client_tnc_status !== 'undefined' && client_tnc_status !== website_tnc_version;
     };

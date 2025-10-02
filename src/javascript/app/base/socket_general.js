@@ -3,14 +3,13 @@ const Clock                  = require('./clock');
 const Header                 = require('./header');
 const BinarySocket           = require('./socket');
 const Dialog                 = require('../common/attach_dom/dialog');
-const createLanguageDropDown = require('../common/attach_dom/language_dropdown');
-const setCurrencies          = require('../common/currency').setCurrencies;
+
 const SessionDurationLimit   = require('../common/session_duration_limit');
 const updateBalance          = require('../pages/user/update_balance');
 const GTM                    = require('../../_common/base/gtm');
-const NetworkMonitorBase     = require('../../_common/base/network_monitor_base');
+
 const SubscriptionManager    = require('../../_common/base/subscription_manager').default;
-const Crowdin                = require('../../_common/crowdin');
+
 const localize               = require('../../_common/localize').localize;
 const LocalStore             = require('../../_common/storage').LocalStore;
 const State                  = require('../../_common/storage').State;
@@ -26,7 +25,9 @@ const BinarySocketGeneral = (() => {
                     Client.sendLogoutRequest();
                     return;
                 }
-                BinarySocket.send({ website_status: 1, subscribe: 1 });
+              
+                // Send initial requests for logged-out users
+                BinarySocket.send({ active_symbols: 'brief' });
             }
             Clock.startClock();
         }
@@ -36,34 +37,6 @@ const BinarySocketGeneral = (() => {
         handleError(response);
         Header.hideNotification('CONNECTION_ERROR');
         switch (response.msg_type) {
-            case 'website_status':
-                if (response.website_status) {
-                    const is_available = !BinarySocket.isSiteDown(response.website_status.site_status);
-                    if (is_available && BinarySocket.getAvailability().is_down) {
-                        window.location.reload();
-                        return;
-                    }
-                    const is_updating = BinarySocket.isSiteUpdating(response.website_status.site_status);
-                    if (is_updating && !BinarySocket.getAvailability().is_updating) {
-                        // the existing connection is alive for one minute while status is updating
-                        // switch to the new connection somewhere between 1-30 seconds from now
-                        // to avoid everyone switching to the new connection at the same time
-                        const rand_timeout = Math.floor(Math.random() * 30) + 1;
-                        window.setTimeout(() => {
-                            NetworkMonitorBase.wsEvent('reconnect');
-                        }, rand_timeout * 1000);
-                    }
-                    if (!Crowdin.isInContext()) {
-                        createLanguageDropDown(response.website_status);
-                    }
-                    BinarySocket.setAvailability(response.website_status.site_status);
-                    setCurrencies(response.website_status);
-                    // for logged out clients send landing company with IP address as residence
-                    if (!Client.isLoggedIn() && !State.getResponse('landing_company')) {
-                        BinarySocket.send({ landing_company: response.website_status.clients_country });
-                    }
-                }
-                break;
             case 'authorize':
                 if (response.error) {
                     const is_active_tab = sessionStorage.getItem('active_tab') === '1';
@@ -83,14 +56,15 @@ const BinarySocketGeneral = (() => {
                         BinarySocket.send({ balance: 1, subscribe: 1 });
                         BinarySocket.send({ get_settings: 1 });
                         BinarySocket.send({ get_account_status: 1 });
-                        BinarySocket.send({ payout_currencies: 1 });
+                        // [AI] payout_currencies removed - no longer supported in new API
                         BinarySocket.send({ mt5_login_list: 1 });
                         SubscriptionManager.subscribe('transaction', { transaction: 1, subscribe: 1 }, () => false);
                         const clients_country = response.authorize.country || Client.get('residence');
                         setResidence(clients_country);
                         // for logged in clients send landing company with IP address as residence
                         if (!clients_country) {
-                            BinarySocket.send({ landing_company: State.getResponse('website_status.clients_country') });
+                            // [AI] website_status.clients_country no longer available, use landing_company.id instead
+                            BinarySocket.send({ landing_company: State.getResponse('landing_company.id') });
                         }
                         if (!Client.get('is_virtual')) {
                             BinarySocket.send({ get_self_exclusion: 1 });
@@ -106,14 +80,15 @@ const BinarySocketGeneral = (() => {
                         BinarySocket.send({ balance: 1, subscribe: 1 });
                         BinarySocket.send({ get_settings: 1 });
                         BinarySocket.send({ get_account_status: 1 });
-                        BinarySocket.send({ payout_currencies: 1 });
+                        // [AI] payout_currencies removed - no longer supported in new API
                         BinarySocket.send({ mt5_login_list: 1 });
                         SubscriptionManager.subscribe('transaction', { transaction: 1, subscribe: 1 }, () => false);
                         const clients_country = response.authorize.country || Client.get('residence');
                         setResidence(clients_country);
                         // for logged in clients send landing company with IP address as residence
                         if (!clients_country) {
-                            BinarySocket.send({ landing_company: State.getResponse('website_status.clients_country') });
+                            // [AI] website_status.clients_country no longer available, use landing_company.id instead
+                            BinarySocket.send({ landing_company: State.getResponse('landing_company.id') });
                         }
                         if (!Client.get('is_virtual')) {
                             BinarySocket.send({ get_self_exclusion: 1 });
@@ -133,6 +108,7 @@ const BinarySocketGeneral = (() => {
             case 'landing_company':
                 Header.upgradeMessageVisibility();
                 break;
+            // [AI] payout_currencies handler removed - no longer supported in new API
             case 'get_self_exclusion':
                 SessionDurationLimit.exclusionResponseHandler(response);
                 break;

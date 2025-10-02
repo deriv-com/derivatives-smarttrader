@@ -1,12 +1,11 @@
 const localize               = require('./localize').localize;
 const BinarySocket           = require('../app/base/socket');
 const Dialog                 = require('../app/common/attach_dom/dialog');
-const isEuCountry            = require('../app/common/country_base').isEuCountry;
 const getCurrentBinaryDomain = require('../config').getCurrentBinaryDomain;
 
 const ThirdPartyLinks = (() => {
     const init = () => {
-        BinarySocket.wait('website_status', 'authorize', 'landing_company').then(() => {
+        BinarySocket.wait('authorize').then(() => {
             document.body.addEventListener('click', clickHandler);
         });
     };
@@ -17,22 +16,12 @@ const ThirdPartyLinks = (() => {
         if (!el_link) return;
 
         const href = el_link.href;
-        if (isEuCountry()) {
-            const dialog = document.querySelector('#third_party_redirect_dialog');
-            if (dialog && dialog.contains(el_link)) return;
+        const dialog = document.querySelector('#telegram_installation_dialog');
+        if (dialog && dialog.contains(el_link)) return;
 
-            if (isThirdPartyLink(href)) {
-                e.preventDefault();
-                showThirdPartyLinkPopup(href);
-            }
-        } else {
-            const dialog = document.querySelector('#telegram_installation_dialog');
-            if (dialog && dialog.contains(el_link)) return;
-
-            if (isTelegramLink(href)) {
-                e.preventDefault();
-                showTelegramPopup(href);
-            }
+        if (isTelegramLink(href)) {
+            e.preventDefault();
+            showTelegramPopup(href);
         }
     };
 
@@ -40,20 +29,6 @@ const ThirdPartyLinks = (() => {
         const link = window.open();
         link.opener = null;
         link.location = href;
-    };
-
-    const showThirdPartyLinkPopup = (href) => {
-        // show third-party website redirect notification for logged in and logged out EU clients
-        Dialog.confirm({
-            id               : 'third_party_redirect_dialog',
-            localized_message: localize(['You will be redirected to a third-party website which is not owned by Binary.com.', 'Click OK to proceed.']),
-        }).then((should_proceed) => {
-            if (should_proceed && isTelegramLink(href))  {
-                showTelegramPopup(href);
-            } else if (should_proceed) {
-                openThirdPartyLink(href);
-            }
-        });
     };
 
     const showTelegramPopup = (href) => {
