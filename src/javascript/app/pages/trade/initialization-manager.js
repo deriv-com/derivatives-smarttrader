@@ -12,6 +12,7 @@
 
 const BinarySocket = require('../../base/socket');
 const getElementById = require('../../../_common/common_functions').getElementById;
+const State = require('../../../_common/storage').State;
 
 const InitializationManager = (() => {
     // Configuration

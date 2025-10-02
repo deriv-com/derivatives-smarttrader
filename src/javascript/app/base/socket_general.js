@@ -176,6 +176,11 @@ const BinarySocketGeneral = (() => {
     };
 
     const handleError = (response) => {
+        // Only process responses that actually have errors
+        if (!response.error) {
+            return;
+        }
+        
         const msg_type   = response.msg_type;
         const error_code = getPropertyValue(response, ['error', 'code']);
         switch (error_code) {

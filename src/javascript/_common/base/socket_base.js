@@ -207,7 +207,8 @@ const BinarySocketBase = (() => {
 
         if (isReady() && !availability.is_down && config.isOnline() && binary_socket.readyState === 1) {
             is_disconnect_called = false;
-            if (!getPropertyValue(data, 'passthrough') && !getPropertyValue(data, 'verify_email')) {
+            // Don't add passthrough to time API calls - they should only have req_id and time
+            if (!getPropertyValue(data, 'passthrough') && !getPropertyValue(data, 'verify_email') && !getPropertyValue(data, 'time')) {
                 data.passthrough = {};
             }
 
