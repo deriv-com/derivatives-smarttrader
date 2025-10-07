@@ -53,6 +53,102 @@ const ActiveSymbols = (() => {
 
     const clone = obj => extend({}, obj);
 
+    const getDisplayName = (key) => {
+        const displayNames = {
+            'forex'           : 'Forex',
+            'indices'         : 'Stock Indices',
+            'cryptocurrency'  : 'Cryptocurrencies',
+            'commodities'     : 'Commodities',
+            'synthetic_index' : 'Derived',
+            'synthetics'      : 'Synthetics',
+            'baskets'         : 'Baskets',
+            'random_index'    : 'Continuous Indices',
+            'random_daily'    : 'Daily Reset Indices',
+            'crash_index'     : 'Crash/Boom Indices',
+            'jump_index'      : 'Jump Indices',
+            'step_index'      : 'Step Indices',
+            'forex_basket'    : 'Forex Basket',
+            'commodity_basket': 'Commodities Basket',
+            'major_pairs'     : 'Major Pairs',
+            'minor_pairs'     : 'Minor Pairs',
+            'europe_OTC'      : 'European indices',
+            'asia_oceania_OTC': 'Asian indices',
+            'americas_OTC'    : 'American indices',
+            'metals'          : 'Metals',
+            'energy'          : 'Energy',
+            'non_stable_coin' : 'Cryptocurrencies',
+        };
+        return displayNames[key] || key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ');
+    };
+
+    const generateSymbolDisplayName = (symbolKey) => {
+        if (symbolKey.startsWith('frxX')) {
+            const commodityMap = {
+                'frxXAUUSD': 'Gold/USD',
+                'frxXAGUSD': 'Silver/USD',
+                'frxXPDUSD': 'Palladium/USD',
+                'frxXPTUSD': 'Platinum/USD',
+            };
+            return commodityMap[symbolKey] || symbolKey.replace('frxX', '').replace(/([A-Z]{3})([A-Z]{3})/, '$1/$2');
+        } else if (symbolKey.startsWith('frx')) {
+            const pair = symbolKey.replace('frx', '').replace(/([A-Z]{3})([A-Z]{3})/, '$1/$2');
+            return pair;
+        } else if (symbolKey.startsWith('cry')) {
+            const pair = symbolKey.replace('cry', '').replace(/([A-Z]{3})([A-Z]{3})/, '$1/$2');
+            return pair;
+        } else if (symbolKey.startsWith('OTC_')) {
+            const indexMap = {
+                'OTC_DJI'   : 'Wall Street 30',
+                'OTC_SPC'   : 'US 500',
+                'OTC_NDX'   : 'US Tech 100',
+                'OTC_FTSE'  : 'UK 100',
+                'OTC_GDAXI' : 'Germany 40',
+                'OTC_FCHI'  : 'France 40',
+                'OTC_N225'  : 'Japan 225',
+                'OTC_HSI'   : 'Hong Kong 50',
+                'OTC_AS51'  : 'Australia 200',
+                'OTC_SSMI'  : 'Swiss 20',
+                'OTC_SX5E'  : 'Euro 50',
+                'OTC_AEX'   : 'Netherlands 25',
+                'OTC_IBEX35': 'IBEX 35',
+            };
+            return indexMap[symbolKey] || symbolKey.replace('OTC_', '');
+        } else if (symbolKey.startsWith('WLDX')) {
+            const commoditiesBasketMap = {
+                'WLDXAU': 'Gold Basket',
+                'WLDXAG': 'Silver Basket',
+                'WLDXPD': 'Palladium Basket',
+                'WLDXPT': 'Platinum Basket',
+            };
+            return commoditiesBasketMap[symbolKey] || `${symbolKey.replace('WLDX', '')} Basket`;
+        } else if (symbolKey.startsWith('WLD')) {
+            const currency = symbolKey.replace('WLD', '');
+            return `${currency} Basket`;
+        } else if (symbolKey.startsWith('R_')) {
+            const number = symbolKey.replace('R_', '');
+            return `Volatility ${number} Index`;
+        } else if (symbolKey.startsWith('JD')) {
+            const number = symbolKey.replace('JD', '');
+            return `Jump ${number} Index`;
+        } else if (symbolKey.startsWith('CRASH') || symbolKey.startsWith('BOOM')) {
+            return symbolKey.replace(/(CRASH|BOOM)(\d+)/, '$1 $2 Index');
+        } else if (symbolKey.startsWith('RDBEAR') || symbolKey.startsWith('RDBULL')) {
+            return symbolKey.replace('RDBEAR', 'Bear Market Index').replace('RDBULL', 'Bull Market Index');
+        } else if (symbolKey.startsWith('stpRNG')) {
+            const number = symbolKey.replace('stpRNG', '') || '1';
+            return `Step Index ${number}00`;
+        } else if (symbolKey.match(/^\d+HZ\d+V$/)) {
+            // Handle volatility indices like 1HZ100V, 1HZ75V, etc.
+            const match = symbolKey.match(/^(\d+)HZ(\d+)V$/);
+            if (match) {
+                const [, frequency, volatility] = match;
+                return `Volatility ${volatility} (${frequency}s) Index`;
+            }
+        }
+        
+        return symbolKey.replace(/_/g, ' ').replace(/([A-Z])/g, ' $1').trim();
+    };
+
     let markets    = {};
     let submarkets = {};
     let symbols    = {};
@@ -73,10 +169,14 @@ const ActiveSymbols = (() => {
             const symbol         = market_symbols[0];
 
             markets[market_name] = {
-                name         : market_name,
+                name: symbol.market === 'synthetic_index' ?
+                    getDisplayName(symbol.subgroup) :
+                    getDisplayName(symbol.market),
                 is_active    : !symbol.is_trading_suspended && symbol.exchange_is_open,
-                subgroup_name: symbol.subgroup !== 'none' ? symbol.market : symbol.subgroup,
-                subgroup     : symbol.subgroup !== 'none' ? symbol.market : symbol.subgroup,
+                subgroup_name: symbol.subgroup !== 'none' ?
+                    getDisplayName(symbol.market) :
+                    getDisplayName(symbol.subgroup),
+                subgroup: symbol.subgroup !== 'none' ? symbol.market : symbol.subgroup,
             };
             getSubmarketsForMarket(market_symbols, markets[market_name]);
         });
@@ -103,7 +203,7 @@ const ActiveSymbols = (() => {
             const symbol            = submarket_symbols[0];
 
             market.submarkets[submarket_name] = {
-                name     : symbol.submarket || submarket_name,
+                name     : getDisplayName(submarket_name),
                 is_active: !symbol.is_trading_suspended && symbol.exchange_is_open,
             };
 
@@ -119,7 +219,7 @@ const ActiveSymbols = (() => {
                 const symbolKey = symbol.underlying_symbol;
                 if (symbolKey) {
                     submarket.symbols[symbolKey] = {
-                        display    : symbolKey,
+                        display    : generateSymbolDisplayName(symbolKey),
                         symbol_type: symbol.underlying_symbol_type,
                         is_active  : !symbol.is_trading_suspended && symbol.exchange_is_open,
                         pip        : symbol.pip_size,

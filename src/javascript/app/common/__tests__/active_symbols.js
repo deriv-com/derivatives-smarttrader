@@ -42,7 +42,7 @@ const expected_markets_str = `{
                         "symbol_type": "forex_basket",
                         "is_active": 1,
                         "pip": 0.001,
-                        "market": "synthetic_index",
+                        "market": "baskets",
                         "submarket": "forex_basket"
                     }
                 }
@@ -54,34 +54,26 @@ const expected_markets_str = `{
 const active_symbols = [
     {
         allow_forward_starting: 1,
-        display_name: "EUR/USD",
         display_order: 78,
         exchange_is_open: 1,
         is_trading_suspended: 0,
         market: "forex",
-        market_display_name: "Forex",
-        pip: 0.00001,
+        pip_size: 0.00001,
         subgroup: "none",
-        subgroup_display_name: "None",
         submarket: "major_pairs",
-        submarket_display_name: "Major Pairs",
-        symbol: "frxEURUSD",
-        symbol_type: "forex",
+        underlying_symbol: "frxEURUSD",
+        underlying_symbol_type: "forex",
     }, {
         allow_forward_starting: 0,
-        display_name: "AUD Basket",
         display_order: 78,
         exchange_is_open: 1,
         is_trading_suspended: 0,
         market: "synthetic_index",
-        market_display_name: "Derived",
-        pip: 0.001,
+        pip_size: 0.001,
         subgroup: "baskets",
-        subgroup_display_name: "Baskets",
         submarket: "forex_basket",
-        submarket_display_name: "Forex Basket",
-        symbol: "WLDAUD",
-        symbol_type: "forex_basket",
+        underlying_symbol: "WLDAUD",
+        underlying_symbol_type: "forex_basket",
     }
 ];
 
