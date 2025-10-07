@@ -59,7 +59,9 @@ const processTradingTimesAnswer = (response) => {
                                 trading_times[response.echo_req.trading_times] = {};
                             }
                             const symbol_id = symbol.underlying_symbol;
-                            trading_times[response.echo_req.trading_times][symbol_id] = symbol.times.close;
+                            if (symbol_id && symbol.times && symbol.times.close) {
+                                trading_times[response.echo_req.trading_times][symbol_id] = symbol.times.close;
+                            }
                         }
                     }
                 }

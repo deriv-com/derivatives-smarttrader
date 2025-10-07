@@ -34,7 +34,6 @@ const Durations = (() => {
     let smallest_duration = {};
     let has_end_date      = 0;
     const {
-        DATE_START,
         DURATION,
         DURATION_AMOUNT,
         DURATION_UNITS,
@@ -45,19 +44,8 @@ const Durations = (() => {
         TIME_START,
     } = Defaults.PARAM_NAMES;
 
-    const displayDurations = (time_start_val) => {
-        let date_time_start = moment(Defaults.get(DATE_START) * 1000);
-        if (time_start_val) {
-            const start_time = time_start_val.split(':');
-            date_time_start  = date_time_start.utc().hour(start_time[0]).minute(start_time[1]);
-        }
-
-        let start_type;
-        if (Defaults.get(DATE_START) !== 'now' && State.get('is_start_dates_displayed') && date_time_start.isAfter(moment())) {
-            start_type = 'forward';
-        } else {
-            start_type = 'spot';
-        }
+    const displayDurations = () => {
+        // Start type logic removed - no longer needed with new API
 
         if (Defaults.get(FORM_NAME) === 'highlowticks') {
             Barriers.display(); // hide barrier field, instead of selecting barrier we select tick number
@@ -80,7 +68,6 @@ const Durations = (() => {
 
         const target             = CommonFunctions.getElementById('duration_units');
         const form_name          = Contract.form();
-        const barrier_category   = Contract.barrier();
         const duration_container = {};
 
         while (target && target.firstChild) {
@@ -88,25 +75,9 @@ const Durations = (() => {
         }
 
         Object.keys(durations).forEach((key) => {
-            Object.keys(durations[key][form_name] || []).forEach((form) => {
-                let obj = {};
-                if (barrier_category) {
-                    obj = durations[key][form_name][barrier_category];
-                } else {
-                    obj = durations[key][form_name][form];
-                }
-                Object.keys(obj).forEach((type) => {
-                    if (start_type) {
-                        if (start_type === type) {
-                            if (!getPropertyValue(duration_container, start_type)) {
-                                duration_container[key] = obj[start_type];
-                            }
-                        }
-                    } else if (!getPropertyValue(duration_container, type)) {
-                        duration_container[key] = obj[type];
-                    }
-                });
-            });
+            if (durations[key][form_name]) {
+                duration_container[key] = durations[key][form_name];
+            }
         });
 
         const duration_list = {};
@@ -719,7 +690,7 @@ const Durations = (() => {
 
         let make_price_request = 1;
         let requested;
-        const displayed = displayDurations(time_start.value);
+        const displayed = displayDurations();
         if (+displayed > 0) {
             make_price_request = -1;
         } else if (value !== 'now' && Defaults.get(EXPIRY_TYPE) === 'endtime') {

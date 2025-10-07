@@ -395,6 +395,14 @@ ul.bullet {
             background: url('../images/pages/trade/fall_1.svg') no-repeat top center;
             background-size: 40%;
         }
+        &.HIGHER {
+            background: url('../images/pages/trade/rise_1.svg') no-repeat top center;
+            background-size: 40%;
+        }
+        &.LOWER {
+            background: url('../images/pages/trade/fall_1.svg') no-repeat top center;
+            background-size: 40%;
+        }
         &.ONETOUCH {
             background: url('../images/pages/trade/touch_1.svg') no-repeat top center;
             background-size: 40%;

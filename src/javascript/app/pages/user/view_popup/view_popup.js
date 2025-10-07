@@ -4,7 +4,6 @@ const Highchart                = require('../../trade/charts/highchart');
 const Callputspread            = require('../../trade/callputspread');
 const Defaults                 = require('../../trade/defaults');
 const DigitDisplay             = require('../../trade/digit_trade');
-// Removed lookback import as lookback functionality has been removed
 const Reset                    = require('../../trade/reset');
 const TickDisplay              = require('../../trade/tick_trade');
 const Clock                    = require('../../../base/clock');
@@ -83,7 +82,6 @@ const ViewPopup = (() => {
 
         $.extend(contract, response.proposal_open_contract);
         is_sold_before_start = contract.sell_time && contract.sell_time < contract.date_start;
-        // Lookback multiplier value
         multiplier = contract.multiplier;
         is_multiplier_contract = /MULTDOWN|MULTUP/.test(contract.contract_type);
 
@@ -114,7 +112,6 @@ const ViewPopup = (() => {
             EXPIRYMISS  : localize('Ends Outside'),
             EXPIRYRANGE : localize('Ends Between'),
             EXPIRYRANGEE: localize('Ends Between'),
-            // Removed lookback contract type display mappings
             RANGE       : localize('Stays Between'),
             RESETCALL   : localize('Reset Call'),
             RESETPUT    : localize('Reset Put'),
@@ -142,7 +139,6 @@ const ViewPopup = (() => {
         containerSetText('trade_details_contract_type', ContractTypeDisplay()[contract.contract_type]);
         containerSetText('trade_details_purchase_price', formatMoney(contract.currency, contract.buy_price));
         containerSetText('trade_details_multiplier', formatMoney(contract.currency, multiplier, false, 3, 2));
-        // Removed lookback-specific payout logic
         containerSetText('trade_details_payout', formatMoney(contract.currency, contract.payout));
         dataManager.setPurchase({
             cd_payout: formatMoney(contract.currency, contract.payout),
@@ -203,12 +199,12 @@ const ViewPopup = (() => {
             // only show entry spot if available and contract was not sold before start time
             containerSetText(
                 'trade_details_barrier',
-                contract.entry_tick_time && is_sold_before_start ? '-' : (barrier_prefix + formatted_barrier),
+                contract.entry_spot_time && is_sold_before_start ? '-' : (barrier_prefix + formatted_barrier),
                 '',
                 true);
 
             dataManager.setPurchase({
-                cd_barrier: contract.entry_tick_time && is_sold_before_start ? '-' : (barrier_prefix + formatted_barrier),
+                cd_barrier: contract.entry_spot_time && is_sold_before_start ? '-' : (barrier_prefix + formatted_barrier),
             });
 
             if (Reset.isReset(contract.contract_type) && Reset.isNewBarrier(contract.entry_spot, contract.barrier)) {
@@ -219,13 +215,13 @@ const ViewPopup = (() => {
                     true);
                 containerSetText(
                     'trade_details_reset_barrier',
-                    contract.entry_tick_time && is_sold_before_start ? '-' : (barrier_prefix + formatted_barrier),
+                    contract.entry_spot_time && is_sold_before_start ? '-' : (barrier_prefix + formatted_barrier),
                     '',
                     true);
 
                 dataManager.setPurchase({
                     cd_barrier      : is_sold_before_start ? '-' : contract.entry_spot_display_value,
-                    cd_barrier_reset: contract.entry_tick_time && is_sold_before_start ? '-' : (barrier_prefix + formatted_barrier),
+                    cd_barrier_reset: contract.entry_spot_time && is_sold_before_start ? '-' : (barrier_prefix + formatted_barrier),
                 });
             }
         }
@@ -233,8 +229,8 @@ const ViewPopup = (() => {
         let current_spot      = contract.status === 'sold' ? '' : contract.current_spot_display_value;
         let current_spot_time = contract.status === 'sold' ? '' : contract.current_spot_time;
         if (is_ended && contract.status !== 'sold') {
-            current_spot      = contract.exit_tick_display_value;
-            current_spot_time = contract.exit_tick_time;
+            current_spot      = contract.exit_spot_display_value;
+            current_spot_time = contract.exit_spot_time;
         }
 
         if (current_spot) {
@@ -345,10 +341,10 @@ const ViewPopup = (() => {
 
         const is_digit = /digit/i.test(contract.contract_type);
         if (is_digit) {
-            if (!chart_started && contract.entry_tick_time) {
+            if (!chart_started && contract.entry_spot_time) {
                 DigitDisplay.init(id_tick_chart, contract);
-                if (contract.entry_tick_time) chart_started = true;
-            } else if (!chart_started && !contract.entry_tick_time) {
+                if (contract.entry_spot_time) chart_started = true;
+            } else if (!chart_started && !contract.entry_spot_time) {
                 // Since the contract not started yet, display the loading table:
                 DigitDisplay.initTable(id_tick_chart, DigitDisplay.calculateTableHeight(contract), contract);
             } else if (chart_started) {
@@ -360,7 +356,7 @@ const ViewPopup = (() => {
                 Highchart.showChart(contract);
             }
             Highchart.showChart(contract, 'update');
-            if (contract.entry_tick_time) {
+            if (contract.entry_spot_time) {
                 chart_started = true;
             }
         } else if (contract.tick_count) {
@@ -468,7 +464,6 @@ const ViewPopup = (() => {
                 cd_end_date : epochToDateTime(contract.sell_time),
             });
         }
-        // Removed lookback-specific spot label logic
         containerSetText('trade_details_spot_label', localize('Exit spot'));
         containerSetText('trade_details_spottime_label', localize('Exit spot time'));
         dataManager.setPurchase({
@@ -484,9 +479,8 @@ const ViewPopup = (() => {
         $container.find('#notice_ongoing').setVisibility(0);
         sellSetVisibility(false);
         // don't show for contracts that are manually sold before starting
-        // Hide audit table for Lookback
         if (contract.audit_details &&
-            (!contract.exit_tick_time || contract.exit_tick_time > contract.date_start)) {
+            (!contract.exit_spot_time || contract.exit_spot_time > contract.date_start)) {
             initAuditTable(0);
         }
     };
@@ -786,7 +780,6 @@ const ViewPopup = (() => {
             ${Reset.isReset(contract.contract_type) ? createRow(localize('Reset barrier'), '', 'trade_details_reset_barrier', true) : ''}
             ${(contract.barrier_count > 1 ? createRow(low_barrier_text, '', 'trade_details_barrier_low', true) : '')}
             ${createRow(Callputspread.isCallputspread(contract.contract_type) ? localize('Maximum payout') : localize('Potential payout'), '', 'trade_details_payout')}
-            // Removed lookback-specific multiplier row
             ${createRow(localize('Purchase price'), '', 'trade_details_purchase_price')}
             </tbody>
             <th colspan="2" id="barrier_change" class="invisible">${localize('Barrier change')}</th>

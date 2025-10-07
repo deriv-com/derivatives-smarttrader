@@ -8,15 +8,16 @@ const Portfolio = (() => {
 
     const getPortfolioData = c => (
         {
-            transaction_id: c.transaction_id,
-            contract_id   : c.contract_id,
-            payout        : parseFloat(c.payout),
-            expiry_time   : c.expiry_time,
-            longcode      : c.longcode,
-            shortcode     : c.shortcode,
-            currency      : c.currency,
-            buy_price     : c.buy_price,
-            app_id        : c.app_id,
+            transaction_id   : c.transaction_id,
+            contract_id      : c.contract_id,
+            payout           : parseFloat(c.payout),
+            expiry_time      : c.expiry_time,
+            longcode         : c.longcode,
+            shortcode        : c.shortcode,
+            currency         : c.currency,
+            buy_price        : c.buy_price,
+            app_id           : c.app_id,
+            underlying_symbol: c.underlying_symbol,
         }
     );
 

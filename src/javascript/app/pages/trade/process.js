@@ -315,8 +315,6 @@ const Process = (() => {
         refreshDropdown('#prediction');
         displaySelectedTick();
         refreshDropdown('#selected_tick');
-        // Removed Lookback.display() call as lookback functionality has been removed
-
         if (!Reset.isReset(Defaults.get(FORM_NAME))) {
             Reset.hideResetTime();
         }

@@ -104,7 +104,7 @@ const GTM = (() => {
         const data = {
             event             : 'buy_contract',
             bom_ui            : 'legacy',
-            bom_symbol        : req.symbol,
+            bom_symbol        : req.underlying_symbol,
             bom_market        : getElementById('contract_markets').value,
             bom_currency      : req.currency,
             bom_contract_type : req.contract_type,

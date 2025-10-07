@@ -239,7 +239,7 @@ const TickDisplay = (() => {
 
                 // add any indicator lines on this spot that is needed
                 // entry line
-                if (data.epoch === +contract.entry_tick_time) {
+                if (data.epoch === +contract.entry_spot_time) {
                     setIndicator({
                         value: idx,
                         label: localize('Entry Spot'),
@@ -258,7 +258,7 @@ const TickDisplay = (() => {
                 }
 
                 // exit line
-                if (data.epoch === +contract.exit_tick_time) {
+                if (data.epoch === +contract.exit_spot_time) {
                     setIndicator({
                         value    : idx,
                         label    : localize('Exit Spot'),

@@ -214,7 +214,6 @@ const TradingAnalysis = (() => {
                 image1: 'over.svg',
                 image2: 'under.svg',
             },
-            // Removed lookback image references as lookback functionality has been removed
             reset: {
                 image1: 'reset-call.svg',
                 image2: 'reset-put.svg',

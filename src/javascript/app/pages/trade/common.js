@@ -77,30 +77,21 @@ const commonTrading = (() => {
     };
 
     /*
-     * This maps the form name and barrierCategory we display on
-     * trading form to the actual we send it to backend
-     * for e.g risefall is mapped to callput with barrierCategory euro_atm
+     * This maps the form name we display on trading form to the actual
+     * form name we send to backend. With the new API, barrier categories
+     * are no longer needed as contract categories are distinct.
      */
     const getFormNameBarrierCategory = (form_name = '') => {
-        let name    = form_name;
-        let barrier = '';
-        if (/higherlower/.test(form_name)) {
-            name    = 'callput';
-            barrier = 'euro_non_atm';
-        } else if (/callputequal/.test(form_name)) {
-            barrier = 'euro_atm';
-        } else if (/risefall|callput/.test(form_name)) {
-            name    = 'callput';
-            barrier = 'euro_atm';
+        let name = form_name;
+        if (/risefall|callput/.test(form_name)) {
+            name = 'callput';
         } else if (/overunder|evenodd|matchdiff/.test(form_name)) {
             name = 'digits';
-        // Removed lookback form name detection as lookback functionality has been removed
         } else if (/reset/.test(form_name)) {
             name = 'reset';
         }
         return {
-            form_name       : name,
-            barrier_category: barrier,
+            form_name: name,
         };
     };
 
@@ -116,6 +107,8 @@ const commonTrading = (() => {
         PUT         : 'bottom',
         CALLE       : 'top',
         PUTE        : 'bottom',
+        HIGHER      : 'top',
+        LOWER       : 'bottom',
         ASIANU      : 'top',
         ASIAND      : 'bottom',
         DIGITMATCH  : 'top',
@@ -132,7 +125,6 @@ const commonTrading = (() => {
         UPORDOWN    : 'bottom',
         ONETOUCH    : 'top',
         NOTOUCH     : 'bottom',
-        // Removed lookback barrier position mappings as lookback functionality has been removed
         RESETCALL   : 'top',
         RESETPUT    : 'bottom',
         TICKHIGH    : 'top',
@@ -172,7 +164,6 @@ const commonTrading = (() => {
             ['digits',
                 ['matchdiff', 'evenodd', 'overunder'],
             ],
-            // Removed lookback contract group as lookback functionality has been removed
             'reset',
             'highlowticks',
             ['runs', ['runs']],
@@ -296,10 +287,10 @@ const commonTrading = (() => {
         return mkt;
     };
 
-    // Order - Updated to include new API market names
+    // Order
     const market_order = {
-        baskets         : 1,  // New API market name
-        commodity_basket: 2,  // New API market name
+        baskets         : 1,
+        commodity_basket: 2,
         basket_index    : 3,
         forex           : 4,
         synthetic_index : 5,

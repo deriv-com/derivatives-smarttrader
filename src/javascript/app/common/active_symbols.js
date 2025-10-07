@@ -71,10 +71,11 @@ const ActiveSymbols = (() => {
             const market_name    = key;
             const market_symbols = final_markets[key];
             const symbol         = market_symbols[0];
+
             markets[market_name] = {
-                name         : symbol.market === 'synthetic_index' ? symbol.subgroup_display_name : symbol.market_display_name,
+                name         : market_name,
                 is_active    : !symbol.is_trading_suspended && symbol.exchange_is_open,
-                subgroup_name: symbol.subgroup_display_name !== 'None' ? symbol.market_display_name : symbol.subgroup_display_name,
+                subgroup_name: symbol.subgroup !== 'none' ? symbol.market : symbol.subgroup,
                 subgroup     : symbol.subgroup !== 'none' ? symbol.market : symbol.subgroup,
             };
             getSubmarketsForMarket(market_symbols, markets[market_name]);
@@ -102,7 +103,7 @@ const ActiveSymbols = (() => {
             const symbol            = submarket_symbols[0];
 
             market.submarkets[submarket_name] = {
-                name     : symbol.submarket_display_name,
+                name     : symbol.submarket || submarket_name,
                 is_active: !symbol.is_trading_suspended && symbol.exchange_is_open,
             };
 
@@ -115,14 +116,13 @@ const ActiveSymbols = (() => {
         if (isEmptyObject(submarket.symbols)) {
             submarket.symbols = {};
             all_symbols.forEach((symbol) => {
-                // Use underlying_symbol instead of symbol (API structure changed)
-                const symbolKey = symbol.underlying_symbol || symbol.symbol;
+                const symbolKey = symbol.underlying_symbol;
                 if (symbolKey) {
                     submarket.symbols[symbolKey] = {
-                        display    : symbol.display_name || symbolKey,
-                        symbol_type: symbol.underlying_symbol_type || symbol.symbol_type,
+                        display    : symbolKey,
+                        symbol_type: symbol.underlying_symbol_type,
                         is_active  : !symbol.is_trading_suspended && symbol.exchange_is_open,
-                        pip        : symbol.pip_size || symbol.pip,
+                        pip        : symbol.pip_size,
                         market     : symbol.market !== 'synthetic_index' ? symbol.market : symbol.subgroup,
                         submarket  : symbol.submarket,
                     };
