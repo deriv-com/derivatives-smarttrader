@@ -500,11 +500,17 @@ const Durations = (() => {
         let date_start_val = CommonFunctions.getElementById('date_start').value;
         // if 'now' is selected, take first option's value
         if (!date_start_val || isNaN(+date_start_val)) {
-            date_start_val = window.time;
+            date_start_val = moment(window.time);
         } else {
             date_start_val = moment.unix(date_start_val).utc();
         }
         const expiry_date_day = moment.utc(expiry_date.getAttribute('data-value'));
+        
+        // Ensure both are valid moment objects
+        if (!moment.isMoment(date_start_val) || !moment.isMoment(expiry_date_day)) {
+            return false;
+        }
+        
         return date_start_val.isSame(expiry_date_day, 'day');
     };
 
