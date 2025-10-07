@@ -59,16 +59,6 @@ const Price = (() => {
             proposal.basis = amount_type.value;
         }
 
-        // Ensure we have required fields for proposal validation
-        if (!proposal.amount || proposal.amount <= 0) {
-            // Set a default amount if none provided to prevent validation errors
-            proposal.amount = 10; // Default stake amount
-        }
-
-        if (!proposal.basis) {
-            proposal.basis = 'stake'; // Default basis
-        }
-
         if (contract_type) {
             proposal.contract_type = type_of_contract;
         }
@@ -82,12 +72,8 @@ const Price = (() => {
         }
 
         if (expiry_type && CommonFunctions.isVisible(expiry_type) && expiry_type.value === 'duration') {
-            // Ensure duration values are valid
-            const durationValue = duration && duration.value ? parseInt(duration.value) : 5;
-            const durationUnitValue = duration_unit && duration_unit.value ? duration_unit.value : 't';
-            
-            proposal.duration      = durationValue;
-            proposal.duration_unit = durationUnitValue;
+            proposal.duration      = parseInt(duration.value);
+            proposal.duration_unit = duration_unit.value;
         } else if (expiry_type && CommonFunctions.isVisible(expiry_type) && expiry_type.value === 'endtime') {
             const end_date2 = end_date.getAttribute('data-value');
             let end_time2   = Defaults.get(EXPIRY_TIME);
@@ -262,15 +248,9 @@ const Price = (() => {
             comment.hide();
             setData();
             error.show();
-            
-            let error_message = details.error.message;
-            if (error_message && error_message.includes('missing market') && error_message.includes('old') && error_message.includes('data')) {
-                error_message = localize('Market temporarily unavailable. Please try again.');
-            }
-            
-            CommonFunctions.elementTextContent(error, error_message);
+            CommonFunctions.elementTextContent(error, details.error.message);
             dataManager.setPurchase({
-                [`${position}_comment`]: error_message,
+                [`${position}_comment`]: details.error.message,
             });
         } else {
             setData(proposal);
@@ -450,4 +430,3 @@ const Price = (() => {
 })();
 
 module.exports = Price;
-
