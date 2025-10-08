@@ -4,8 +4,6 @@ const displayPriceMovement = require('./common_independent').displayPriceMovemen
 const getTradingTimes      = require('./common_independent').getTradingTimes;
 const Contract             = require('./contract');
 const Defaults             = require('./defaults');
-// Removed lookback imports as lookback functionality has been removed
-// Removed unused Client import
 const BinarySocket         = require('../../base/socket');
 const formatMoney          = require('../../common/currency').formatMoney;
 const CommonFunctions      = require('../../../_common/common_functions');
@@ -53,13 +51,9 @@ const Price = (() => {
         const low_barrier   = CommonFunctions.getElementById('barrier_low');
         const prediction    = CommonFunctions.getElementById('prediction');
         const selected_tick = CommonFunctions.getElementById('selected_tick');
-        // Removed multiplier variable as lookback functionality has been removed
-
         if (payout && CommonFunctions.isVisible(payout) && payout.value) {
             proposal.amount = parseFloat(payout.value);
         }
-
-        // Removed multiplier handling as lookback functionality has been removed
 
         if (amount_type && CommonFunctions.isVisible(amount_type) && amount_type.value) {
             proposal.basis = amount_type.value;
@@ -74,7 +68,7 @@ const Price = (() => {
         }
 
         if (underlying && underlying.value) {
-            proposal.symbol = underlying.value;
+            proposal.underlying_symbol = underlying.value;
         }
 
         if (expiry_type && CommonFunctions.isVisible(expiry_type) && expiry_type.value === 'duration') {
@@ -100,7 +94,7 @@ const Price = (() => {
             proposal.duration_unit = 'm';
         }
 
-        if (barrier && CommonFunctions.isVisible(barrier)) {
+        if (barrier && CommonFunctions.isVisible(barrier) && barrier.value) {
             proposal.barrier = barrier.value;
         }
 
@@ -168,7 +162,6 @@ const Price = (() => {
         const payout_amount = container.getElementsByClassName('contract_payout')[0];
         const stake         = container.getElementsByClassName('stake')[0];
         const payout        = container.getElementsByClassName('payout')[0];
-        // Removed contract_multiplier and multiplier variables as lookback functionality has been removed
         const purchase            = container.getElementsByClassName('purchase_button')[0];
         const description         = container.getElementsByClassName('contract_description')[0];
         const longcode            = container.getElementsByClassName('contract_longcode')[0];
@@ -203,14 +196,14 @@ const Price = (() => {
         const setData = (data = {}) => {
             const currentCurrency = (currency.value || currency.getAttribute('value'));
         
-            if (!data.display_value) {
+            if (!data.ask_price) {
                 amount.classList.remove('price_moved_up', 'price_moved_down');
                 dataManager.setPurchase({
                     [`${position}_amount_classname`]: '',
                 });
             }
             CommonFunctions.elementTextContent(stake, `${localize('Stake')}: `);
-            CommonFunctions.elementInnerHtml(amount, data.display_value ? formatMoney(currentCurrency, data.display_value) : '-');
+            CommonFunctions.elementInnerHtml(amount, data.ask_price ? formatMoney(currentCurrency, data.ask_price) : '-');
 
             if (!data.payout) {
                 amount.classList.remove('price_moved_up', 'price_moved_down');
@@ -220,10 +213,8 @@ const Price = (() => {
             }
             CommonFunctions.elementTextContent(payout, `${localize('Payout')}: `);
             CommonFunctions.elementInnerHtml(payout_amount, data.payout ? formatMoney(currentCurrency, data.payout) : '-');
-            // Removed multiplier display logic as lookback functionality has been removed
-
             dataManager.setPurchase({
-                [`${position}_amount`]       : data.display_value ? formatMoney(currentCurrency, data.display_value, true) : '-',
+                [`${position}_amount`]       : data.ask_price ? formatMoney(currentCurrency, data.ask_price, true) : '-',
                 [`${position}_payout_amount`]: data.payout ? formatMoney(currentCurrency, data.payout, true) : '-',
                 currency                     : getCurrencyDisplayCode(currentCurrency),
             });
@@ -270,11 +261,10 @@ const Price = (() => {
             }
             comment.show();
             error.hide();
-            // Removed lookback-specific comment price logic
-            commonTrading.displayCommentPrice(comment, (currency.value || currency.getAttribute('value')), proposal.display_value, proposal.payout, position);
+            commonTrading.displayCommentPrice(comment, (currency.value || currency.getAttribute('value')), proposal.ask_price, proposal.payout, position);
             const old_price  = purchase.getAttribute('data-display_value');
             const old_payout = purchase.getAttribute('data-payout');
-            if (amount) displayPriceMovement(amount, old_price, proposal.display_value,`${position}_amount_classname`);
+            if (amount) displayPriceMovement(amount, old_price, proposal.ask_price,`${position}_amount_classname`);
             if (payout_amount) displayPriceMovement(payout_amount, old_payout, proposal.payout,`${position}_payout_amount_classname`);
             Array.from(purchase.attributes).filter(attr => {
                 if (!/^data/.test(attr.name) ||
@@ -292,9 +282,9 @@ const Price = (() => {
                 });
             purchase.setAttribute('data-purchase-id', id);
             purchase.setAttribute('data-ask-price', proposal.ask_price);
-            purchase.setAttribute('data-display_value', proposal.display_value);
+            purchase.setAttribute('data-display_value', proposal.ask_price);
             purchase.setAttribute('data-payout', proposal.payout);
-            purchase.setAttribute('data-symbol', id);
+            purchase.setAttribute('data-underlying-symbol', params.underlying_symbol);
             Object.keys(params).forEach((key) => {
                 if (key && key !== 'proposal') {
                     purchase.setAttribute(`data-${key}`, params[key]);
@@ -358,8 +348,6 @@ const Price = (() => {
                     break;
             }
         }
-
-        // Removed lookback-specific pricing logic as lookback functionality has been removed
 
         processForgetProposalOpenContract();
         processForgetProposals().then(() => {

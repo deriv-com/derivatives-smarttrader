@@ -2,7 +2,6 @@ const moment                   = require('moment');
 const Contract                 = require('./contract');
 const hidePriceOverlay         = require('./common').hidePriceOverlay;
 const countDecimalPlaces       = require('./common_independent').countDecimalPlaces;
-// Removed lookback imports as lookback functionality has been removed
 const processPriceRequest      = require('./price').processPriceRequest;
 const DigitTicker              = require('./digit_ticker');
 const TickDisplay              = require('./tick_trade');
@@ -201,8 +200,6 @@ const Purchase = (() => {
             });
 
             const currency = Client.get('currency');
-            // Removed unused variables and lookback-specific logic
-
             payout_value = +receipt.payout;
             cost_value   = receipt.buy_price;
 
@@ -214,7 +211,6 @@ const Purchase = (() => {
                 pr_table_cost_value: formatMoney(currency, cost_value),
             });
 
-            // Removed lookback-specific payout logic
             profit.setVisibility(1);
             CommonFunctions.elementInnerHtml(payout, `${localize('Potential Payout')} <p>${formatMoney(currency, payout_value)}</p>`);
             CommonFunctions.elementInnerHtml(profit, `${localize('Potential Profit')} <p>${potential_profit_value}</p>`);

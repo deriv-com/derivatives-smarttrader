@@ -47,7 +47,8 @@ const Symbols = (() => {
                 // if we disable a symbol in API, pipsize won't be available
                 // but we can still draw historical trades' charts
                 // so we should handle getting undefined from this function
-                resolve(countDecimalPlaces(getPropertyValue(market[underlying], ['pip'])));
+                const pipValue = getPropertyValue(market[underlying], ['pip_size']);
+                resolve(countDecimalPlaces(pipValue));
             });
         })
     );
@@ -55,7 +56,9 @@ const Symbols = (() => {
     const isSymbolOpen = symbol => symbol.exchange_is_open === 1;
 
     const findSymbol = async (active_symbols, symbol) => {
-        const first_symbol = active_symbols.find(item => item.underlying_symbol === symbol && isSymbolOpen(item));
+        const first_symbol = active_symbols.find(item =>
+            item.underlying_symbol === symbol && isSymbolOpen(item)
+        );
         const is_symbol_offered = await isSymbolOffered(first_symbol);
 
         if (is_symbol_offered) return first_symbol;

@@ -108,25 +108,25 @@ const getMinMaxTimeEnd = ($date_start = $('#date_start'), $time_start = $('#time
         min_time = min_max_time.minTime.clone().add(1, 'minute'); // round up seconds (previously 9:05 endtime was available, when time is 9:05:12)
         max_time = min_max_time.maxTime;
     } else {
-        const expiry_time_val = $expiry_time.val().split(':');
+        const expiry_time_val = ($expiry_time.val() || '').split(':');
         let end_time          = moment.utc($expiry_date.attr('data-value'));
         if (expiry_time_val.length > 1) {
             end_time = end_time.hour(expiry_time_val[0]).minute(expiry_time_val[1]);
         }
         const moment_date_start = moment.unix(date_start_val).utc();
-        const start_time_val    = $time_start.val().split(':');
+        const start_time_val    = ($time_start.val() || '').split(':');
         const compare           = isNaN(+date_start_val) ? moment_now.clone() :
             moment_date_start.hour(start_time_val[0]).minute(start_time_val[1]);
         // if expiry time is one day after start time, minTime can be 0
         // but maxTime should be 24 hours after start time, so exact value of start time
         if (end_time.isAfter(compare, 'day')) {
-            min_time = 0;
+            min_time = moment.utc().startOf('day'); // Use moment object instead of 0
             max_time = start_time_val.length > 1 ?
-                end_time.clone().hour(start_time_val[0]).minute(start_time_val[1]) : end_time.clone();
+                end_time.clone().hour(start_time_val[0] || 0).minute(start_time_val[1] || 0) : end_time.clone();
         } else {
             // if expiry time is same as today, min time should be the selected start time plus five minutes
             min_time = moment_date_start.clone();
-            min_time = min_time.hour(start_time_val[0]).minute(start_time_val[1]);
+            min_time = min_time.hour(start_time_val[0] || 0).minute(start_time_val[1] || 0);
             if (!(+start_time_val[0] === 23 && +start_time_val[1] === 55)) {
                 min_time = min_time.add(5, 'minutes');
             }

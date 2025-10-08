@@ -98,8 +98,6 @@ export const contract_explanation_data = {
                 localize('If you select "falls", you win the payout if the market price is lower than the entry spot.'),
             ],
         },
-        // Removed lookback explanation entries (lookbacklow, lookbackhigh, lookbackhighlow)
-        // as lookback functionality has been completely removed
         reset: {
             
             content: [
@@ -204,7 +202,6 @@ export const contract_explanation_data = {
                 localize('The <strong>end time</strong> is the selected number of minutes/hours after the <strong>start time</strong> (if less than one day in duration), or at the end of the trading day (if one day or more in duration).'),
             ],
         },
-        // Removed lookback explanation entries as lookback functionality has been removed
         reset: {
             title  : localize('Reset Time') ,
             content: [

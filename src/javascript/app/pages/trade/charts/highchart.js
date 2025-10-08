@@ -4,7 +4,6 @@ const getUnderlyingPipSize = require('../symbols').getUnderlyingPipSize;
 const Callputspread        = require('../callputspread');
 const Defaults             = require('../defaults');
 const GetTicks             = require('../get_ticks');
-// Removed lookback import as lookback functionality has been removed
 const Reset                = require('../reset');
 const ViewPopupUI          = require('../../user/view_popup/view_popup.ui');
 const BinarySocket         = require('../../../base/socket');
@@ -454,7 +453,6 @@ const Highchart = (() => {
             } else if (high_barrier && low_barrier) {
                 prev_barriers[1] = high_barrier;
                 prev_barriers[0] = low_barrier;
-                // Removed lookback-specific barrier logic, using standard barrier logic
                 addPlotLine({ id: 'high_barrier', value: +high_barrier, label: `${localize('High Barrier')} (${addComma(high_barrier)})`,  dashStyle: 'Dot' }, 'y');
                 addPlotLine({ id: 'low_barrier',  value: +low_barrier,  label: `${localize('Low Barrier')} (${addComma(low_barrier)})`,    dashStyle: 'Dot', textBottom: true }, 'y');
             }

@@ -21,7 +21,8 @@ const isEmptyObject              = require('../../../_common/utility').isEmptyOb
  */
 
 const CATEGORY_TYPES = {
-    callput      : [{ category: 'risefall', barrier: 'euro_atm' }, { category: 'higherlower', barrier: 'euro_non_atm' }],
+    callput      : ['risefall'],
+    higherlower  : ['higherlower'],
     touchnotouch : ['touchnotouch'],
     inout        : ['endsinout', 'staysinout'],
     asian        : ['asians'],
@@ -29,12 +30,12 @@ const CATEGORY_TYPES = {
     reset        : ['resetcall' , 'resetput'],
     highlowticks : ['highlowticks'],
     runs         : ['runs'],
-    // Removed lookback contract forms as lookback functionality has been removed
     callputspread: ['callputspread'],
 };
 
 const CATEGORY_NAMES = {
     callput      : 'Up/Down',
+    higherlower  : 'Higher/Lower',
     touchnotouch : 'Touch/No Touch',
     inout        : 'In/Out',
     asian        : 'Asians',
@@ -43,7 +44,6 @@ const CATEGORY_NAMES = {
     callputspread: 'Call Spread/Put Spread',
     highlowticks : 'High/Low Ticks',
     runs         : 'Only Ups/Only Downs',
-    // Removed lookback display name as lookback functionality has been removed
 };
 
 const CATEGORY_ITEMS = {
@@ -56,7 +56,6 @@ const CATEGORY_ITEMS = {
     matchdiff    : 'Matches/Differs',
     evenodd      : 'Even/Odd',
     overunder    : 'Over/Under',
-    // Removed lookback form names as lookback functionality has been removed
     resetcall    : 'Reset Call',
     resetput     : 'Reset Put',
     highlowticks : 'High/Low Ticks',
@@ -69,7 +68,7 @@ const Contract = (() => {
     const contract_type = {};
 
     let contract_details = {};
-    let barriers         = {};
+    const barriers       = {};
     let durations        = {};
 
     let open,
@@ -80,8 +79,6 @@ const Contract = (() => {
     const populateDurations = (current_contract) => {
         const current_category = current_contract.contract_category;
         const expiry_type      = current_contract.expiry_type;
-        const barrier_category = current_contract.barrier_category;
-        const start_type       = current_contract.start_type;
         const max_duration     = current_contract.max_contract_duration;
         const min_duration     = current_contract.min_contract_duration;
 
@@ -93,17 +90,8 @@ const Contract = (() => {
             durations[expiry_type][current_category] = {};
         }
 
-        if (!durations[expiry_type][current_category][barrier_category]) {
-            durations[expiry_type][current_category][barrier_category] = {};
-        }
-
-        if (!durations[expiry_type][current_category][barrier_category][start_type]) {
-            durations[expiry_type][current_category][barrier_category][start_type] = {};
-        }
-
-        durations[expiry_type][current_category][barrier_category][start_type].max_contract_duration = max_duration;
-
-        durations[expiry_type][current_category][barrier_category][start_type].min_contract_duration = min_duration;
+        durations[expiry_type][current_category].max_contract_duration = max_duration;
+        durations[expiry_type][current_category].min_contract_duration = min_duration;
     };
 
     const details = (form_name) => {
@@ -120,46 +108,36 @@ const Contract = (() => {
         if (!form) {
             return;
         }
-        barrier = form_barrier.barrier_category;
 
         contracts.available.forEach((current_obj) => {
             const contract_category = current_obj.contract_category;
-            // for callput and callputequals, populate duration for both
-            if (form === contract_category || (/callput/.test(form) && /callput/.test(contract_category))) {
-                if (barrier) {
-                    if (barrier === current_obj.barrier_category) {
-                        populateDurations(current_obj);
-                    }
-                } else {
-                    populateDurations(current_obj);
-                }
+            // Populate durations for matching contract categories
+            if (form === contract_category) {
+                populateDurations(current_obj);
             }
+            
             if (form === contract_category) {
                 const symbol = current_obj.underlying_symbol;
-                if (current_obj.barrier_category && current_obj.barrier_category !== 'non_financial') {
-                    if (!getPropertyValue(barriers, symbol)) {
-                        barriers[symbol] = {};
-                    }
-                    if (!getPropertyValue(barriers[symbol], contract_category)) {
-                        barriers[symbol][contract_category] = {};
-                    }
-                    if (!getPropertyValue(barriers[symbol][contract_category], current_obj.expiry_type)) {
-                        barriers[symbol][contract_category][current_obj.expiry_type] = {};
-                    }
-                    if (current_obj.barriers === 1) {
-                        barriers[symbol][contract_category][current_obj.expiry_type] = {
-                            count           : 1,
-                            barrier         : current_obj.barrier,
-                            barrier_category: current_obj.barrier_category,
-                        };
-                    } else if (current_obj.barriers === 2) {
-                        barriers[symbol][contract_category][current_obj.expiry_type] = {
-                            count           : 2,
-                            barrier         : current_obj.high_barrier,
-                            barrier1        : current_obj.low_barrier,
-                            barrier_category: current_obj.barrier_category,
-                        };
-                    }
+                if (!getPropertyValue(barriers, symbol)) {
+                    barriers[symbol] = {};
+                }
+                if (!getPropertyValue(barriers[symbol], contract_category)) {
+                    barriers[symbol][contract_category] = {};
+                }
+                if (!getPropertyValue(barriers[symbol][contract_category], current_obj.expiry_type)) {
+                    barriers[symbol][contract_category][current_obj.expiry_type] = {};
+                }
+                if (current_obj.barriers === 1) {
+                    barriers[symbol][contract_category][current_obj.expiry_type] = {
+                        count  : 1,
+                        barrier: current_obj.barrier,
+                    };
+                } else if (current_obj.barriers === 2) {
+                    barriers[symbol][contract_category][current_obj.expiry_type] = {
+                        count   : 2,
+                        barrier : current_obj.high_barrier,
+                        barrier1: current_obj.low_barrier,
+                    };
                 }
 
                 if (!contract_type[contract_category]) {
@@ -173,18 +151,11 @@ const Contract = (() => {
                 }
             }
         });
-
-        if (barrier) {
-            if (barriers && barriers[form] && barriers[form].barrier_category !== barrier) {
-                barriers = {};
-            }
-        }
     };
 
-    const categoryMaker = (category, contract_barrier) => {
+    const categoryMaker = (category) => {
         const object = {
             category,
-            barrier: contract_barrier,
         };
         return object;
     };
@@ -200,32 +171,26 @@ const Contract = (() => {
         
         contracts.available.forEach((current_obj) => {
             const contract_category = current_obj.contract_category;
-            const contract_barrier  = current_obj.barrier_category;
             const contract_display  = current_obj.contract_category_display ||
                                        current_obj.contract_display ||
                                        contract_category;
-            const current_contract  = { category: contract_category, barrier: contract_barrier };
-            if (contract_category && !getPropertyValue(contract_categories, current_contract)) {
-                /* eslint-disable max-len */
-                contract_categories[contract_category] = categoryMaker(localize(contract_display /* localize-ignore */), contract_barrier);
+            if (contract_category && !getPropertyValue(contract_categories, contract_category)) {
+                contract_categories[contract_category] = categoryMaker(
+                    localize(contract_display /* localize-ignore */)
+                );
                 Object.keys(CATEGORY_TYPES).forEach(category => {
                     const categoryRegEx = new RegExp(category, 'gi');
                     if (contract_category.match(categoryRegEx)) {
-                        contract_categories[category] = categoryMaker(localize(CATEGORY_NAMES[category] /* localize-ignore */), contract_barrier);
+                        contract_categories[category] = categoryMaker(
+                            localize(CATEGORY_NAMES[category] /* localize-ignore */)
+                        );
                         CATEGORY_TYPES[category].forEach(t => {
-                            if (t.category) {
-                                if (t.barrier === current_obj.barrier_category) {
-                                    contract_categories[t.category] = categoryMaker(localize(CATEGORY_ITEMS[t.category] /* localize-ignore */), t.barrier);
-                                }
-                            } else {
-                                contract_categories[t] = categoryMaker(localize(CATEGORY_ITEMS[t] /* localize-ignore */), contract_barrier);
-                            }
+                            contract_categories[t] = categoryMaker(
+                                localize(CATEGORY_ITEMS[t] /* localize-ignore */)
+                            );
                         });
                     }
-
                 });
-                /* eslint-disable max-len */
-
             }
         });
         return contract_categories;

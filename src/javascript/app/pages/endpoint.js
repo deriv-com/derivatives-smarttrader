@@ -1,5 +1,6 @@
 const getAppId     = require('../../config').getAppId;
 const getSocketURL = require('../../config').getSocketURL;
+const LocalStore   = require('../../_common/storage').LocalStore;
 
 const Endpoint = (() => {
     const onLoad = () => {
@@ -14,12 +15,14 @@ const Endpoint = (() => {
             const app_id     = $app_id.val().trim();
             if (server_url) localStorage.setItem('config.server_url', server_url);
             if (app_id && !isNaN(app_id)) localStorage.setItem('config.app_id', parseInt(app_id));
+            LocalStore.remove('ws_cache'); // Clear WebSocket cache when server URL changes
             window.location.reload();
         });
 
         $('#reset_endpoint').on('click', () => {
             localStorage.removeItem('config.server_url');
             localStorage.removeItem('config.app_id');
+            LocalStore.remove('ws_cache'); // Clear WebSocket cache when endpoint is reset
             window.location.reload();
         });
     };

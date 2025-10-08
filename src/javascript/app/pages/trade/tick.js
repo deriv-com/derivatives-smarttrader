@@ -42,7 +42,7 @@ const Tick = (() => {
                 const all_underlyings = underlyings();
                 Object.keys(all_underlyings).forEach(key => {
                     if (Object.prototype.hasOwnProperty.call(all_underlyings[key], data.tick.symbol)) {
-                        pip_size = countDecimalPlaces(all_underlyings[key][data.tick.symbol].pip);
+                        pip_size = countDecimalPlaces(all_underlyings[key][data.tick.symbol].pip_size);
                     }
                 });
                 const tick = data.tick;
