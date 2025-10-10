@@ -12,13 +12,9 @@ const isEmptyObject    = require('../utility').isEmptyObject;
 const PromiseClass     = require('../utility').PromiseClass;
 const getAppId         = require('../../config').getAppId;
 const getSocketURL     = require('../../config').getSocketURL;
-const isLoginPages     = require('../utility').isLoginPages;
-
-// Simplified server configuration for token-based authentication
 
 /**
  * Get server configuration without circular dependency
- * Simplified for token-based authentication (no app_id required)
  */
 const getServerInfo = () => {
     // Use the same server URL logic as the main WebSocket connection
@@ -26,14 +22,6 @@ const getServerInfo = () => {
                      localStorage.getItem('config.server_url') ||
                      getSocketURL().replace(/^wss?:\/\//, ''); // Extract domain from main socket URL
     const lang = LocalStorageUtils.getValue(LocalStorageConstants.i18nLanguage) || 'en';
-
-    // Debug: Log server info
-    // eslint-disable-next-line no-console
-    console.log('🌐 getServerInfo result:', {
-        serverUrl,
-        mainSocketURL  : getSocketURL(),
-        configServerURL: localStorage.getItem('config.server_url'),
-    });
 
     return {
         lang,
@@ -242,46 +230,13 @@ const BinarySocketBase = (() => {
         binary_socket.onopen = async () => {
             config.wsEvent('open');
             
-            // Debug: Intercept reload calls to trace source
-            if (!window._reloadIntercepted) {
-                const originalReload = window.location.reload;
-                window.location.reload = function(force) {
-                    // eslint-disable-next-line no-console
-                    console.error('🔄 Page reload triggered!', new Error().stack);
-                    return originalReload.call(this, force);
-                };
-                window._reloadIntercepted = true;
-            }
-            
-            // Clear the token exchange flag for testing (temporary)
-            window._tokenExchangeCompleted = false;
-            
-            // Clean up any existing temp accounts from localStorage (simplified for single account)
-            const current_account = JSON.parse(localStorage.getItem('current_account') || '{}');
-            if (current_account.loginid && current_account.loginid.startsWith('temp_')) {
-                // eslint-disable-next-line no-console
-                console.log('🧹 Removing old temp account:', current_account.loginid);
-                localStorage.removeItem('current_account');
-                localStorage.removeItem('active_loginid');
-            }
-            
             // Handle token exchange flow if token parameter exists in URL
-            const tokenExchanged = await handleTokenExchangeIfNeeded();
+            const newSessionToken = await handleTokenExchange();
             
-            // Check for session token authentication first
-            if (ClientBase.isUsingSessionToken() || tokenExchanged) {
-                // Use session token for authorization
-                const authToken = ClientBase.getAuthToken();
-                // eslint-disable-next-line no-console
-                console.log('Using session token for authorization:', !!authToken);
-                if (authToken) {
-                    send({ authorize: authToken }, { forced: true });
-                } else {
-                    sendBufferedRequests();
-                }
-            } else if (ClientBase.isLoggedIn() && !isLoginPages()) {
-                // Regular logged-in user authorization
-                send({ authorize: ClientBase.getAuthToken() }, { forced: true });
+            // Use newly exchanged token if available, otherwise use existing token
+            const sessionToken = newSessionToken || ClientBase.getStoredSessionToken();
+            if (sessionToken) {
+                send({ authorize: sessionToken }, { forced: true });
             } else {
                 sendBufferedRequests();
             }
@@ -303,12 +258,7 @@ const BinarySocketBase = (() => {
          * Handles token exchange flow for URL query parameter token authentication
          * Integrated directly to avoid circular dependency
          */
-        const handleTokenExchangeIfNeeded = async () => {
-            // Prevent multiple token exchanges in the same session
-            if (window._tokenExchangeCompleted) {
-                return false;
-            }
-            
+        const handleTokenExchange = async () => {
             // Check URL for one-time token
             const urlParams = new URLSearchParams(window.location.search);
             const oneTimeToken = urlParams.get('token');
@@ -321,44 +271,26 @@ const BinarySocketBase = (() => {
 
                 try {
                     // Exchange the token for session_token
-                    // eslint-disable-next-line no-console
-                    console.log('Exchanging token for session token...');
                     const sessionTokenResponse = await getSessionToken(oneTimeToken);
-                    
-                    // eslint-disable-next-line no-console
-                    console.log('Session token response:', sessionTokenResponse);
 
                     if (sessionTokenResponse?.error) {
-                        // eslint-disable-next-line no-console
-                        console.error('Token exchange failed:', sessionTokenResponse.error);
-                        return false;
+                        return null;
                     }
 
                     if (sessionTokenResponse?.get_session_token?.token) {
                         const sessionToken = sessionTokenResponse.get_session_token.token;
-                        // eslint-disable-next-line no-console
-                        console.log('Token exchange successful, storing session token for authorization');
                         
                         // Store session token temporarily - will be moved to proper account after authorize
                         localStorage.setItem('session_token', sessionToken);
                         
-                        // eslint-disable-next-line no-console
-                        console.log('Session token stored, authorize call will handle account creation');
-                        
-                        // Mark token exchange as completed to prevent loops
-                        window._tokenExchangeCompleted = true;
-                        // eslint-disable-next-line no-console
-                        console.log('🎉 Token exchange completed successfully!');
-                        return true;
+                        return sessionToken;
                     }
                 } catch (error) {
-                    // eslint-disable-next-line no-console
-                    console.error('❌ Error exchanging token:', error);
-                    return false;
+                    return null;
                 }
             }
             
-            return false; // No token found or exchange failed
+            return null;
         };
 
         /**
@@ -367,9 +299,6 @@ const BinarySocketBase = (() => {
          * @returns {Promise} - API response with session token
          */
         const getSessionToken = (oneTimeToken) => new Promise((resolve, reject) => {
-            // eslint-disable-next-line no-console
-            console.log('🔄 getSessionToken called with token length:', oneTimeToken ? oneTimeToken.length : 0);
-            
             if (!oneTimeToken) {
                 reject(new Error('No token provided'));
                 return;
@@ -380,9 +309,6 @@ const BinarySocketBase = (() => {
             const appId = getAppId(); // Get app_id separately using the fixed function
             const wsUrl = `wss://${serverUrl}/websockets/v3?app_id=${appId}&l=en`;
             
-            // Debug logging
-            // eslint-disable-next-line no-console
-            console.log('getSessionToken: Creating WebSocket connection', { serverUrl, appId, wsUrl });
             const ws = new WebSocket(wsUrl);
                 
             let responseReceived = false;
@@ -443,8 +369,6 @@ const BinarySocketBase = (() => {
                 }
                 // resolve the wait promise
                 waiting_list.resolve(response);
-
-                // App ID validation removed - using token-based authentication
 
                 if (typeof config.onMessage === 'function') {
                     config.onMessage(response);

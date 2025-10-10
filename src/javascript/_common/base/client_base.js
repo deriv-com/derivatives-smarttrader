@@ -202,11 +202,9 @@ const ClientBase = (() => {
         // Store session token for compatibility
         current_account.token = sessionToken;
         
+        // Single storage operation for account data
         LocalStore.setObject(storage_key, current_account);
         LocalStore.set('active_loginid', authorize.loginid);
-        
-        // Keep session_token in localStorage for simple authentication check
-        // No cleanup needed - session_token remains the source of truth
         
         // Set simplified client information cookie
         const client_information = {
@@ -224,8 +222,6 @@ const ClientBase = (() => {
             path  : '/',
         });
     };
-
-    // updateAccountList removed - simplified for single-account authentication
 
     const shouldAcceptTnc = () => {
         if (get('is_virtual')) return false;
@@ -480,16 +476,10 @@ const ClientBase = (() => {
     };
 
     /**
-     * Check if we are using session token authentication
-     * @returns {boolean} - True if session token is being used (always true in pure session token system)
+     * Get session token if it exists
+     * @returns {string|null} - Session token or null if not found
      */
-    const isUsingSessionToken = () => !!localStorage.getItem('session_token');
-
-    /**
-     * Get the current authentication token (session token only)
-     * @returns {string|null} - Session token
-     */
-    const getAuthToken = () => localStorage.getItem('session_token');
+    const getStoredSessionToken = () => localStorage.getItem('session_token');
 
     return {
         init,
@@ -526,8 +516,7 @@ const ClientBase = (() => {
         canTransferFunds,
         hasSvgAccount,
         canChangeCurrency,
-        isUsingSessionToken,
-        getAuthToken,
+        getStoredSessionToken,
     };
 })();
 

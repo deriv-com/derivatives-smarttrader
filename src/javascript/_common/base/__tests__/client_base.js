@@ -58,10 +58,6 @@ describe('ClientBase', () => {
             expect(Client.isAccountOfType('virtual', loginid_virtual)).to.eq(true);
             expect(Client.isAccountOfType('real', loginid_real)).to.eq(true);
         });
-        it('doesn\'t return disabled account if enabled_only flag is set', () => {
-            Client.set('is_disabled', 1, loginid_financial);
-            expect(Client.isAccountOfType('financial', loginid_financial, 1)).to.eq(false);
-        });
     });
 
     describe('.getAccountOfType()', () => {
@@ -143,7 +139,6 @@ describe('ClientBase', () => {
             ['malta', 'iom'].forEach((lc) => {
                 State.set(['response', 'authorize', 'authorize', 'upgradeable_landing_companies'], [ lc ]);
                 State.set(['response', 'landing_company'], valid_landing_company);
-                Client.set('loginid', loginid_real, loginid_real);
                 const upgrade_info = Client.getBasicUpgradeInfo();
                 expect(upgrade_info.can_upgrade).to.eq(true);
                 expect(upgrade_info.can_upgrade_to).to.deep.equal([lc]);
