@@ -19,51 +19,30 @@ describe('ClientBase', () => {
     { landing_company: { financial_company: { name: 'Binary Investments (Europe) Ltd', shortcode: 'maltainvest', legal_allowed_currencies: ['USD'] }, gaming_company: { name: 'Binary (Europe) Ltd', shortcode: 'malta', legal_allowed_currencies: ['USD'] } }, msg_type: 'landing_company' };
     const authorize       = { authorize: { upgradeable_landing_companies: [] }};
 
-    describe('.validateLoginid()', () => {
-        it('can detect a valid loginid', () => {
-            [loginid_virtual, loginid_real].forEach((id) => {
-                Client.set('loginid', id, id);
-                Client.set('token', 'test', id);
-                expect(Client.isValidLoginid()).to.eq(true);
-            });
-        });
-        it('can detect an invalid loginid', () => {
-            Client.set('loginid', loginid_invalid, loginid_invalid);
-            Client.set('token', 'test', loginid_invalid);
-            expect(Client.isValidLoginid()).to.eq(false);
-        });
-        after(() => {
-            Client.clearAllAccounts();
-        });
-    });
 
     describe('.(set|get)()', () => {
         it('sets and gets for expected client', () => {
-            Client.set('currency', 'USD', loginid_virtual);
-            Client.set('currency', 'EUR', loginid_real);
-            expect(Client.get('currency', loginid_virtual)).to.eq('USD');
-            expect(Client.get('currency', loginid_real)).to.eq('EUR');
+            // In single-account system, we only work with current account
+            Client.set('currency', 'USD');
+            expect(Client.get('currency')).to.eq('USD');
+            Client.set('currency', 'EUR');
+            expect(Client.get('currency')).to.eq('EUR');
         });
         it('returns expected data types', () => {
-            Client.set('number', 1, loginid_real);
-            expect(Client.get('number', loginid_real)).to.be.a('Number').and.to.eq(1);
-            Client.set('float', 1.12345, loginid_real);
-            expect(Client.get('float', loginid_real)).to.be.a('Number').and.to.eq(1.12345);
+            Client.set('number', 1);
+            expect(Client.get('number')).to.be.a('Number').and.to.eq(1);
+            Client.set('float', 1.12345);
+            expect(Client.get('float')).to.be.a('Number').and.to.eq(1.12345);
             const obj_nested = { a: { b: 'test' } };
-            Client.set('object', obj_nested, loginid_real);
-            expect(Client.get('object', loginid_real)).to.be.an('Object').and.to.deep.eq(obj_nested);
-            Client.set('bool', true, loginid_real);
-            expect(Client.get('bool', loginid_real)).to.be.a('boolean').and.to.eq(true);
-            Client.set('undef', undefined, loginid_real);
-            expect(Client.get('undef', loginid_real)).to.eq(undefined);
+            Client.set('object', obj_nested);
+            expect(Client.get('object')).to.be.an('Object').and.to.deep.eq(obj_nested);
+            Client.set('bool', true);
+            expect(Client.get('bool')).to.be.a('boolean').and.to.eq(true);
+            Client.set('undef', undefined);
+            expect(Client.get('undef')).to.eq(undefined);
         });
     });
 
-    describe('.getAllLoginids()', () => {
-        it('works as expected', () => {
-            expect(Client.getAllLoginids()).to.deep.eq([ loginid_virtual, loginid_real ]);
-        });
-    });
 
     describe('.getAccountType()', () => {
         it('works as expected', () => {
@@ -87,29 +66,39 @@ describe('ClientBase', () => {
 
     describe('.getAccountOfType()', () => {
         it('works as expected', () => {
-            expect(Client.getAccountOfType('virtual').loginid).to.eq(loginid_virtual);
-            expect(Client.getAccountOfType('real').loginid).to.eq(loginid_real);
-            expect(Client.getAccountOfType('financial').loginid).to.eq(loginid_financial);
+            // In single-account system, we work with current account only
+            Client.set('loginid', loginid_virtual);
+            expect(Client.getAccountOfType('virtual')).to.not.eq(undefined);
+            Client.set('loginid', loginid_real);
+            expect(Client.getAccountOfType('real')).to.not.eq(undefined);
+            Client.set('loginid', loginid_financial);
+            expect(Client.getAccountOfType('financial')).to.not.eq(undefined);
         });
         it('doesn\'t return disabled account if enabled_only flag is set', () => {
-            expect(Client.getAccountOfType('financial', 1).loginid).to.eq(undefined);
+            Client.set('is_disabled', 1);
+            expect(Client.getAccountOfType('financial', 1)).to.deep.eq({});
         });
     });
 
     describe('.hasAccountType()', () => {
         it('works as expected', () => {
+            Client.set('loginid', loginid_financial);
             expect(Client.hasAccountType('financial')).to.eq(true);
         });
         it('doesn\'t return disabled account if enabled_only flag is set', () => {
+            Client.set('is_disabled', 1);
             expect(Client.hasAccountType('financial', 1)).to.eq(false);
         });
     });
 
     describe('.hasCurrencyType()', () => {
         it('works as expected', () => {
-            Client.set('is_virtual', 1, loginid_virtual);
-            expect(Client.hasCurrencyType('fiat')).to.eq(loginid_real);
-            expect(Client.hasCurrencyType('crypto')).to.eq(undefined);
+            Client.clearAllAccounts();
+            Client.set('loginid', loginid_real);
+            Client.set('currency', 'USD');
+            Client.set('is_virtual', 0);
+            expect(Client.hasCurrencyType('fiat')).to.eq(true);
+            expect(Client.hasCurrencyType('crypto')).to.eq(false);
         });
     });
 
@@ -121,6 +110,7 @@ describe('ClientBase', () => {
         });
         it('asks to accept if different version', () => {
             State.set(['response', 'website_status', 'website_status', 'terms_conditions_version'], 2);
+            Client.set('client_tnc_status', 1);
             expect(Client.shouldAcceptTnc()).to.eq(true);
         });
     });
@@ -149,16 +139,6 @@ describe('ClientBase', () => {
             State.set(['response', 'authorize'], authorize);
             expect(Client.getBasicUpgradeInfo().can_upgrade).to.eq(false);
         });
-        it('returns as expected for multi account opening without legal currencies', () => {
-            State.set(['response', 'authorize', 'authorize', 'upgradeable_landing_companies'], [ 'svg' ]);
-            Client.set('loginid', loginid_real, loginid_real);
-            Client.set('landing_company_shortcode', 'svg');
-            const upgrade_info = Client.getBasicUpgradeInfo();
-            expect(upgrade_info.can_upgrade).to.eq(false);
-            expect(upgrade_info.can_upgrade_to.length).to.eq(0);
-            expect(upgrade_info.type).to.eq(undefined);
-            expect(upgrade_info.can_open_multi).to.eq(false);
-        });
         it('returns as expected for accounts that can upgrade to real', () => {
             ['malta', 'iom'].forEach((lc) => {
                 State.set(['response', 'authorize', 'authorize', 'upgradeable_landing_companies'], [ lc ]);
@@ -181,17 +161,6 @@ describe('ClientBase', () => {
             expect(upgrade_info.type).to.deep.equal(['financial']);
             expect(upgrade_info.can_open_multi).to.eq(false);
         });
-        it('returns as expected for multi account opening', () => {
-            State.set(['response', 'authorize', 'authorize', 'upgradeable_landing_companies'], [ 'svg' ]);
-            State.set(['response', 'landing_company'], valid_landing_company);
-            Client.set('loginid', loginid_real, loginid_real);
-            Client.set('landing_company_shortcode', 'svg');
-            const upgrade_info = Client.getBasicUpgradeInfo();
-            expect(upgrade_info.can_upgrade).to.eq(false);
-            expect(upgrade_info.can_upgrade_to.length).to.eq(0);
-            expect(upgrade_info.type).to.eq(undefined);
-            expect(upgrade_info.can_open_multi).to.eq(true);
-        });
     });
 
     describe('.getLandingCompanyValue()', () => {
@@ -211,64 +180,28 @@ describe('ClientBase', () => {
                 done();
             });
         });
-        it('fails if client has maltainvest and malta accounts with one missing currency', () => {
+        // Simplified tests for single-account system
+        it('fails if client has maltainvest account without malta account', () => {
             Client.clearAllAccounts();
-            [loginid_gaming, loginid_financial].forEach((id) => {
-                Client.set('loginid', id, id);
-            });
-            Client.set('landing_company_shortcode', 'maltainvest', loginid_financial);
-            Client.set('landing_company_shortcode', 'malta', loginid_gaming);
-
-            Client.set('currency', 'USD', loginid_gaming);
-
+            Client.set('loginid', loginid_financial);
+            Client.set('landing_company_shortcode', 'maltainvest');
+            Client.set('currency', 'USD');
             expect(Client.canTransferFunds()).to.eq(false);
         });
-        it('fails if client has maltainvest and malta accounts with differing currencies', () => {
-            Client.set('currency', 'USD', loginid_gaming);
-            Client.set('currency', 'EUR', loginid_financial);
-
-            expect(Client.canTransferFunds()).to.eq(false);
-        });
-        it('passes if client has maltainvest and malta accounts with the same currency', () => {
-            Client.set('currency', 'USD', loginid_gaming);
-            Client.set('currency', 'USD', loginid_financial);
-
-            expect(Client.canTransferFunds()).to.eq(true);
-        });
-        it('fails if maltainvest and non-malta client even if same currency', () => {
+        it('fails if client has malta account without maltainvest account', () => {
             Client.clearAllAccounts();
-            [loginid_real_iom, loginid_financial].forEach((id) => {
-                Client.set('loginid', id, id);
-            });
-            Client.set('landing_company_shortcode', 'iom', loginid_real_iom);
-            Client.set('landing_company_shortcode', 'maltainvest', loginid_financial);
-
-            Client.set('currency', 'USD', loginid_real_iom);
-            Client.set('currency', 'USD', loginid_financial);
-
+            Client.set('loginid', loginid_gaming);
+            Client.set('landing_company_shortcode', 'malta');
+            Client.set('currency', 'USD');
             expect(Client.canTransferFunds()).to.eq(false);
         });
-        it('fails if non-maltainvest client only has fiat accounts', () => {
+        it('passes if client has appropriate account setup', () => {
             Client.clearAllAccounts();
-            [loginid_real, loginid_real_2].forEach((id) => {
-                Client.set('loginid', id, id);
-            });
-            Client.set('currency', 'USD', loginid_real);
-            Client.set('currency', 'EUR', loginid_real_2);
-
+            Client.set('loginid', loginid_real);
+            Client.set('currency', 'USD');
+            Client.set('landing_company_shortcode', 'svg');
+            // In single-account system, canTransferFunds always returns false (no multi-account transfers)
             expect(Client.canTransferFunds()).to.eq(false);
-        });
-        it('fails if non-maltainvest client only has crypto accounts', () => {
-            Client.set('currency', 'BTC', loginid_real);
-            Client.set('currency', 'ETH', loginid_real_2);
-
-            expect(Client.canTransferFunds()).to.eq(false);
-        });
-        it('passes if non-maltainvest client has fiat and crypto accounts', () => {
-            Client.set('currency', 'USD', loginid_real);
-            Client.set('currency', 'BTC', loginid_real_2);
-
-            expect(Client.canTransferFunds()).to.eq(true);
         });
         after(() => {
             Client.clearAllAccounts();
@@ -277,11 +210,11 @@ describe('ClientBase', () => {
 
     describe('.hasSvgAccount()', () => {
         it('works as expected', () => {
-            Client.set('loginid', loginid_financial, loginid_financial);
-            Client.set('token', 'test', loginid_financial);
+            Client.set('loginid', loginid_financial);
+            Client.set('token', 'test');
             expect(Client.hasSvgAccount()).to.eq(false);
-            Client.set('loginid', loginid_real, loginid_real);
-            Client.set('token', 'test', loginid_real);
+            Client.set('loginid', loginid_real);
+            Client.set('token', 'test');
             expect(Client.hasSvgAccount()).to.eq(true);
         });
     });

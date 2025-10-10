@@ -1,5 +1,4 @@
 const refreshDropdown   = require('@binary-com/binary-style').selectDropdown;
-const Cookies           = require('js-cookie');
 const moment            = require('moment');
 const TradingAnalysis   = require('./analysis');
 const commonTrading     = require('./common');
@@ -222,13 +221,11 @@ const Process = (() => {
                     if (skeleton_login) skeleton_login.remove();
                     if (skeleton_signup) skeleton_signup.remove();
                     
-                    // Show appropriate buttons based on login state
-                    const logged_state = Cookies.get('logged_state');
-                    const client_accounts = typeof window !== 'undefined' ? JSON.parse(window.localStorage.getItem('client.accounts') || '{}') : {};
-                    const is_client_accounts_populated = Object.keys(client_accounts).length > 0;
-                    const will_eventually_sso = logged_state === 'true' && !is_client_accounts_populated;
+                    // Simple authentication check: if there is a session_token, user is logged in
+                    const session_token = localStorage.getItem('session_token');
+                    const is_logged_in = !!session_token;
                     
-                    if (!will_eventually_sso) {
+                    if (!is_logged_in) {
                         if (btn_login) btn_login.style.display = 'flex';
                         if (btn_signup) btn_signup.style.display = 'flex';
                     }

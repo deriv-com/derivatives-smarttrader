@@ -43,52 +43,28 @@ const Page = (() => {
     };
 
     const handleAccountsChange = (newValue, oldValue) => {
-        const removedSessionAndBalnce = (input) => {
+        const removedSessionAndBalance = (input) => {
             const filtered_account = input
                 .replace(/"balance":[+-]?([0-9]*[.])?[0-9]+/g, '')
                 .replace(/"session_start":([0-9]+),/g, '');
             return filtered_account;
         };
 
-        const new_accounts = JSON.parse(newValue);
-        const old_accounts = JSON.parse(oldValue || '{}');
-        // First try to get account from session storage
-        const session_account = SessionStore.get('account');
-        let active_loginid;
+        const new_account = JSON.parse(newValue || '{}');
+        const old_account = JSON.parse(oldValue || '{}');
+        
+        const new_currency = new_account.currency || '';
+        const old_currency = old_account.currency || '';
 
-        if (session_account) {
-            // Find matching account based on account type
-            if (session_account === 'demo') {
-                active_loginid = Object.keys(new_accounts).find(loginid => /^VR/.test(loginid));
-                if (active_loginid) {
-                    SessionStore.set('active_loginid', active_loginid);
-                }
-            } else {
-                active_loginid = Object.keys(new_accounts).find(loginid =>
-                    new_accounts[loginid].currency?.toUpperCase() === session_account.toUpperCase() &&
-                    !new_accounts[loginid]?.is_virtual
-                );
-                if (active_loginid) {
-                    SessionStore.set('active_loginid', active_loginid);
-                }
+        // Check for account in URL param, if missing add currency or demo
+        if (!Url.param('account') && new_account.loginid) {
+            const account_param = /^VR/.test(new_account.loginid) ? 'demo' : new_account.currency;
+            if (account_param) {
+                Url.updateParamsWithoutReload({ account: account_param }, true);
             }
         }
 
-        // Fallback to existing logic if no match found
-        if (!active_loginid) {
-            active_loginid = SessionStore.get('active_loginid') || LocalStore.get('active_loginid');
-        }
-
-        const new_currency = new_accounts[active_loginid] ? new_accounts[active_loginid].currency : '';
-        const old_currency = old_accounts[active_loginid] ? old_accounts[active_loginid].currency : '';
-
-        // Check for account in URL param, if missing add currency or demo
-        if (!Url.param('account') && active_loginid && new_accounts[active_loginid]) {
-            const account_param = /^VR/.test(active_loginid) ? 'demo' : new_accounts[active_loginid]?.currency;
-            Url.updateParamsWithoutReload({ account: account_param }, true);
-        }
-
-        if (removedSessionAndBalnce(newValue) !== removedSessionAndBalnce(oldValue || '{}') &&
+        if (removedSessionAndBalance(newValue) !== removedSessionAndBalance(oldValue || '{}') &&
             old_currency !== new_currency) {
             reload();
         }
@@ -109,7 +85,7 @@ const Page = (() => {
             // So, fall back to a more basic solution.
             const handleStorageEvent = (evt) => {
                 switch (evt.key) {
-                    case 'client.accounts':
+                    case 'current_account':
                         if (evt.newValue !== evt.oldValue) {
                             handleAccountsChange(evt.newValue, evt.oldValue);
                         }
@@ -133,7 +109,7 @@ const Page = (() => {
             LocalStore.setObject = function(key, value) {
                 const oldValue = LocalStore.getObject(key);
                 originalSetItem.apply(this, [key, value]);
-                if (key === 'client.accounts') {
+                if (key === 'current_account') {
                     handleAccountsChange(JSON.stringify(value), JSON.stringify(oldValue));
                 }
             };

@@ -256,20 +256,13 @@ const BinarySocketBase = (() => {
             // Clear the token exchange flag for testing (temporary)
             window._tokenExchangeCompleted = false;
             
-            // Clean up any existing temp accounts from localStorage
-            const accounts = JSON.parse(localStorage.getItem('client.accounts') || '{}');
-            const tempLoginIds = Object.keys(accounts).filter(loginid => loginid.startsWith('temp_'));
-            if (tempLoginIds.length > 0) {
+            // Clean up any existing temp accounts from localStorage (simplified for single account)
+            const current_account = JSON.parse(localStorage.getItem('current_account') || '{}');
+            if (current_account.loginid && current_account.loginid.startsWith('temp_')) {
                 // eslint-disable-next-line no-console
-                console.log('🧹 Removing old temp accounts:', tempLoginIds);
-                tempLoginIds.forEach(tempLoginId => delete accounts[tempLoginId]);
-                localStorage.setItem('client.accounts', JSON.stringify(accounts));
-                
-                // Clear active_loginid if it was a temp account
-                const activeLoginId = localStorage.getItem('active_loginid');
-                if (activeLoginId && activeLoginId.startsWith('temp_')) {
-                    localStorage.removeItem('active_loginid');
-                }
+                console.log('🧹 Removing old temp account:', current_account.loginid);
+                localStorage.removeItem('current_account');
+                localStorage.removeItem('active_loginid');
             }
             
             // Handle token exchange flow if token parameter exists in URL

@@ -45,11 +45,6 @@ const MobileMenu = () => (
                         <div className='mobile__platform-switcher-text'>{it.L('Reports')}</div>
                         <img id='mobile__platform-switcher-icon-arrowright' className='mobile__platform-switcher-icon-right' />
                     </div>
-                    <div id='mobile__platform-switcher-item-account-settings' className='mobile__platform-switcher-item client_logged_in invisible'>
-                        <img className='mobile__platform-switcher-icon account-settings-icon' src='../images/pages/header/ic-account-settings.svg' alt='Account Settings' />
-                        <div className='mobile__platform-switcher-text'>{it.L('Account Settings')}</div>
-                        <img id='mobile__platform-switcher-icon-arrowright' className='mobile__platform-switcher-icon-right' />
-                    </div>
 
                     <div className='mobile__platform-switcher-item'>
                         <a href='https://deriv.com/help-centre' target='_blank' rel='noopener noreferrer'>
@@ -98,81 +93,6 @@ const MobileMenu = () => (
                 </div>
             </div>
 
-            <div id='mobile__menu-content-submenu-account-settings' className='mobile__menu-content-submenu mobile__menu-content client_logged_in invisible'>
-                <div id='mobile__menu-content-submenu-account-settings-header' className='mobile__menu-content-submenu-header mobile__platform-switcher-item'>
-                    <img id='mobile__menu-content-submenu-account-settings-icon-back' className='mobile__menu-content-submenu-icon' />
-                    <div className='mobile__menu-content-submenu-header-text' >{it.L('Account Settings')}</div>
-                </div>
-                <div className='mobile__menu-content-submenu-lists'>
-                    <div className='mobile__menu-content-submenu-category-header'>
-                        <img className='mobile__menu-content-submenu-icon' src='../images/pages/header/ic-profile.svg' alt='Profile' />
-                        <div className='mobile__menu-content-submenu-category-text'>{it.L('Profile')}</div>
-                    </div>
-                    <a href='https://app.deriv.com/account/personal-details' className='mobile__menu-content-submenu-item mobile__platform-switcher-item mobile__menu-content-submenu-sub-item'>
-                        <div className='mobile__menu-content-submenu-item-text'>{it.L('Personal details')}</div>
-                    </a>
-                    <div id='mobile__account-settings-languages' className='mobile__menu-content-submenu-item mobile__platform-switcher-item mobile__menu-content-submenu-sub-item'>
-                        <div className='mobile__menu-content-submenu-item-text'>{it.L('Languages')}</div>
-                    </div>
-                    
-                    <div className='mobile__menu-content-submenu-category-header'>
-                        <img className='mobile__menu-content-submenu-icon' src='../images/pages/header/ic-assessments.svg' alt='Assessments' />
-                        <div className='mobile__menu-content-submenu-category-text'>{it.L('Assessments')}</div>
-                    </div>
-                    <a href='https://app.deriv.com/account/trading-assessment' className='mobile__menu-content-submenu-item mobile__platform-switcher-item mobile__menu-content-submenu-sub-item'>
-                        <div className='mobile__menu-content-submenu-item-text'>{it.L('Trading assessment')}</div>
-                    </a>
-                    <a href='https://app.deriv.com/account/financial-assessment' className='mobile__menu-content-submenu-item mobile__platform-switcher-item mobile__menu-content-submenu-sub-item'>
-                        <div className='mobile__menu-content-submenu-item-text'>{it.L('Financial assessment')}</div>
-                    </a>
-                    
-                    <div className='mobile__menu-content-submenu-category-header'>
-                        <img className='mobile__menu-content-submenu-icon' src='../images/pages/header/ic-verification.svg' alt='Verification' />
-                        <div className='mobile__menu-content-submenu-category-text'>{it.L('Verification')}</div>
-                    </div>
-                    <a href='https://app.deriv.com/account/proof-of-identity' className='mobile__menu-content-submenu-item mobile__platform-switcher-item mobile__menu-content-submenu-sub-item'>
-                        <div className='mobile__menu-content-submenu-item-text'>{it.L('Proof of identity')}</div>
-                    </a>
-                    <a href='https://app.deriv.com/account/proof-of-address' className='mobile__menu-content-submenu-item mobile__platform-switcher-item mobile__menu-content-submenu-sub-item'>
-                        <div className='mobile__menu-content-submenu-item-text'>{it.L('Proof of address')}</div>
-                    </a>
-                    <a href='https://app.deriv.com/account/proof-of-ownership' className='mobile__menu-content-submenu-item mobile__platform-switcher-item mobile__menu-content-submenu-sub-item'>
-                        <div className='mobile__menu-content-submenu-item-text'>{it.L('Proof of ownership')}</div>
-                    </a>
-                    <a href='https://app.deriv.com/account/proof-of-income' className='mobile__menu-content-submenu-item mobile__platform-switcher-item mobile__menu-content-submenu-sub-item'>
-                        <div className='mobile__menu-content-submenu-item-text'>{it.L('Proof of income')}</div>
-                    </a>
-                    
-                    <div className='mobile__menu-content-submenu-category-header'>
-                        <img className='mobile__menu-content-submenu-icon' src='../images/pages/header/ic-security.svg' alt='Security and safety' />
-                        <div className='mobile__menu-content-submenu-category-text'>{it.L('Security and safety')}</div>
-                    </div>
-                    <a href='https://app.deriv.com/account/passwords' className='mobile__menu-content-submenu-item mobile__platform-switcher-item mobile__menu-content-submenu-sub-item'>
-                        <div className='mobile__menu-content-submenu-item-text'>{it.L('Email and passwords')}</div>
-                    </a>
-                    <a href='https://app.deriv.com/account/passkeys' className='mobile__menu-content-submenu-item mobile__platform-switcher-item mobile__menu-content-submenu-sub-item'>
-                        <div className='mobile__menu-content-submenu-item-text'>{it.L('Passkeys')} <span className='mobile__menu-content-submenu-badge'>NEW!</span></div>
-                    </a>
-                    <a href='https://app.deriv.com/account/self-exclusion' className='mobile__menu-content-submenu-item mobile__platform-switcher-item mobile__menu-content-submenu-sub-item'>
-                        <div className='mobile__menu-content-submenu-item-text'>{it.L('Self-exclusion')}</div>
-                    </a>
-                    <a href='https://app.deriv.com/account/login-history' className='mobile__menu-content-submenu-item mobile__platform-switcher-item mobile__menu-content-submenu-sub-item'>
-                        <div className='mobile__menu-content-submenu-item-text'>{it.L('Login history')}</div>
-                    </a>
-                    <a href='https://app.deriv.com/account/api-token' className='mobile__menu-content-submenu-item mobile__platform-switcher-item mobile__menu-content-submenu-sub-item'>
-                        <div className='mobile__menu-content-submenu-item-text'>{it.L('API token')}</div>
-                    </a>
-                    <a href='https://app.deriv.com/account/connected-apps' className='mobile__menu-content-submenu-item mobile__platform-switcher-item mobile__menu-content-submenu-sub-item'>
-                        <div className='mobile__menu-content-submenu-item-text'>{it.L('Connected apps')}</div>
-                    </a>
-                    <a href='https://app.deriv.com/account/two-factor-authentication' className='mobile__menu-content-submenu-item mobile__platform-switcher-item mobile__menu-content-submenu-sub-item'>
-                        <div className='mobile__menu-content-submenu-item-text'>{it.L('Two-factor authentication')}</div>
-                    </a>
-                    <a href='https://app.deriv.com/account/deactivate-account' className='mobile__menu-content-submenu-item mobile__platform-switcher-item mobile__menu-content-submenu-sub-item'>
-                        <div className='mobile__menu-content-submenu-item-text'>{it.L('Close your account')}</div>
-                    </a>
-                </div>
-            </div>
             <div id='mobile__menu-content-submenu-language' className='mobile__menu-content-submenu mobile__menu-content-submenu-language'>
                 <div id='mobile__menu-content-submenu-language-header' className='mobile__menu-content-submenu-header mobile__platform-switcher-item mobile__menu-content-submenu-language-header'>
                     <img id='mobile__menu-content-submenu-language-icon-back' className='mobile__menu-content-submenu-icon' />

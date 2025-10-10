@@ -13,7 +13,6 @@ const Client            = require('../../base/client');
 const Header            = require('../../base/header');
 const BinarySocket      = require('../../base/socket');
 const DerivBanner       = require('../../common/deriv_banner');
-const TopUpVirtualPopup = require('../user/account/top_up_virtual/pop_up');
 const State             = require('../../../_common/storage').State;
 const LoaderElement     = require('../loader.jsx');
 
@@ -54,12 +53,7 @@ const TradePage = (() => {
             // Handle virtual account setup
             if (Client.get('is_virtual')) {
                 Header.upgradeMessageVisibility(); // To handle the upgrade buttons visibility
-                // if not loaded by pjax, balance update function calls TopUpVirtualPopup
-                if (State.get('is_loaded_by_pjax')) {
-                    BinarySocket.wait('balance').then(() => {
-                        TopUpVirtualPopup.init(State.getResponse('balance.balance'));
-                    });
-                }
+                // Note: TopUpVirtualPopup removed - account management functionality disabled
             }
             Client.activateByClientType('trading_socket_container');
 

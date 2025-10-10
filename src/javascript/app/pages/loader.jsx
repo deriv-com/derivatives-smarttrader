@@ -53,8 +53,11 @@ const Loader = () => {
     useEffect(() => {
         const hide_page_loader = dataManager.getContract('hide_page_loader');
         const sso_finished = dataManager.getContract('sso_finished');
+        
+        // Check for session token authentication - if user is authenticated via session token, hide loader
+        const isSessionTokenAuth = !!localStorage.getItem('session_token');
 
-        if (hide_page_loader || sso_finished) {
+        if (hide_page_loader || sso_finished || isSessionTokenAuth) {
             setLoading(false);
         }
            
