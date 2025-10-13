@@ -77,7 +77,6 @@ const getAppId = () => {
 const isBinaryApp = () => +getAppId() === binary_desktop_app_id;
 
 const getAccountType = () => {
-    // [/AI]
     // Check URL parameter first
     const urlParams = new URLSearchParams(window.location.search);
     const urlAccountType = urlParams.get('account_type');
@@ -113,7 +112,6 @@ const getSocketURL = () => {
 
     // Map account type to new v2 endpoints
     const server_url = accountType === 'real' ? 'realv2.derivws.com' : 'demov2.derivws.com';
-    // [/AI]
     return `wss://${server_url}/websockets/v3`;
 };
 
