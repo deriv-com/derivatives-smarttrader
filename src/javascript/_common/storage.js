@@ -11,12 +11,16 @@ const getObject = function(key) {
  * Removing all but user details
  */
 const keepUserAndClean = () => {
-    const client_accounts = localStorage.getItem('client.accounts');
+    const current_account = localStorage.getItem('current_account');
     const active_loginid  = sessionStorage.getItem('active_loginid') || localStorage.getItem('active_loginid');
+    const session_token   = localStorage.getItem('session_token');
     localStorage.clear();
-    localStorage.setItem('client.accounts', client_accounts);
-    sessionStorage.setItem('active_loginid', active_loginid);
-    localStorage.setItem('active_loginid', active_loginid);
+    if (current_account) localStorage.setItem('current_account', current_account);
+    if (session_token) localStorage.setItem('session_token', session_token);
+    if (active_loginid) {
+        sessionStorage.setItem('active_loginid', active_loginid);
+        localStorage.setItem('active_loginid', active_loginid);
+    }
 };
 
 const getTotalStorageUsage = (storage) => Object.keys(storage).reduce((acc, cur) => acc + localStorage[cur].length, 0);

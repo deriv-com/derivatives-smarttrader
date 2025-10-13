@@ -20,14 +20,6 @@ const Header = () => (
                     </a>
                 </div>
                 <div className='header-divider is-logout mobile-hide' />
-                <div className='header__menu-item header__menu-links mobile-hide'>
-                    <a className='url-appstore header__menu-links-item'>
-                        <span className='header__menu-item--label'>
-                            <img id='appstore-icon' className='header__icon-text appstore-icon' />
-                            {it.L('Home')}
-                        </span>
-                    </a>
-                </div>
                 <div className='header__menu-item header__menu-links client_logged_in invisible mobile-hide'>
                     <a className='url-reports-positions header__menu-links-item'>
                         <span className='header__menu-item--label'>
@@ -63,8 +55,11 @@ const Header = () => (
             </div>
             <div className='header__menu-right is-logout'>
                 <div className='header__btn'>
-                    <Skeleton.Square width={72} height={32} className='btn header__btn-login skeleton-btn-login' />
-                    <Skeleton.Square width={72} height={32} className='btn header__btn-login skeleton-btn-signup' />
+                    {/* Skeleton loaders - only show during initial loading, hidden by default for session token users */}
+                    <div id='skeleton-loaders-container' className='skeleton-loaders-container' style={{ display: 'none' }}>
+                        <Skeleton.Square width={72} height={32} className='btn header__btn-login skeleton-btn-login' />
+                        <Skeleton.Square width={72} height={32} className='btn header__btn-login skeleton-btn-signup' />
+                    </div>
                             
                     <button id='btn__login' className='btn btn--tertiary header__btn-login' style={{ display: 'none' }}>{it.L('Log in')}</button>
                     <a id='btn__signup' className='btn btn--primary header__btn-signup' target='_blank' rel='noopener noreferrer' style={{ display: 'none' }}>{it.L('Sign up')}</a>

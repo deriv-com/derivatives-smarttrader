@@ -10,47 +10,20 @@ const getPropertyValue             = require('../utility').getPropertyValue;
 const isEmptyObject                = require('../utility').isEmptyObject;
 
 const ClientBase = (() => {
-    const storage_key = 'client.accounts';
-    let client_object = {};
+    const storage_key = 'current_account';
+    let current_account = {};
     let total_balance = {};
     let current_loginid;
 
     const init = () => {
-        const url_params = new URLSearchParams(window.location.search);
-        const account_currency = url_params.get('account') || SessionStore.get('account');
-        client_object = getAllAccountsObject();
+        current_account = getCurrentAccount();
 
-        if (account_currency) {
-            let matching_loginid;
+        // Simple single-account initialization
+        current_loginid = current_account.loginid || SessionStore.get('active_loginid') || LocalStore.get('active_loginid');
 
-            const account_param_upper = account_currency.toUpperCase();
-            if (account_param_upper === 'DEMO') {
-                matching_loginid = Object.keys(client_object).find(loginid => /^VR/.test(loginid));
-            } else {
-                matching_loginid = Object.keys(client_object).find(loginid =>
-                    client_object[loginid].currency?.toUpperCase() === account_param_upper
-                    && !client_object[loginid]?.is_virtual
-                );
-            }
-            if (matching_loginid) {
-                current_loginid = matching_loginid;
-                SessionStore.set('active_loginid', matching_loginid);
-                LocalStore.set('active_loginid', matching_loginid);
-                return;
-            }
-        }
-
-        current_loginid = SessionStore.get('active_loginid') || LocalStore.get('active_loginid');
-
-        if (!current_loginid && Object.keys(client_object).length) {
-            current_loginid = Object.keys(client_object)[0];
-            SessionStore.set('active_loginid', current_loginid);
-            LocalStore.set('active_loginid', current_loginid);
-        }
-
-        if (current_loginid) {
+        if (current_loginid && current_account.currency) {
             const url = new URL(window.location.href);
-            const account_param = /^VR/.test(current_loginid) ? 'demo' : client_object[current_loginid]?.currency;
+            const account_param = /^VR/.test(current_loginid) ? 'demo' : current_account.currency;
             if (account_param) {
                 url.searchParams.set('account', new URLSearchParams(window.location.search).get('account') || account_param);
                 window.history.replaceState({}, '', url.toString());
@@ -58,17 +31,7 @@ const ClientBase = (() => {
         }
     };
 
-    const isLoggedIn = () => (
-        !isEmptyObject(getAllAccountsObject()) &&
-        get('loginid') &&
-        get('token')
-    );
-
-    const isValidLoginid = () => {
-        if (!isLoggedIn()) return true;
-        const valid_login_ids = /^(MX|MF|VRTC|MLT|CR|FOG|VRW|CRW|MFW)[0-9]+$/i;
-        return getAllLoginids().every(loginid => valid_login_ids.test(loginid));
-    };
+    const isLoggedIn = () => !!localStorage.getItem('session_token');
 
     /**
      * Stores the client information in local variable and localStorage
@@ -77,27 +40,23 @@ const ClientBase = (() => {
      * @param {String|Number|Object} value The regarding value
      * @param {String|null} loginid        The account to set the value for
      */
-    const set = (key, value, loginid = current_loginid) => {
+    const set = (key, value) => {
         if (key === 'loginid' && value !== current_loginid) {
             SessionStore.set('active_loginid', value);
             LocalStore.set('active_loginid', value);
             current_loginid = value;
+            current_account.loginid = value;
             const url = new URL(window.location.href);
-            const account_param = /^VR/.test(value) ? 'demo' : client_object[value]?.currency;
+            const account_param = /^VR/.test(value) ? 'demo' : current_account.currency;
             if (account_param) {
                 url.searchParams.set('account', account_param);
-                url.searchParams.set('currency', client_object[value]?.currency);
+                url.searchParams.set('currency', current_account.currency);
                 window.history.replaceState({}, '', url.toString());
             }
         } else {
-            if (!(loginid in client_object)) {
-                client_object[loginid] = {};
-            }
-            if (loginid === '__proto__' || loginid === 'constructor' || loginid === 'prototype') {
-                return;
-            }
-            client_object[loginid][key] = value;
-            LocalStore.setObject(storage_key, client_object);
+            // Simple single-account property setting
+            current_account[key] = value;
+            LocalStore.setObject(storage_key, current_account);
         }
     };
 
@@ -107,22 +66,16 @@ const ClientBase = (() => {
      * @param {String|null} key     The property name to return the value from, if missing returns the account object
      * @param {String|null} loginid The account to return the value from
      */
-    const get = (key, loginid = current_loginid) => {
+    const get = (key) => {
         let value;
         if (key === 'loginid') {
-            value = loginid || SessionStore.get('active_loginid') || LocalStore.get('active_loginid');
+            value = current_account.loginid || SessionStore.get('active_loginid') || LocalStore.get('active_loginid');
         } else if (key === 'token') {
-            // Check for session token first if no specific loginid token exists
-            const current_client = client_object[loginid] || getAllAccountsObject()[loginid] || client_object;
-            value = current_client[key];
-            
-            // If no token found in client object but we have a session token, use that
-            if (!value && localStorage.getItem('session_token')) {
-                value = localStorage.getItem('session_token');
-            }
+            // Always return session token for pure session token authentication
+            value = localStorage.getItem('session_token');
         } else {
-            const current_client = client_object[loginid] || getAllAccountsObject()[loginid] || client_object;
-            value = key ? current_client[key] : current_client;
+            // Simple single-account property retrieval
+            value = key ? current_account[key] : current_account;
         }
         if (!Array.isArray(value) && (+value === 1 || +value === 0 || value === 'true' || value === 'false')) {
             value = JSON.parse(value || false);
@@ -134,9 +87,7 @@ const ClientBase = (() => {
 
     const getTotalBalance = () => total_balance;
 
-    const getAllAccountsObject = () => LocalStore.getObject(storage_key);
-
-    const getAllLoginids = () => Object.keys(getAllAccountsObject());
+    const getCurrentAccount = () => LocalStore.getObject(storage_key) || {};
 
     const getAccountType = (loginid = current_loginid) => {
         let account_type;
@@ -152,12 +103,13 @@ const ClientBase = (() => {
             (type === 'virtual' && this_type === 'virtual') ||
             (type === 'real'    && this_type !== 'virtual') ||
             type === this_type) &&
-            (only_enabled ? !get('is_disabled', loginid) : true));
+            (only_enabled ? !get('is_disabled') : true));
     };
 
     const getAccountOfType = (type, only_enabled) => {
-        const id = getAllLoginids().find(loginid => isAccountOfType(type, loginid, only_enabled));
-        return id ? Object.assign({ loginid: id }, get(null, id)) : {};
+        const loginid = current_account.loginid;
+        return (loginid && isAccountOfType(type, loginid, only_enabled)) ?
+            Object.assign({ loginid }, current_account) : {};
     };
 
     const hasAccountType = (type, only_enabled) => !isEmptyObject(getAccountOfType(type, only_enabled));
@@ -165,43 +117,28 @@ const ClientBase = (() => {
     // only considers currency of real money accounts
     // @param {String} type = crypto|fiat
     const hasCurrencyType = (type) => {
-        const loginids = getAllLoginids();
         if (type === 'crypto') {
             // find if has crypto currency account
-            return loginids.find(loginid =>
-                !get('is_virtual', loginid) && isCryptocurrency(get('currency', loginid)));
+            return !get('is_virtual') && isCryptocurrency(get('currency'));
         }
         // else find if have fiat currency account
-        return loginids.find(loginid =>
-            !get('is_virtual', loginid) && !isCryptocurrency(get('currency', loginid)));
+        return !get('is_virtual') && !isCryptocurrency(get('currency'));
     };
 
     const hasOnlyCurrencyType = (type = 'fiat') => {
-        const loginids = getAllLoginids();
+        const loginid = current_account.loginid;
         const real_loginid = /^(MX|MF|MLT|CR|FOG)[0-9]+$/i;
-        const only_real_loginids = loginids.filter((loginid) => real_loginid.test(loginid));
+        if (!loginid || !real_loginid.test(loginid)) return false;
+        
         if (type === 'crypto') {
-            return only_real_loginids.every(loginid => isCryptocurrency(get('currency', loginid)));
+            return isCryptocurrency(get('currency'));
         }
         if (type === 'unset') {
-            return only_real_loginids.every(loginid => !get('currency', loginid));
+            return !get('currency');
         }
 
-        return only_real_loginids.every(loginid => get('currency', loginid) && !isCryptocurrency(get('currency', loginid)));
+        return get('currency') && !isCryptocurrency(get('currency'));
     };
-
-    const isWalletsAccount = (loginid) => {
-        if (typeof loginid === 'undefined') {
-            return false;
-        }
-        const account_object = getAllAccountsObject()[loginid];
-        if (!account_object) {
-            return false;
-        }
-        return account_object.account_category === 'wallet';
-    };
-
-    const hasWalletsAccount = () => Object.values(getAllAccountsObject()).some(account => account.account_category === 'wallet');
 
     const TypesMapConfig = (() => {
         let types_map_config;
@@ -228,63 +165,6 @@ const ClientBase = (() => {
         return (types_map[getAccountType(loginid)] || types_map.default);
     };
 
-    const responseAuthorize = (response) => {
-        const authorize = response.authorize;
-        
-        // Simplified single-account authentication
-        // Set current loginid first
-        current_loginid = authorize.loginid;
-        
-        // Set basic account properties for the single logged-in account
-        set('loginid',    authorize.loginid,    authorize.loginid);
-        set('email',      authorize.email || '', authorize.loginid);
-        set('country',    authorize.country || '', authorize.loginid);
-        set('currency',   authorize.currency,   authorize.loginid);
-        set('is_virtual', +authorize.is_virtual, authorize.loginid);
-        set('balance',    authorize.balance,    authorize.loginid);
-        set('session_start', parseInt(moment().valueOf() / 1000), authorize.loginid);
-        
-        // Set optional properties if they exist
-        if (authorize.landing_company_name) {
-            set('landing_company_shortcode', authorize.landing_company_name, authorize.loginid);
-        }
-        if (authorize.user_id) {
-            set('user_id', authorize.user_id, authorize.loginid);
-        }
-        
-        // Create and store minimal account entry
-        const accounts = getAllAccountsObject();
-        accounts[authorize.loginid] = {
-            currency  : authorize.currency,
-            is_virtual: +authorize.is_virtual,
-            email     : authorize.email || '',
-            loginid   : authorize.loginid,
-            balance   : authorize.balance,
-            token     : ClientBase.getAuthToken(authorize.loginid) || localStorage.getItem('session_token'),
-        };
-        
-        LocalStore.setObject(storage_key, accounts);
-        
-        // Set active loginid
-        LocalStore.set('active_loginid', authorize.loginid);
-        
-        // Set client information cookie with simplified data
-        const client_information = {
-            loginid   : authorize.loginid,
-            email     : authorize.email || '',
-            currency  : authorize.currency,
-            is_virtual: +authorize.is_virtual,
-            user_id   : authorize.user_id || '',
-        };
-        
-        const currentDomain = `.${window.location.hostname.split('.').slice(-2).join('.')}`;
-        
-        Cookies.set('client_information', JSON.stringify(client_information), {
-            domain: currentDomain,
-            path  : '/',
-        });
-    };
-
     /**
      * Handle authorization response specifically for session token authentication
      * Simplified for single-account token exchange
@@ -292,65 +172,39 @@ const ClientBase = (() => {
     const responseAuthorizeSessionToken = (response) => {
         const authorize = response.authorize;
         if (!authorize || !authorize.loginid) {
-            // eslint-disable-next-line no-console
-            console.error('responseAuthorizeSessionToken: Invalid authorize response', response);
             return;
         }
-        
-        // eslint-disable-next-line no-console
-        console.log('responseAuthorizeSessionToken: Processing single-account session token auth', authorize);
 
-        // Get accounts object
-        const accounts = getAllAccountsObject();
-        
         // Set current loginid
         current_loginid = authorize.loginid;
         
-        // Get session token and create proper account entry
+        // Get session token
         const sessionToken = localStorage.getItem('session_token');
         
         // Set account properties for single logged-in account
-        set('loginid',    authorize.loginid,    authorize.loginid);
-        set('token',      sessionToken,         authorize.loginid);
-        set('email',      authorize.email || '', authorize.loginid);
-        set('country',    authorize.country || '', authorize.loginid);
-        set('currency',   authorize.currency,   authorize.loginid);
-        set('is_virtual', +authorize.is_virtual, authorize.loginid);
-        set('balance',    authorize.balance,    authorize.loginid);
-        set('session_start', parseInt(moment().valueOf() / 1000), authorize.loginid);
+        set('loginid',    authorize.loginid);
+        // Note: token is always retrieved from localStorage in pure session token system
+        set('email',      authorize.email || '');
+        set('country',    authorize.country || '');
+        set('currency',   authorize.currency);
+        set('is_virtual', +authorize.is_virtual);
+        set('balance',    authorize.balance);
+        set('session_start', parseInt(moment().valueOf() / 1000));
         
         // Set optional properties if they exist
         if (authorize.landing_company_name) {
-            set('landing_company_shortcode', authorize.landing_company_name, authorize.loginid);
+            set('landing_company_shortcode', authorize.landing_company_name);
         }
         if (authorize.user_id) {
-            set('user_id', authorize.user_id, authorize.loginid);
+            set('user_id', authorize.user_id);
         }
         
-        // Create single account entry
-        accounts[authorize.loginid] = {
-            currency  : authorize.currency,
-            is_virtual: +authorize.is_virtual,
-            email     : authorize.email || '',
-            loginid   : authorize.loginid,
-            balance   : authorize.balance,
-            token     : sessionToken,
-        };
+        // Store session token for compatibility
+        current_account.token = sessionToken;
         
-        LocalStore.setObject(storage_key, accounts);
+        // Single storage operation for account data
+        LocalStore.setObject(storage_key, current_account);
         LocalStore.set('active_loginid', authorize.loginid);
-        
-        // Clean up session token from localStorage now that it's stored in account
-        cleanupSessionToken();
-        
-        // eslint-disable-next-line no-console
-        console.log('responseAuthorizeSessionToken: Single-account session token setup complete', {
-            loginid   : authorize.loginid,
-            currency  : authorize.currency,
-            is_virtual: !!authorize.is_virtual,
-            balance   : authorize.balance,
-            hasToken  : !!sessionToken,
-        });
         
         // Set simplified client information cookie
         const client_information = {
@@ -369,8 +223,6 @@ const ClientBase = (() => {
         });
     };
 
-    // updateAccountList removed - simplified for single-account authentication
-
     const shouldAcceptTnc = () => {
         if (get('is_virtual')) return false;
         const website_tnc_version = State.getResponse('website_status.terms_conditions_version');
@@ -380,8 +232,8 @@ const ClientBase = (() => {
 
     const clearAllAccounts = () => {
         current_loginid = undefined;
-        client_object   = {};
-        LocalStore.setObject(storage_key, client_object);
+        current_account = {};
+        LocalStore.setObject(storage_key, current_account);
     };
 
     const setNewAccount = (options) => {
@@ -392,9 +244,9 @@ const ClientBase = (() => {
         SocketCache.clear();
         localStorage.setItem('GTM_new_account', '1');
 
-        set('token',      options.token,       options.loginid);
-        set('email',      options.email,       options.loginid);
-        set('is_virtual', +options.is_virtual, options.loginid);
+        set('token',      options.token);
+        set('email',      options.email);
+        set('is_virtual', +options.is_virtual);
         set('loginid',    options.loginid);
 
         return true;
@@ -535,40 +387,13 @@ const ClientBase = (() => {
             // this specific account can be used to transfer funds to
             return canTransferFundsTo(account.loginid);
         }
-        // at least one account can be used to transfer funds to
-        return Object.keys(client_object).some(loginid => canTransferFundsTo(loginid));
+        // single account can be used to transfer funds to
+        return current_account.loginid && canTransferFundsTo(current_account.loginid);
     };
 
-    const canTransferFundsTo = (to_loginid) => {
-        if (to_loginid === current_loginid || get('is_virtual', to_loginid) || get('is_virtual') ||
-            get('is_disabled', to_loginid)) {
-            return false;
-        }
-        const from_currency = get('currency');
-        const to_currency   = get('currency', to_loginid);
-        if (!from_currency || !to_currency) {
-            return false;
-        }
-        // only transfer to other accounts that have the same currency as current account if one is maltainvest and one is malta
-        if (from_currency === to_currency) {
-            // these landing companies are allowed to transfer funds to each other if they have the same currency
-            const same_cur_allowed = {
-                maltainvest: 'malta',
-                malta      : 'maltainvest',
-            };
-            const from_landing_company = get('landing_company_shortcode');
-            const to_landing_company   = get('landing_company_shortcode', to_loginid);
-            // if same_cur_allowed[from_landing_company] is undefined and to_landing_company is also undefined, it will return true
-            // so we should compare '' === undefined instead
-            return (same_cur_allowed[from_landing_company] || '') === to_landing_company;
-        }
-        // or for other clients if current account is cryptocurrency it should only transfer to fiat currencies and vice versa
-        const is_from_crypto = isCryptocurrency(from_currency);
-        const is_to_crypto   = isCryptocurrency(to_currency);
-        return (is_from_crypto ? !is_to_crypto : is_to_crypto);
-    };
+    const canTransferFundsTo = () => false; // Simplified for single account - no transfers between accounts in pure session token system
 
-    const hasSvgAccount = () => !!(getAllLoginids().find(loginid => /^CR/.test(loginid)));
+    const hasSvgAccount = () => current_account.loginid && /^CR/.test(current_account.loginid);
 
     const canChangeCurrency = (statement, mt5_login_list, is_current = true) => {
         const currency             = get('currency');
@@ -651,62 +476,20 @@ const ClientBase = (() => {
     };
 
     /**
-     * Check if we are using session token authentication
-     * @returns {boolean} - True if session token is being used
+     * Get session token if it exists
+     * @returns {string|null} - Session token or null if not found
      */
-    const isUsingSessionToken = () => {
-        const sessionToken = localStorage.getItem('session_token');
-        const currentLoginId = get('loginid');
-        return !!(sessionToken && !currentLoginId);
-    };
-
-    /**
-     * Get the current authentication token (either from client accounts or session storage)
-     * @param {string} loginid - Optional specific login ID
-     * @returns {string|null} - Authentication token
-     */
-    const getAuthToken = (loginid = current_loginid) => {
-        // First try to get token from client accounts
-        const accountToken = get('token', loginid);
-        if (accountToken) {
-            return accountToken;
-        }
-        
-        // Fallback to session token if available
-        const sessionToken = localStorage.getItem('session_token');
-        if (sessionToken) {
-            return sessionToken;
-        }
-        
-        return accountToken || null;
-    };
-
-    /**
-     * Clean up session token after successful authorization
-     */
-    const cleanupSessionToken = () => {
-        const sessionToken = localStorage.getItem('session_token');
-        // eslint-disable-next-line no-console
-        console.log('cleanupSessionToken: Removing session_token:', !!sessionToken);
-        
-        // Remove session token as it's now stored properly in client accounts
-        localStorage.removeItem('session_token');
-        
-        // eslint-disable-next-line no-console
-        console.log('cleanupSessionToken: Cleanup complete');
-    };
+    const getStoredSessionToken = () => localStorage.getItem('session_token');
 
     return {
         init,
         isLoggedIn,
         isMF,
         isMultipliersOnly,
-        isValidLoginid,
         set,
         get,
         setTotalBalance,
         getTotalBalance,
-        getAllLoginids,
         getAccountType,
         isAccountOfType,
         isAuthenticationAllowed,
@@ -714,21 +497,18 @@ const ClientBase = (() => {
         isLowRisk,
         isOptionsBlocked,
         isOfferingBlocked,
-        isWalletsAccount,
         getAccountOfType,
         hasAccountType,
         hasCurrencyType,
         hasOnlyCurrencyType,
-        hasWalletsAccount,
         getAccountTitle,
-        responseAuthorize,
         responseAuthorizeSessionToken,
         shouldAcceptTnc,
         clearAllAccounts,
         setNewAccount,
         currentLandingCompany,
         shouldCompleteTax,
-        getAllAccountsObject,
+        getCurrentAccount,
         getMT5AccountDisplays,
         getBasicUpgradeInfo,
         getLandingCompanyValue,
@@ -736,9 +516,7 @@ const ClientBase = (() => {
         canTransferFunds,
         hasSvgAccount,
         canChangeCurrency,
-        isUsingSessionToken,
-        getAuthToken,
-        cleanupSessionToken,
+        getStoredSessionToken,
     };
 })();
 

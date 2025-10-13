@@ -1,16 +1,8 @@
-// const BinaryPjax               = require('./binary_pjax');
-const Cookies = require('js-cookie');
-const requestOidcAuthentication =
-  require('@deriv-com/auth-client').requestOidcAuthentication;
 const Client = require('./client');
 const BinarySocket = require('./socket');
-const AuthClient = require('../../_common/auth');
-const TMB = require('../../_common/tmb');
-const showHidePulser = require('../common/account_opening').showHidePulser;
 
 const Login = require('../../_common/base/login');
 const SocketCache = require('../../_common/base/socket_cache');
-// const elementInnerHtml         = require('../../_common/common_functions').elementInnerHtml;
 const getElementById = require('../../_common/common_functions').getElementById;
 const localize = require('../../_common/localize').localize;
 const Url = require('../../_common/url');
@@ -23,7 +15,6 @@ const getPlatformSettings =
       require('../../../templates/_common/brand.config').getPlatformSettings;
 
 const formatMoney = require('../common/currency').formatMoney;
-
 const isEuCountry = require('../common/country_base').isEuCountry;
 const DerivLiveChat = require('../pages/livechat.jsx');
 const {
@@ -32,8 +23,6 @@ const {
 const { SessionStore } = require('../../_common/storage');
 const Chat = require('../../_common/chat.js').default;
 const getRemoteConfig = require('../hooks/useRemoteConfig').getRemoteConfig;
-const ErrorModal =
-  require('../../../templates/_common/components/error-modal.jsx').default;
 
 const header_icon_base_path = '/images/pages/header/';
 
@@ -102,7 +91,7 @@ const Header = (() => {
         window.SmartTrader.Header = {
             addHeaderReadyCallback,
             isHeaderReady,
-            updateLoginButtonsDisplay,
+            updateLoginButtonsDisplay: () => updateLoginButtonsDisplay(),
         };
     }
 
@@ -232,7 +221,6 @@ const Header = (() => {
             setupSingleAccountHeader();
             
             await BinarySocket.wait('authorize', 'landing_company');
-            bindPlatform();
 
         } catch (error) {
             // eslint-disable-next-line no-console
@@ -527,103 +515,69 @@ const Header = (() => {
         });
     };
 
-    const bindPlatform = () => {};
-
     const updateLoginButtonsDisplay = () => {
-        // Check if we should show skeleton loading state
-        const logged_state = Cookies.get('logged_state');
-        const client_accounts =
-      typeof window !== 'undefined'
-          ? JSON.parse(window.localStorage.getItem('client.accounts') || '{}')
-          : {};
-        const is_client_accounts_populated =
-      Object.keys(client_accounts).length > 0;
-        const is_silent_login_excluded =
-      window.location.pathname.includes('callback') ||
-      window.location.pathname.includes('endpoint');
-        const will_eventually_sso =
-      logged_state === 'true' && !is_client_accounts_populated;
+        // Get login and signup buttons
+        const btn_login = getElementById('btn__login');
+        const btn_signup = getElementById('btn__signup');
         
-        // Check if user is logged out - this takes priority over trading page logic
+        if (!btn_login || !btn_signup) return;
+
+        // Hide buttons initially
+        btn_login.style.display = 'none';
+        btn_signup.style.display = 'none';
+        
+        // Check if user is logged out
         const is_logged_out = !Client.isLoggedIn();
         
         // Check if we're on a trading page and if trading is still loading
         const is_trading_page = window.location.pathname.includes('/trading');
         const trading_init_progress = getElementById('trading_init_progress');
-        const is_trading_loading =
-      trading_init_progress && trading_init_progress.style.display !== 'none';
+        const is_trading_loading = trading_init_progress && trading_init_progress.style.display !== 'none';
         
-        // Get login and signup buttons
-        const btn_login = getElementById('btn__login');
-        const btn_signup = getElementById('btn__signup');
-        const header_btn_container = btn_login ? btn_login.parentElement : null;
-
-        if (!header_btn_container) return;
-
-        // Hide buttons initially
-        if (btn_login) btn_login.style.display = 'none';
-        if (btn_signup) btn_signup.style.display = 'none';
-        
-        // PRIORITY 1: If user is logged out, always show login buttons (override trading logic)
+        // If user is logged out, always show login buttons
         if (is_logged_out) {
             removeHeaderSkeletonLoaders();
-            if (btn_login) btn_login.style.display = 'flex';
-            if (btn_signup) btn_signup.style.display = 'flex';
+            btn_login.style.display = 'flex';
+            btn_signup.style.display = 'flex';
             return;
         }
         
-        // PRIORITY 2: On trading pages, sync with purchase container loading state (only for logged-in users)
+        // On trading pages, sync with purchase container loading state (only for logged-in users)
         if (is_trading_page && is_trading_loading) {
-            // Show skeleton loaders while trading is initializing
             showHeaderSkeletonLoaders();
             return;
         }
         
-        // Remove skeleton loaders first
+        // For logged-in users, hide login buttons and skeleton loaders
         removeHeaderSkeletonLoaders();
-        
-        if (!will_eventually_sso || is_silent_login_excluded) {
-            // Show regular buttons
-            if (btn_login) btn_login.style.display = 'flex';
-            if (btn_signup) btn_signup.style.display = 'flex';
-        } else {
-            // Show skeleton loaders for silent login
-            showHeaderSkeletonLoaders();
-        }
     };
 
     const showHeaderSkeletonLoaders = () => {
         const btn_login = getElementById('btn__login');
         const btn_signup = getElementById('btn__signup');
-        const header_btn_container = btn_login ? btn_login.parentElement : null;
+        const skeleton_container = getElementById('skeleton-loaders-container');
         
-        if (!header_btn_container) return;
-        
-        // Remove existing skeleton loaders first
-        removeHeaderSkeletonLoaders();
+        if (!skeleton_container) return;
         
         // Hide actual buttons
         if (btn_login) btn_login.style.display = 'none';
         if (btn_signup) btn_signup.style.display = 'none';
         
-        // Create and add skeleton loaders
-        const skeleton_login = document.createElement('div');
-        skeleton_login.className = 'skeleton-btn-login';
-        skeleton_login.style.cssText =
-      'width: 60px; height: 32px; background: #f0f0f0; border-radius: 4px; margin-right: 8px; animation: skeleton-loading 1.5s infinite ease-in-out;';
-        
-        const skeleton_signup = document.createElement('div');
-        skeleton_signup.className = 'skeleton-btn-signup';
-        skeleton_signup.style.cssText =
-      'width: 80px; height: 32px; background: #f0f0f0; border-radius: 4px; animation: skeleton-loading 1.5s infinite ease-in-out;';
-        
-        header_btn_container.appendChild(skeleton_login);
-        header_btn_container.appendChild(skeleton_signup);
+        // Show React skeleton loaders container
+        skeleton_container.style.display = 'flex';
     };
 
     const removeHeaderSkeletonLoaders = () => {
-        const skeleton_login = document.querySelector('.skeleton-btn-login');
-        const skeleton_signup = document.querySelector('.skeleton-btn-signup');
+        const skeleton_container = getElementById('skeleton-loaders-container');
+        
+        // Hide React skeleton loaders container
+        if (skeleton_container) {
+            skeleton_container.style.display = 'none';
+        }
+        
+        // Also remove any legacy DOM skeleton loaders that might exist
+        const skeleton_login = document.querySelector('.skeleton-btn-login:not(.skeleton-loaders-container .skeleton-btn-login)');
+        const skeleton_signup = document.querySelector('.skeleton-btn-signup:not(.skeleton-loaders-container .skeleton-btn-signup)');
         
         if (skeleton_login) skeleton_login.remove();
         if (skeleton_signup) skeleton_signup.remove();
@@ -699,9 +653,6 @@ const Header = (() => {
         mobile_platform_appstore_link.href = traders_hub_link;
 
         // Note: wallet switcher functionality is disabled for single account mode
-        if (Client.hasWalletsAccount()) {
-            // Wallet switcher UI removed - account switching functionality disabled
-        }
 
         // Mobile reports menu
         const appstore_menu = getElementById(
@@ -1127,90 +1078,15 @@ const Header = (() => {
         }
     };
 
-    // const logoOnClick = () => {
-    //     if (Client.isLoggedIn()) {
-    //         const url = Client.isAccountOfType('financial') ? Url.urlFor('user/metatrader') : Client.defaultRedirectUrl();
-    //         BinaryPjax.load(url);
-    //     } else {
-    //         BinaryPjax.load(Url.urlFor(''));
-    //     }
-    // };
-
     const loginOnClick = async (e) => {
         e.preventDefault();
-        const is_staging_or_production =
-      /^staging-smarttrader\.deriv\.com$/i.test(window.location.hostname) ||
-                                        /^smarttrader\.deriv\.com$/i.test(window.location.hostname);
-
-        if (is_staging_or_production) {
-            // Check if TMB is enabled first
-            if (await TMB.isTMBEnabled()) {
-                // TMB doesn't need explicit login redirect - sessions are managed automatically
-                // Just trigger a check for active sessions
-                try {
-                    await TMB.handleTMBLogin();
-                } catch (error) {
-                    ErrorModal.init({
-                        message: localize(
-                            'Something went wrong while logging in. Please refresh and try again.'
-                        ),
-                        buttonText   : localize('Refresh'),
-                        onButtonClick: () => {
-                            ErrorModal.remove();
-                            setTimeout(() => {
-                                window.location.reload();
-                            }, 0);
-                        },
-                    });
-                }
-                return;
-            }
-
-            // Original OIDC authentication flow
-            const currentLanguage = Language.get();
-            const redirectCallbackUri = `${window.location.origin}/${currentLanguage}/callback`;
-            const postLoginRedirectUri = window.location.origin;
-            const postLogoutRedirectUri = `${window.location.origin}/${currentLanguage}/trading`;
-            try {
-                await requestOidcAuthentication({
-                    redirectCallbackUri,
-                    postLoginRedirectUri,
-                    postLogoutRedirectUri,
-                });
-            } catch (error) {
-                ErrorModal.init({
-                    message: localize(
-                        'Something went wrong while logging in. Please refresh and try again.'
-                    ),
-                    buttonText   : localize('Refresh'),
-                    onButtonClick: () => {
-                        ErrorModal.remove();
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 0);
-                    },
-                });
-            }
-        } else {
-            Login.redirectToLogin();
-        }
+        // Session token authentication - redirect to login
+        Login.redirectToLogin();
     };
   
     const logoutOnClick = async () => {
         await Chat.clear();
-
-        // Check if TMB is enabled first
-        if (await TMB.isTMBEnabled()) {
-            await TMB.handleTMBLogout();
-            Client.sendLogoutRequest();
-            return;
-        }
-
-        // Original OIDC logout flow
-        // This will wrap the logout call Client.sendLogoutRequest with our own logout iframe, which is to inform Hydra that the user is logging out
-        // and the session should be cleared on Hydra's side. Once this is done, it will call the passed-in logout handler Client.sendLogoutRequest.
-        // If Hydra authentication is not enabled, the logout handler Client.sendLogoutRequest will just be called instead.
-        await AuthClient.requestOauth2Logout(Client.sendLogoutRequest);
+        Client.sendLogoutRequest();
     };
 
     const upgradeMessageVisibility = () => {
@@ -1319,9 +1195,6 @@ const Header = (() => {
                         );
                     });
                 }
-                if (/accounts/.test(window.location.href)) {
-                    showHidePulser(0);
-                }
             } else if (show_upgrade_msg) {
                 getElementById('virtual-wrapper').setVisibility(0);
                 const upgrade_url =
@@ -1331,9 +1204,6 @@ const Header = (() => {
                 showUpgrade(upgrade_url, upgrade_link_txt);
                 showUpgradeBtn(upgrade_url, upgrade_btn_txt);
 
-                if (/new_account/.test(window.location.href)) {
-                    showHidePulser(0);
-                }
             } else {
                 applyToAllElements(upgrade_msg, (el) => {
                     el.setVisibility(0);

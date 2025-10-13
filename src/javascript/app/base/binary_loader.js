@@ -17,13 +17,10 @@ const localizeForLang = require('../../_common/localize').forLang;
 const localize = require('../../_common/localize').localize;
 const ScrollToAnchor = require('../../_common/scroll_to_anchor');
 const isStorageSupported = require('../../_common/storage').isStorageSupported;
-const SessionStore = require('../../_common/storage').SessionStore;
 const ThirdPartyLinks = require('../../_common/third_party_links');
 const urlFor = require('../../_common/url').urlFor;
-const Url = require('../../_common/url');
 const createElement = require('../../_common/utility').createElement;
 const DevShortcuts = require('../../_common/dev_shortcuts');
-const SSOLoader = require('../pages/sso-loader.jsx');
 
 const BinaryLoader = (() => {
     let container;
@@ -50,7 +47,6 @@ const BinaryLoader = (() => {
 
         Page.showNotificationOutdatedBrowser();
 
-        SSOLoader.init();
         Client.init();
         NetworkMonitor.init();
         DerivBanner.chooseBanner();
@@ -62,10 +58,8 @@ const BinaryLoader = (() => {
         try {
             BinaryPjax.init(container, '#content');
         } catch (error) {
-            if (window.location.pathname.includes('/callback')) {
-                const account_param = Url.param('account') || SessionStore.get('account');
-                window.location.replace(`${window.location.protocol}//${window.location.hostname}${account_param ? `?account=${account_param}` : ''}`);
-            }
+            // BinaryPjax initialization error - redirect to home
+            window.location.replace(`${window.location.protocol}//${window.location.hostname}`);
         }
         
         ThirdPartyLinks.init();

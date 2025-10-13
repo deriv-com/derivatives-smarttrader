@@ -1,8 +1,6 @@
 const moment                   = require('moment');
 const Contract                 = require('./contract');
-const hidePriceOverlay         = require('./common').hidePriceOverlay;
 const countDecimalPlaces       = require('./common_independent').countDecimalPlaces;
-const processPriceRequest      = require('./price').processPriceRequest;
 const DigitTicker              = require('./digit_ticker');
 const TickDisplay              = require('./tick_trade');
 const updateValues             = require('./update_values');
@@ -11,11 +9,9 @@ const Header                   = require('../../base/header');
 const BinarySocket             = require('../../base/socket');
 const formatMoney              = require('../../common/currency').formatMoney;
 const changePocNumbersToString = require('../../common/request_middleware').changePocNumbersToString;
-const TopUpVirtualPopup        = require('../user/account/top_up_virtual/pop_up');
 const addComma                 = require('../../../_common/base/currency_base').addComma;
 const CommonFunctions          = require('../../../_common/common_functions');
 const localize                 = require('../../../_common/localize').localize;
-const State                    = require('../../../_common/storage').State;
 const Url                      = require('../../../_common/url');
 const dataManager              = require('../../common/data_manager').default;
 const createElement            = require('../../../_common/utility').createElement;
@@ -83,22 +79,23 @@ const Purchase = (() => {
         const show_chart = !error && passthrough.duration <= 10 && passthrough.duration_unit === 't';
 
         if (error) {
-            const balance = State.getResponse('balance.balance');
             confirmation_error.show();
 
-            if (/InsufficientBalance/.test(error.code) && TopUpVirtualPopup.shouldShow(balance, true)) {
-                hidePriceOverlay();
-                processPriceRequest();
-                TopUpVirtualPopup.show(error.message);
-
+            // Note: TopUpVirtualPopup removed - account management functionality disabled
+            if (/InsufficientBalance/.test(error.code)) {
+                // Show insufficient balance error without top-up popup
+                contracts_list.style.display = 'none';
+                container.style.display = 'block';
                 dataManager.setPurchase({
-                    error: {
-                        show_purchase_results: true,
-                        ...error,
-                        action               : TopUpVirtualPopup.doTopUp,
-                        title                : localize('Top up Virtual Account?'),
-                        is_custom            : true,
-                    },
+                    show_purchase_results: true,
+                });
+
+                message_container.hide();
+                confirmation_error.setVisibility(1);
+                CommonFunctions.elementInnerHtml(confirmation_error, error.message);
+                
+                dataManager.setPurchase({
+                    error: { ...error },
                 });
             } else {
                 contracts_list.style.display = 'none';

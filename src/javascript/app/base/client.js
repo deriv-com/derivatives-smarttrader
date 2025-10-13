@@ -32,7 +32,7 @@ const Client = (() => {
         // const secondary_bg_color    = 'secondary-bg-color';
         
         if (ClientBase.isLoggedIn()) {
-            BinarySocket.wait('authorize', 'website_status', 'get_account_status', 'balance').then(() => {
+            BinarySocket.wait('authorize', 'balance').then(() => {
                 // const client_logged_in = getElementById('client-logged-in');
                 // client_logged_in.classList.add('gr-centered');
 
@@ -75,19 +75,21 @@ const Client = (() => {
                 }
                 
                 if (!is_trading_loading && is_header_ready) {
-                    // Hide skeleton loaders for logged-in state (login buttons not needed)
-                    applyToAllElements('.skeleton-btn-login, .skeleton-btn-signup', (el) => {
-                        el.classList.add('hidden');
-                    });
+                    // Hide skeleton loaders container for logged-in state (login buttons not needed)
+                    const skeletonContainer = getElementById('skeleton-loaders-container');
+                    if (skeletonContainer) {
+                        skeletonContainer.style.display = 'none';
+                    }
                 } else if (!is_header_ready) {
                     // If header not ready, register callback via SmartTrader namespace
                     if (typeof window !== 'undefined' && window.SmartTrader?.Header?.addHeaderReadyCallback) {
                         window.SmartTrader.Header.addHeaderReadyCallback(() => {
                             // Re-run the skeleton loader logic when header is ready
                             if (!is_trading_loading) {
-                                applyToAllElements('.skeleton-btn-login, .skeleton-btn-signup', (el) => {
-                                    el.style.display = 'none';
-                                });
+                                const skeletonContainer = getElementById('skeleton-loaders-container');
+                                if (skeletonContainer) {
+                                    skeletonContainer.style.display = 'none';
+                                }
                             }
                         });
                     }
@@ -114,10 +116,11 @@ const Client = (() => {
             });
             // .is-logout container is already visible by default, no need to show it again
             
-            // EXPLICIT CLEANUP: Always remove skeleton loaders first for logout scenarios
-            applyToAllElements('.skeleton-btn-login, .skeleton-btn-signup', (el) => {
-                el.style.display = 'none';
-            });
+            // EXPLICIT CLEANUP: Always hide skeleton loaders container first for logout scenarios
+            const skeletonContainer = getElementById('skeleton-loaders-container');
+            if (skeletonContainer) {
+                skeletonContainer.style.display = 'none';
+            }
             
             // Check if header is ready via SmartTrader namespace to avoid circular dependency
             let is_header_ready = false;
@@ -167,17 +170,6 @@ const Client = (() => {
     };
 
     const sendLogoutRequest = (show_login_page, redirect_to) => {
-        // Debug: Log logout request details especially during session token auth
-        const sessionToken = localStorage.getItem('session_token');
-        // eslint-disable-next-line no-console
-        console.log('🚪 sendLogoutRequest called:', {
-            show_login_page,
-            redirect_to,
-            hasSessionToken: !!sessionToken,
-            currentLoginId : ClientBase.get('loginid'),
-            stack          : new Error().stack,
-        });
-        
         if (show_login_page) {
             sessionStorage.setItem('showLoginPage', 1);
         }
@@ -244,6 +236,8 @@ const Client = (() => {
         Defaults.remove(MARKET, UNDERLYING);
         ClientBase.clearAllAccounts();
         ClientBase.set('loginid', '');
+        // Clear session token for pure session token authentication
+        localStorage.removeItem('session_token');
         SocketCache.clear();
         RealityCheckData.clear();
         if (isBinaryDomain()){

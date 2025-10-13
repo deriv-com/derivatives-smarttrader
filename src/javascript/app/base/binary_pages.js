@@ -2,8 +2,7 @@
 // const TabSelector = require('../../_common/tab_selector'); // eslint-disable-line import/order
 
 // ==================== app ====================
-const LoggedInHandler         = require('./logged_in');
-const CallbackHandler         = require('./callback');
+// const LoggedInHandler         = require('./logged_in'); // Removed - OAuth callback no longer needed
 // const Redirect                = require('./redirect');
 // const AccountTransfer         = require('../pages/cashier/account_transfer');
 // const Cashier                 = require('../pages/cashier/cashier');
@@ -87,7 +86,7 @@ const pages_config = {
     // dp2p                     : { module: DP2P,                       is_authenticated: true },
     // dubai                    : { module: StaticPages.Locations },
     // economic_calendar        : { module: EconomicCalendar },
-    endpoint   : { module: Endpoint },
+    endpoint: { module: Endpoint },
     // epg_forwardws            : { module: DepositWithdraw,            is_authenticated: true, only_real: true },
     // faq                      : { module: StaticPages.AffiliatesFAQ },
     // forex                    : { module: GetStarted.Forex },
@@ -97,8 +96,7 @@ const pages_config = {
     // labuan                   : { module: StaticPages.Locations },
     // landing_page             : { module: StaticPages.LandingPage,    is_authenticated: true, only_virtual: true },
     // limitsws                 : { module: Limits,                     is_authenticated: true, no_mf: true, only_real: true, needs_currency: true },
-    logged_inws: { module: LoggedInHandler },
-    callback   : { module: CallbackHandler },
+    // logged_inws: { module: LoggedInHandler }, // Removed - OAuth callback no longer needed
     // lost_passwordws          : { module: LostPassword,               not_authenticated: true },
     // malta                    : { module: StaticPages.Locations },
     // maltainvestws            : { module: FinancialAccOpening,        is_authenticated: true },
@@ -120,7 +118,7 @@ const pages_config = {
     // statementws              : { module: Statement,                  is_authenticated: true, needs_currency: true },
     // tnc_approvalws           : { module: TNCApproval,                is_authenticated: true, only_real: true },
     // top_up_virtualws         : { module: TopUpVirtual,               is_authenticated: true, only_virtual: true },
-    trading    : { module: TradePage,                  no_mf: true, no_blocked_country: true },
+    trading : { module: TradePage,                  no_mf: true, no_blocked_country: true },
     // transferws               : { module: PaymentAgentTransfer,       is_authenticated: true, only_real: true },
     // two_factor_authentication: { module: TwoFactorAuthentication,    is_authenticated: true },
     // virtualws                : { module: VirtualAccOpening,          not_authenticated: true },
