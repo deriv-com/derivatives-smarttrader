@@ -13,7 +13,6 @@ const Tick              = require('./tick');
 const NotAvailable      = require('./not-available.jsx');
 const BinarySocket       = require('../../base/socket');
 const dataManager       = require('../../common/data_manager.js').default;
-const getMinPayout      = require('../../common/currency').getMinPayout;
 const isCryptocurrency  = require('../../common/currency').isCryptocurrency;
 const elementInnerHtml  = require('../../../_common/common_functions').elementInnerHtml;
 const getElementById    = require('../../../_common/common_functions').getElementById;
@@ -327,7 +326,15 @@ const Process = (() => {
         if (Defaults.get(amount)) {
             $('#amount').val(Defaults.get(amount));
         } else {
-            const default_value = getMinPayout(currency);
+            let default_value;
+            
+            const contracts = Contract.contracts().contracts_for;
+            if (contracts && contracts.default_stake) {
+                default_value = contracts.default_stake;
+            } else {
+                default_value = 10;
+            }
+            
             Defaults.set(amount, default_value);
             getElementById('amount').value = default_value;
         }

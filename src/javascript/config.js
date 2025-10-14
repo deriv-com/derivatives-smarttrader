@@ -76,46 +76,42 @@ const getAppId = () => {
 
 const isBinaryApp = () => +getAppId() === binary_desktop_app_id;
 
-const getSocketURL = () => {
-    let server_url = window.localStorage.getItem('config.server_url');
-    if (!server_url) {
-        // const to_green_percent = { real: 100, virtual: 0, logged_out: 0 }; // default percentage
-        // const category_map     = ['real', 'virtual', 'logged_out'];
-        // const percent_values   = Cookies.get('connection_setup'); // set by GTM
-        //
-        // // override defaults by cookie values
-        // if (percent_values && percent_values.indexOf(',') > 0) {
-        //     const cookie_percents = percent_values.split(',');
-        //     category_map.map((cat, idx) => {
-        //         if (cookie_percents[idx] && !isNaN(cookie_percents[idx])) {
-        //             to_green_percent[cat] = +cookie_percents[idx].trim();
-        //         }
-        //     });
-        // }
+const getAccountType = () => {
+    // Check URL parameter first
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlAccountType = urlParams.get('account_type');
+    if (urlAccountType) {
+        // Validate and store
+        const validAccountType = ['demo', 'real'].includes(urlAccountType) ? urlAccountType : 'demo';
+        window.localStorage.setItem('account_type', validAccountType);
+        
+        // Clean up URL
+        const url = new URL(window.location);
+        url.searchParams.delete('account_type');
+        window.history.replaceState({}, '', url);
 
-        // let server = 'blue';
-        // if (/www\.binary\.com/i.test(window.location.hostname)) {
-        //     const loginid = window.localStorage.getItem('active_loginid');
-        //     let client_type = category_map[2];
-        //     if (loginid) {
-        //         client_type = /^VRT/.test(loginid) ? category_map[1] : category_map[0];
-        //     }
-        //
-        //     const random_percent = Math.random() * 100;
-        //     if (random_percent < to_green_percent[client_type]) {
-        //         server = 'green';
-        //     }
-        // }
-
-        // TODO: in order to use connection_setup config, uncomment the above section and remove next lines
-
-        const loginid       = window.sessionStorage.getItem('active_loginid') || window.localStorage.getItem('active_loginid');
-        const is_real       = loginid && !/^VRT/.test(loginid);
-        const real_server   = is_real ? 'green' : 'blue';
-        const server        = isProduction() ? real_server : 'red';
-
-        server_url = `${server}.derivws.com`;
+        return validAccountType;
     }
+    
+    // Check localStorage
+    const storedAccountType = window.localStorage.getItem('account_type');
+    if (storedAccountType && ['demo', 'real'].includes(storedAccountType)) {
+        return storedAccountType;
+    }
+    
+    // Default fallback
+    return 'demo';
+};
+
+const getSocketURL = () => {
+    const local_storage_server_url = window.localStorage.getItem('config.server_url');
+    if (local_storage_server_url) return local_storage_server_url;
+
+    // Get account type
+    const accountType = getAccountType();
+
+    // Map account type to new v2 endpoints
+    const server_url = accountType === 'real' ? 'realv2.derivws.com' : 'demov2.derivws.com';
     return `wss://${server_url}/websockets/v3`;
 };
 
@@ -124,5 +120,6 @@ module.exports = {
     isProduction,
     getAppId,
     isBinaryApp,
+    getAccountType,
     getSocketURL,
 };
