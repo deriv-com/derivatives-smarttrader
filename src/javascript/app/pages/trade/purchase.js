@@ -5,7 +5,8 @@ const DigitTicker              = require('./digit_ticker');
 const TickDisplay              = require('./tick_trade');
 const updateValues             = require('./update_values');
 const Client                   = require('../../base/client');
-const Header                   = require('../../base/header');
+const Login                    = require('../../../_common/base/login');
+const { getBrandSignupUrl }    = require('../../../../templates/_common/brand.config');
 const BinarySocket             = require('../../base/socket');
 const formatMoney              = require('../../common/currency').formatMoney;
 const changePocNumbersToString = require('../../common/request_middleware').changePocNumbersToString;
@@ -109,11 +110,10 @@ const Purchase = (() => {
                     authorization_error.setVisibility(1);
                     const authorization_error_btn_login = CommonFunctions.getElementById('authorization_error_btn_login');
                     const authorization_error_btn_signup = CommonFunctions.getElementById('authorization_error_btn_signup');
-                    authorization_error_btn_login.removeEventListener('click', loginOnClick);
                     authorization_error_btn_login.addEventListener('click', loginOnClick);
+                    authorization_error_btn_signup.addEventListener('click', signupOnClick);
 
-                    const signup_url = `${Url.getStaticUrl()}/signup/`;
-                    authorization_error_btn_signup.href = signup_url;
+                    const signup_url = getBrandSignupUrl();
 
                     dataManager.setPurchase({
                         error: {
@@ -321,7 +321,15 @@ const Purchase = (() => {
         return row_element.outerHTML;
     };
 
-    const loginOnClick = (e) => Header.loginOnClick(e);
+    const loginOnClick = (e) => {
+        e.preventDefault();
+        Login.redirectToLogin();
+    };
+
+    const signupOnClick = (e) => {
+        e.preventDefault();
+        Login.redirectToSignup();
+    };
 
     const onclose = () => {
         DigitTicker.remove();

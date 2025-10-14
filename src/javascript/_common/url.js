@@ -121,6 +121,12 @@ const Url = (() => {
             getAccountParam() ? `?account=${getAccountParam().toUpperCase()}` : '?'
         }${pars ? `&${pars}` : ''}`;
 
+    const urlForReports = (path, redirect_url, account_type) => {
+        const dtrader_domain = `https://dtrader.deriv.${getTopLevelDomain()}`;
+        const encoded_redirect = encodeURIComponent(redirect_url);
+        return `${dtrader_domain}/${path}?redirect=${encoded_redirect}&account=${account_type}`;
+    };
+
     const urlForTradersHub = (path, pars) => {
         const origin = getAllowedLocalStorageOrigin(true) || deriv_app_domain;
         return `${origin}/${path}?${pars ? `${pars}` : ''}`;
@@ -199,6 +205,7 @@ const Url = (() => {
         urlForCurrentDomain,
         urlForStatic,
         urlForDeriv,
+        urlForReports,
         urlForTradersHub,
         getAllowedLocalStorageOrigin,
         getSection,
