@@ -2,6 +2,8 @@ const Client = require('./client');
 const BinarySocket = require('./socket');
 
 const Login = require('../../_common/base/login');
+const { getBrandHomeUrl, getPlatformHostname } = require('../../../templates/_common/brand.config');
+const { getAccountType } = require('../../config');
 const SocketCache = require('../../_common/base/socket_cache');
 const getElementById = require('../../_common/common_functions').getElementById;
 const localize = require('../../_common/localize').localize;
@@ -270,10 +272,6 @@ const Header = (() => {
         const url_add_account_dynamic = document.getElementById(
             'url-add-account-dynamic'
         );
-        const btn__signup = getElementById('btn__signup');
-        const static_url = Url.getStaticUrl();
-        const signup_url = `${static_url}/signup/`;
-        btn__signup.href = signup_url;
 
         if (isEuCountry()) {
             url_add_account_dynamic.classList.remove('url-add-account');
@@ -311,9 +309,13 @@ const Header = (() => {
                 : Url.urlForDeriv('', `ext_platform_url=${ext_platform_url}`);
         });
         applyToAllElements('.url-reports-positions', (el) => {
-            el.href = Url.urlForDeriv(
+            const account_type = getAccountType();
+            const redirect_url = getPlatformHostname();
+            
+            el.href = Url.urlForReports(
                 'reports/positions',
-                `ext_platform_url=${ext_platform_url}`
+                redirect_url,
+                account_type
             );
         });
         applyToAllElements('.url-reports-profit', (el) => {
@@ -366,6 +368,14 @@ const Header = (() => {
                     'redirect',
                     `action=payment_transfer&ext_platform_url=${ext_platform_url}`
                 );
+        });
+
+        // Set Deriv logo links to brand home URL
+        applyToAllElements('.url-deriv-com', (el) => {
+            el.href = getBrandHomeUrl();
+        });
+        applyToAllElements('.url-deriv-com-mobile', (el) => {
+            el.href = getBrandHomeUrl();
         });
     };
 
@@ -586,8 +596,14 @@ const Header = (() => {
     const bindClick = () => {
         updateLoginButtonsDisplay();
         const btn_login = getElementById('btn__login');
+        const btn_signup = getElementById('btn__signup');
+        
         if (btn_login) {
-            btn_login.addEventListener('click', loginOnClick);
+            btn_login.onclick = Login.redirectToLogin;
+        }
+        
+        if (btn_signup) {
+            btn_signup.onclick = Login.redirectToSignup;
         }
 
         applyToAllElements('.logout', (el) => {
@@ -1078,12 +1094,6 @@ const Header = (() => {
         }
     };
 
-    const loginOnClick = async (e) => {
-        e.preventDefault();
-        // Session token authentication - redirect to login
-        Login.redirectToLogin();
-    };
-  
     const logoutOnClick = async () => {
         await Chat.clear();
         Client.sendLogoutRequest();
@@ -1307,7 +1317,6 @@ const Header = (() => {
         upgradeMessageVisibility,
         displayNotification,
         hideNotification,
-        loginOnClick,
         updateLoginButtonsDisplay,
         addHeaderReadyCallback,
         isHeaderReady,

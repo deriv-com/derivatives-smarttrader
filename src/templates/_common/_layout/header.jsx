@@ -10,12 +10,12 @@ const Header = () => (
                     <img id='header__hamburger' className='header__hamburger mobile-show' />
                 </span>
                 <div className='header-menu-item header-menu-links client_logged_in invisible mobile-hide'>
-                    <a className='url-deriv-com' target='_blank' rel='noopener noreferrer' href='https://deriv.com'>
+                    <a className='url-deriv-com'>
                         <img className='deriv-com-logo' />
                     </a>
                 </div>
                 <div className='header-menu-item header-menu-links is-logout'>
-                    <a className='url-deriv-com' target='_blank' rel='noopener noreferrer' href='https://deriv.com'>
+                    <a className='url-deriv-com'>
                         <img className='deriv-com-logo' />
                     </a>
                 </div>
@@ -61,8 +61,8 @@ const Header = () => (
                         <Skeleton.Square width={72} height={32} className='btn header__btn-login skeleton-btn-signup' />
                     </div>
                             
-                    <button id='btn__login' className='btn btn--tertiary header__btn-login' style={{ display: 'none' }}>{it.L('Log in')}</button>
-                    <a id='btn__signup' className='btn btn--primary header__btn-signup' target='_blank' rel='noopener noreferrer' style={{ display: 'none' }}>{it.L('Sign up')}</a>
+                    <a id='btn__login' className='btn btn--tertiary header__btn-login' style={{ display: 'none' }}>{it.L('Log in')}</a>
+                    <a id='btn__signup' className='btn btn--primary header__btn-signup' style={{ display: 'none' }}>{it.L('Sign up')}</a>
                 </div>
             </div>
         </div>

@@ -14,28 +14,7 @@ const MobileMenu = () => (
                 </div>
             </div>
             <div id='mobile_menu-content' className='mobile__menu-content mobile__menu-content--active'>
-                <div className='mobile__platform-switcher' >
-                    <div id='mobile__platform-switcher-current' className='mobile__wallet-platform-switcher-current' >
-                        <div className='mobile__wallet-platform-switcher-container'>
-                            <img className='header__logo' />
-                            <img id='mobile__platform-switcher-expand' className='mobile__platform-switcher-expand header__expand' />
-                        </div>
-                    </div>
-                    <div id='mobile__platform-switcher-dropdown' className='mobile__platform-switcher-dropdown' />
-                </div>
                 <div className='mobile__platform-switcher-lists'>
-                    <div className='mobile__platform-switcher-item'>
-                        <a className='url-deriv-com-mobile' target='_blank' rel='noopener noreferrer' href='https://deriv.com'>
-                            <img className='mobile__platform-switcher-icon deriv-com-logo-mobile' />
-                            <div className='mobile__platform-switcher-text'>{'Deriv.com'}</div>
-                        </a>
-                    </div>
-                    <div id='mobile__platform-switcher-item-appstore' className='mobile__platform-switcher-item'>
-                        <a id='url-appstore' className='url-appstore'>
-                            <img id='appstore-icon' className='mobile__platform-switcher-icon appstore-icon' />
-                            <div className='mobile__platform-switcher-text'>{it.L('Trader\'s Hub')}</div>
-                        </a>
-                    </div>
                     <div className='mobile__platform-switcher-item'>
                         <img id='mobile__platform-switcher-icon-trade' className='mobile__platform-switcher-icon' />
                         <div className='mobile__platform-switcher-text mobile__platform-switcher-text-bold'>{it.L('Trade')}</div>
@@ -44,27 +23,6 @@ const MobileMenu = () => (
                         <img className='mobile__platform-switcher-icon reports-icon' />
                         <div className='mobile__platform-switcher-text'>{it.L('Reports')}</div>
                         <img id='mobile__platform-switcher-icon-arrowright' className='mobile__platform-switcher-icon-right' />
-                    </div>
-
-                    <div className='mobile__platform-switcher-item'>
-                        <a href='https://deriv.com/help-centre' target='_blank' rel='noopener noreferrer'>
-                            <img className='mobile__platform-switcher-icon help-center-icon' src='../images/pages/header/ic-help-center.svg' alt='Help center' />
-                            <div className='mobile__platform-switcher-text'>{it.L('Help center')}</div>
-                        </a>
-                    </div>
-                    <div className='mobile__platform-switcher-item'>
-                        <a href='https://deriv.com/responsible' target='_blank' rel='noopener noreferrer'>
-                            <img className='mobile__platform-switcher-icon responsible-trading-icon' src='../images/pages/header/ic-responsible-trading.svg' alt='Responsible trading' />
-                            <div className='mobile__platform-switcher-text'>{it.L('Responsible trading')}</div>
-                        </a>
-                    </div>
-                    <div  id='whatsapp-mobile-drawer' className='mobile__platform-switcher-item whatsapp'>
-                        <img className='mobile__platform-switcher-icon whatsapp-icon' />
-                        <div className='mobile__platform-switcher-text'>{it.L('WhatsApp')}</div>
-                    </div>
-                    <div  id='mobile__menu-livechat' className='mobile__platform-switcher-item'>
-                        <img className='mobile__platform-switcher-icon livechat-icon' />
-                        <div className='mobile__platform-switcher-text'>{it.L('Live chat')}</div>
                     </div>
                     <div className='mobile__platform-switcher-item client_logged_in invisible logout'>
                         <img className='mobile__platform-switcher-icon logout-icon' />
