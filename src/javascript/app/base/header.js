@@ -599,11 +599,11 @@ const Header = (() => {
         const btn_signup = getElementById('btn__signup');
         
         if (btn_login) {
-            btn_login.addEventListener('click', loginOnClick);
+            btn_login.onclick = Login.redirectToLogin;
         }
         
         if (btn_signup) {
-            btn_signup.addEventListener('click', signupOnClick);
+            btn_signup.onclick = Login.redirectToSignup;
         }
 
         applyToAllElements('.logout', (el) => {
@@ -1094,16 +1094,6 @@ const Header = (() => {
         }
     };
 
-    const loginOnClick = async (e) => {
-        e.preventDefault();
-        Login.redirectToLogin();
-    };
-
-    const signupOnClick = async (e) => {
-        e.preventDefault();
-        Login.redirectToSignup();
-    };
-  
     const logoutOnClick = async () => {
         await Chat.clear();
         Client.sendLogoutRequest();
@@ -1327,7 +1317,6 @@ const Header = (() => {
         upgradeMessageVisibility,
         displayNotification,
         hideNotification,
-        loginOnClick,
         updateLoginButtonsDisplay,
         addHeaderReadyCallback,
         isHeaderReady,

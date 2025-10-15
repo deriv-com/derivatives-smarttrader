@@ -110,8 +110,8 @@ const Purchase = (() => {
                     authorization_error.setVisibility(1);
                     const authorization_error_btn_login = CommonFunctions.getElementById('authorization_error_btn_login');
                     const authorization_error_btn_signup = CommonFunctions.getElementById('authorization_error_btn_signup');
-                    authorization_error_btn_login.addEventListener('click', loginOnClick);
-                    authorization_error_btn_signup.addEventListener('click', signupOnClick);
+                    authorization_error_btn_login.onclick = Login.redirectToLogin;
+                    authorization_error_btn_signup.onclick = Login.redirectToSignup;
 
                     const signup_url = getBrandSignupUrl();
 
@@ -319,16 +319,6 @@ const Purchase = (() => {
         row_element.appendChild(cta_element);
 
         return row_element.outerHTML;
-    };
-
-    const loginOnClick = (e) => {
-        e.preventDefault();
-        Login.redirectToLogin();
-    };
-
-    const signupOnClick = (e) => {
-        e.preventDefault();
-        Login.redirectToSignup();
     };
 
     const onclose = () => {
