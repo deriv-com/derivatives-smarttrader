@@ -37,15 +37,16 @@ const Topbar = () => (
             <div id='network_status_wrapper' className='no-underline' data-balloon-pos='up'>
                 <div className='network_status' />
             </div>
-            <div id='language-select'><img id='language-select__logo' /></div>
+            {/* Temporarily hiding language switcher */}
+            {/* <div id='language-select'><img id='language-select__logo' /></div> */}
             <span className='no-underline nowrap gmt-clock' data-balloon-pos='up' />
-            <div id='topbar-whatsapp'>
+            {/* <div id='topbar-whatsapp'>
                 <img src={it.url_for('images/pages/footer/ic-whatsapp.svg')} />
             </div>
             <div id='deriv_livechat' />
             <div id='topbar-help-centre'>
                 <img src={it.url_for('images/pages/footer/ic-help-centre.svg')} />
-            </div>
+            </div> */}
             <div id='topbar-fullscreen'>
                 <img src={it.url_for('images/pages/footer/ic-fullscreen.svg')} />
             </div>
