@@ -9,6 +9,8 @@ const TickDisplay              = require('../../trade/tick_trade');
 const Clock                    = require('../../../base/clock');
 const BinarySocket             = require('../../../base/socket');
 const getCurrencyDisplayCode   = require('../../../common/currency').getCurrencyDisplayCode;
+const addComma                 = require('../../../common/currency').addComma;
+const formatMoney              = require('../../../common/currency').formatMoney;
 const changePocNumbersToString = require('../../../common/request_middleware').changePocNumbersToString;
 const getElementById           = require('../../../../_common/common_functions').getElementById;
 const localize                 = require('../../../../_common/localize').localize;
@@ -1029,8 +1031,5 @@ const ViewPopup = (() => {
         viewButtonOnClick,
     };
 })();
-const addComma             = require('../../../common/currency').addComma;
-
-const formatMoney          = require('../../../common/currency').formatMoney;
 
 module.exports = ViewPopup;

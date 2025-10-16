@@ -368,6 +368,7 @@ const ActiveSymbols = (() => {
         getSymbolsForMarket,
         sortSubmarket,
         getAvailableUnderlyings,
+        generateSymbolDisplayName,
         marketOrder,
         derived,
         sortObjectByKeys,
