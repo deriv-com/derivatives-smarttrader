@@ -108,7 +108,7 @@ const Url = (() => {
         return static_host + path.replace(/(^\/)/g, '');
     };
 
-    const deriv_app_domain = `https://app.deriv.${getTopLevelDomain()}`;
+    const deriv_app_domain = `https://home.deriv.${getTopLevelDomain()}`;
 
     const getAccountParam = () =>
         Url.param('account') ||
@@ -140,7 +140,7 @@ const Url = (() => {
             /^smarttrader-staging\.deriv\.app$/i.test(window.location.hostname) ||
             /^staging-smarttrader\.deriv\.com$/i.test(window.location.hostname)
         ) {
-            return is_traders_hub_or_wallet ? 'https://staging-hub.deriv.com' : 'https://staging-app.deriv.com';
+            return 'https://staging-home.deriv.com';
         } else if (
             /^smarttrader\.deriv\.app$/i.test(window.location.hostname) ||
             /^smarttrader\.deriv\.com$/i.test(window.location.hostname)

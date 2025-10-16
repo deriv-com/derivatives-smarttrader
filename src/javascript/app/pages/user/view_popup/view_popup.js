@@ -212,7 +212,7 @@ const ViewPopup = (() => {
             if (Reset.isReset(contract.contract_type) && Reset.isNewBarrier(contract.entry_spot, contract.barrier)) {
                 containerSetText(
                     'trade_details_barrier',
-                    is_sold_before_start ? '-' : contract.entry_spot_display_value,
+                    is_sold_before_start ? '-' : contract.entry_spot,
                     '',
                     true);
                 containerSetText(
@@ -222,16 +222,16 @@ const ViewPopup = (() => {
                     true);
 
                 dataManager.setPurchase({
-                    cd_barrier      : is_sold_before_start ? '-' : contract.entry_spot_display_value,
+                    cd_barrier      : is_sold_before_start ? '-' : contract.entry_spot,
                     cd_barrier_reset: contract.entry_spot_time && is_sold_before_start ? '-' : (barrier_prefix + formatted_barrier),
                 });
             }
         }
 
-        let current_spot      = contract.status === 'sold' ? '' : contract.current_spot_display_value;
+        let current_spot      = contract.status === 'sold' ? '' : contract.current_spot;
         let current_spot_time = contract.status === 'sold' ? '' : contract.current_spot_time;
         if (is_ended && contract.status !== 'sold') {
-            current_spot      = contract.exit_spot_display_value;
+            current_spot      = contract.exit_spot;
             current_spot_time = contract.exit_spot_time;
         }
 
@@ -322,9 +322,9 @@ const ViewPopup = (() => {
         } else {
             if (contract.entry_spot > 0) {
                 // only show entry spot if available and contract was not sold before start time
-                containerSetText('trade_details_entry_spot > span', is_sold_before_start ? '-' : contract.entry_spot_display_value);
+                containerSetText('trade_details_entry_spot > span', is_sold_before_start ? '-' : contract.entry_spot);
                 dataManager.setPurchase({
-                    cd_entry_spot: is_sold_before_start ? '-' : contract.entry_spot_display_value,
+                    cd_entry_spot: is_sold_before_start ? '-' : contract.entry_spot,
                 });
             }
             containerSetText('trade_details_message', contract.validation_error && !is_unsupported_contract ? contract.validation_error : '&nbsp;');
@@ -332,7 +332,7 @@ const ViewPopup = (() => {
                 cd_info_msg: contract.validation_error && !is_unsupported_contract ? contract.validation_error : null,
             });
             if (is_unsupported_contract) {
-                const redirect = `<a href="https://app.deriv.${Utility.getTopLevelDomain()}" target="_blank" rel="noopener noreferrer">`;
+                const redirect = `<a href="https://home.deriv.${Utility.getTopLevelDomain()}" target="_blank" rel="noopener noreferrer">`;
                 const redirect_close = '</a>';
                 const message = Callputspread.isCallputspread(contract.contract_type) ?
                     localize('This contract is only available on [_1]DTrader[_2].', [redirect, redirect_close]) :
