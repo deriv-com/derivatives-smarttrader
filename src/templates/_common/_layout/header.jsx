@@ -52,6 +52,11 @@ const Header = () => (
                         </div>
                     </div>
                 </div>
+                <div className='header__divider mobile-hide' />
+                {/* Desktop logout button */}
+                <a id='btn__logout' className='btn header__btn-logout logout mobile-hide'>
+                    {it.L('Log out')}
+                </a>
             </div>
             <div className='header__menu-right is-logout'>
                 <div className='header__btn'>

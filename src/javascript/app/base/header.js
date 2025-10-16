@@ -172,12 +172,12 @@ const Header = (() => {
             const currency = Client.get('currency');
             const loginid = Client.get('loginid');
             const balance = Client.get('balance') || 0;
-            const isVirtual = Client.get('is_virtual');
+            const accountType = getAccountType();
             
             if (currency && loginid) {
                 // Set account icon
                 const getIcon = () => {
-                    if (!isVirtual) return currency ? currency.toLowerCase() : 'unknown';
+                    if (accountType === 'real') return currency ? currency.toLowerCase() : 'unknown';
                     return 'virtual';
                 };
                 
@@ -194,7 +194,7 @@ const Header = (() => {
                 // Set account type (Real/Demo)
                 const accountTypeElement = getElementById('header__acc-type');
                 if (accountTypeElement) {
-                    accountTypeElement.textContent = isVirtual ? 'Demo' : 'Real';
+                    accountTypeElement.textContent = accountType === 'demo' ? 'Demo' : 'Real';
                 }
                 
                 // Set balance if not already set by updateBalance
@@ -1169,7 +1169,7 @@ const Header = (() => {
               : localize('Open a Real Account');
             }
 
-            if (Client.get('is_virtual')) {
+            if (getAccountType() === 'demo') {
                 applyToAllElements(upgrade_msg, (el) => {
                     el.setVisibility(1);
                     const span = el.getElementsByTagName('span')[0];

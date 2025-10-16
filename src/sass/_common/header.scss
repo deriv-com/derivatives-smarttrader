@@ -202,6 +202,11 @@ body .header, .wallet__header {
         &-login, &-signup {
             margin-right: 17px;
         }
+        &-logout {
+            padding: 16px;
+            margin: 0 8px;
+            color: var(--text-prominent) !important;
+        }
     }
     &__menu {
         &-acc {

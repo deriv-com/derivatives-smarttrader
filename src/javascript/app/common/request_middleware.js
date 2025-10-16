@@ -8,13 +8,10 @@ const changePocNumbersToString = (response) => {
         audit_details,
         barrier,
         bid_price,
-        current_spot_display_value,
-        display_value,
-        entry_spot_display_value,
-        entry_tick_display_value,
-        exit_tick_display_value,
+        current_spot,
+        entry_spot,
+        exit_spot,
         sell_price,
-        sell_spot_display_value,
         tick_stream,
         profit_percentage,
     } = response.proposal_open_contract;
@@ -30,16 +27,13 @@ const changePocNumbersToString = (response) => {
         ...response,
         proposal_open_contract: {
             ...response.proposal_open_contract,
-            barrier                   : barrier ? addComma(barrier).replace(/,/g, '') : undefined, // Because `barrier` must not be displayed when zero
-            bid_price                 : toString(bid_price, currency_decimal_places),
-            sell_price                : toString(sell_price, currency_decimal_places),
-            profit_percentage         : toString(profit_percentage, 2),
-            current_spot_display_value: current_spot_display_value ? addComma(current_spot_display_value) : undefined,
-            display_value             : display_value ? addComma(display_value) : undefined,
-            entry_spot_display_value  : entry_spot_display_value ? addComma(entry_spot_display_value) : undefined,
-            entry_tick_display_value  : entry_tick_display_value ? addComma(entry_tick_display_value) : undefined,
-            exit_tick_display_value   : exit_tick_display_value ? addComma(exit_tick_display_value) : undefined,
-            sell_spot_display_value   : sell_spot_display_value ? addComma(sell_spot_display_value) : undefined,
+            barrier          : barrier ? addComma(barrier).replace(/,/g, '') : undefined, // Because `barrier` must not be displayed when zero
+            bid_price        : toString(bid_price, currency_decimal_places),
+            sell_price       : toString(sell_price, currency_decimal_places),
+            profit_percentage: toString(profit_percentage, 2),
+            current_spot     : current_spot ? addComma(current_spot) : undefined,
+            entry_spot       : entry_spot ? addComma(entry_spot) : undefined,
+            exit_spot        : exit_spot ? addComma(exit_spot) : undefined,
         },
     });
 

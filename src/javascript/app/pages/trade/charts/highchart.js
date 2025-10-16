@@ -12,6 +12,7 @@ const localize             = require('../../../../_common/localize').localize;
 const State                = require('../../../../_common/storage').State;
 const getPropertyValue     = require('../../../../_common/utility').getPropertyValue;
 const isEmptyObject        = require('../../../../_common/utility').isEmptyObject;
+const generateSymbolDisplayName = require('../../../common/active_symbols').generateSymbolDisplayName;
 
 const Highchart = (() => {
     let chart,
@@ -58,8 +59,8 @@ const Highchart = (() => {
         purchase_time         = parseInt(contract.purchase_time);
         now_time              = parseInt(contract.current_spot_time);
         end_time              = parseInt(contract.date_expiry);
-        entry_tick_time       = parseInt(contract.entry_tick_time);
-        exit_tick_time        = parseInt(contract.exit_tick_time);
+        entry_tick_time       = parseInt(contract.entry_spot_time);
+        exit_tick_time        = parseInt(contract.exit_spot_time);
         sell_time             = +contract.is_path_dependent && contract.status !== 'sold' ? exit_tick_time : parseInt(contract.sell_time);
         is_sold_before_expiry = end_time - sell_time > 1; // fix odd timings when date_expiry is 1 second after exit_tick_time
         prev_barriers         = [];
@@ -126,7 +127,7 @@ const Highchart = (() => {
 
         // if we disable a symbol in API, it will be missing from active symbols so we can't retrieve its pip
         // so we should handle getting an undefined display_decimals
-        const display_decimals = await getUnderlyingPipSize(contract.underlying);
+        const display_decimals = await getUnderlyingPipSize(contract.underlying_symbol);
         const getExitTime = (() => {
             if (exit_tick_time) return exit_tick_time * 1000;
             return exit_time ? exit_time * 1000 : null;
@@ -155,8 +156,9 @@ const Highchart = (() => {
         HighchartUI.setChartOptions(chart_options);
 
         return getHighstock((Highcharts) => {
-            if (!el) chart = null;
-            else {
+            if (!el) {
+                chart = null;
+            } else {
                 Highcharts.setOptions(HighchartUI.getHighchartOptions());
 
                 chart          = Highcharts.StockChart(el, HighchartUI.getChartOptions());
@@ -202,7 +204,7 @@ const Highchart = (() => {
     };
 
     const onClose = (fnc) => {
-        if (typeof fuc === 'function') {
+        if (typeof fnc === 'function') {
             fnc();
         }
         $(window).off('resize', updateHighchartOptions);
@@ -213,7 +215,7 @@ const Highchart = (() => {
         const error = response.error;
 
         if (/history|candles|tick|ohlc/.test(type) && !error) {
-            options       = { title: contract.display_name };
+            options       = { title: generateSymbolDisplayName(contract.underlying_symbol) };
             options[type] = response[type];
             const history = response.history;
             const candles = response.candles;
@@ -333,7 +335,7 @@ const Highchart = (() => {
         margin = granularity === 0 ? Math.max(300, (30 * duration) / (60 * 60) || 0) : 3 * granularity;
 
         request = {
-            ticks_history    : contract.underlying,
+            ticks_history    : contract.underlying_symbol,
             start            : ((purchase_time || start_time) - margin).toFixed(0), /* load more ticks first */
             end              : end_time ? (end_time + margin).toFixed(0) : 'latest',
             style            : granularity === 0 ? 'ticks' : 'candles',
@@ -359,15 +361,15 @@ const Highchart = (() => {
         }
 
         const contracts_response = State.get(['response', 'contracts_for']);
-        const stored_delay       = sessionStorage.getItem(`license.${contract.underlying}`);
+        const stored_delay       = sessionStorage.getItem(`license.${contract.underlying_symbol}`);
 
-        if (contracts_response && contracts_response.echo_req.contracts_for === contract.underlying) {
+        if (contracts_response && contracts_response.echo_req.contracts_for === contract.underlying_symbol) {
             delayedChart(contracts_response);
         } else if (stored_delay) {
             handleDelay(stored_delay);
             sendTickRequest();
         } else if (!is_contracts_for_send && update === '') {
-            BinarySocket.send({ contracts_for: contract.underlying }).then((response) => {
+            BinarySocket.send({ contracts_for: contract.underlying_symbol }).then((response) => {
                 const error = response.error;
                 if ((!error || (error.code && error.code === 'InvalidSymbol'))) {
                     delayedChart(response);
@@ -392,7 +394,6 @@ const Highchart = (() => {
         } else if (!is_history_send) {
             is_history_send = true;
             if (request.subscribe) is_chart_subscribed = true;
-            // BinarySocket.send(request, { callback: handleResponse });
             GetTicks.request('', request, handleResponse);
         }
     };
@@ -621,7 +622,7 @@ const Highchart = (() => {
             } else if (exit_tick_time) {
                 selectTick(exit_tick_time, 'exit');
             }
-            if (!contract.exit_tick) {
+            if (!contract.exit_spot) {
                 if ($('#waiting_exit_tick').length === 0) {
                     $('#trade_details_message').append($('<div/>', { id: 'waiting_exit_tick', text: localize('Waiting for exit tick.') }));
                 }

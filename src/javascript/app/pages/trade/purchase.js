@@ -383,7 +383,7 @@ const Purchase = (() => {
             return;
         }
 
-        const last_digit_quote = contract.exit_tick_display_value ? contract.exit_tick_display_value.slice(-1) : '';
+        const last_digit_quote = contract.exit_spot ? contract.exit_spot.slice(-1) : '';
         if (status === 'won') {
             DigitTicker.markAsWon();
             DigitTicker.markDigitAsWon(last_digit_quote);

@@ -7,10 +7,11 @@ const MobileMenu = () => (
                 <img id='mobile__menu-close' className='btn__close' />
                 <div className='mobile__menu-header-wrapper'>
                     <div className='mobile__menu-header-text'>{it.L('Menu')}</div>
-                    <div id='mobile__menu-language-selector' className='mobile__menu-language-selector'>
+                    {/* Temporarily hiding mobile language switcher */}
+                    {/* <div id='mobile__menu-language-selector' className='mobile__menu-language-selector'>
                         <img id='mobile__menu-language-flag' className='mobile__menu-language-flag' src='../images/languages/ic-flag-uk.svg' alt='English' />
                         <span id='mobile__menu-language-text' className='mobile__menu-language-text'>EN</span>
-                    </div>
+                    </div> */}
                 </div>
             </div>
             <div id='mobile_menu-content' className='mobile__menu-content mobile__menu-content--active'>
