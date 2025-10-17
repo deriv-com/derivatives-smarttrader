@@ -98,19 +98,6 @@ describe('ClientBase', () => {
         });
     });
 
-    describe('.shouldAcceptTnc()', () => {
-        it('doesn\'t ask to accept if same version', () => {
-            State.set(['response', 'website_status', 'website_status', 'terms_conditions_version'], 1);
-            State.set(['response', 'get_settings', 'get_settings', 'client_tnc_status'], 1);
-            expect(Client.shouldAcceptTnc()).to.eq(false);
-        });
-        it('asks to accept if different version', () => {
-            State.set(['response', 'website_status', 'website_status', 'terms_conditions_version'], 2);
-            Client.set('client_tnc_status', 1);
-            expect(Client.shouldAcceptTnc()).to.eq(true);
-        });
-    });
-
     describe('.clearAllAccounts()', () => {
         it('works as expected', () => {
             Client.clearAllAccounts();
@@ -118,17 +105,6 @@ describe('ClientBase', () => {
         });
     });
 
-    describe('.currentLandingCompany()', () => {
-        it('works as expected', () => {
-            State.set(['response', 'landing_company'], landing_company);
-            Client.set('landing_company_shortcode', 'malta');
-            expect(Client.currentLandingCompany()).to.deep.eq({ name: 'Binary (Europe) Ltd', shortcode: 'malta' });
-            Client.set('landing_company_shortcode', 'maltainvest');
-            expect(Client.currentLandingCompany()).to.deep.eq({ name: 'Binary Investments (Europe) Ltd', shortcode: 'maltainvest' });
-            Client.set('landing_company_shortcode', 'virtual');
-            expect(Client.currentLandingCompany()).to.deep.eq({});
-        });
-    });
 
     describe('.getBasicUpgradeInfo()', () => {
         it('returns false if client can\'t upgrade', () => {

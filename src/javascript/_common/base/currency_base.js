@@ -2,7 +2,7 @@ const getLanguage      = require('../language').get;
 const localize         = require('../localize').localize;
 const getPropertyValue = require('../utility').getPropertyValue;
 
-let currencies_config = {};
+const currencies_config = {};
 
 const displayed_currencies = {
     USD  : localize('US Dollar'),
@@ -68,11 +68,7 @@ const getDecimalPlaces = (currency) => (
     currencies_config[currency] ? getPropertyValue(currencies_config, [currency, 'fractional_digits']) : calcDecimalPlaces(currency)
 );
 
-const setCurrencies = (website_status) => {
-    currencies_config = website_status.currencies_config;
-};
-
-// (currency in crypto_config) is a back-up in case website_status doesn't include the currency config, in some cases where it's disabled
+// (currency in crypto_config) is a back-up in case currencies_config doesn't include the currency config, in some cases where it's disabled
 const isCryptocurrency = currency => /crypto/i.test(getPropertyValue(currencies_config, [currency, 'type'])) || (currency in CryptoConfig.get());
 
 const CryptoConfig = (() => {
@@ -159,7 +155,6 @@ module.exports = {
     formatCurrency,
     addComma,
     getDecimalPlaces,
-    setCurrencies,
     isCryptocurrency,
     getCurrencyDisplayCode,
     getCurrencyName,

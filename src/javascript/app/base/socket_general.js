@@ -3,7 +3,6 @@ const Clock                  = require('./clock');
 const Header                 = require('./header');
 const BinarySocket           = require('./socket');
 const Dialog                 = require('../common/attach_dom/dialog');
-const SessionDurationLimit   = require('../common/session_duration_limit');
 const updateBalance          = require('../pages/user/update_balance');
 const GTM                    = require('../../_common/base/gtm');
 const SubscriptionManager    = require('../../_common/base/subscription_manager').default;
@@ -36,17 +35,8 @@ const BinarySocketGeneral = (() => {
                 } else if (!isLoginPages() && !/authorize/.test(State.get('skip_response'))) {
                     // Pure session token authentication - single path only
                     Client.responseAuthorizeSessionToken(response);
-                    Client.activateByClientType();
                     BinarySocket.send({ balance: 1, subscribe: 1 });
-                    BinarySocket.send({ get_settings: 1 });
-                    BinarySocket.send({ get_account_status: 1 });
-                    BinarySocket.send({ mt5_login_list: 1 });
                     SubscriptionManager.subscribe('transaction', { transaction: 1, subscribe: 1 }, () => false);
-                    const clients_country = response.authorize.country || Client.get('residence');
-                    setResidence(clients_country);
-                    if (!Client.get('is_virtual')) {
-                        BinarySocket.send({ get_self_exclusion: 1 });
-                    }
                     BinarySocket.sendBuffered();
                     LocalStore.remove('date_first_contact');
                     LocalStore.remove('signup_device');
@@ -58,33 +48,10 @@ const BinarySocketGeneral = (() => {
             case 'logout':
                 Client.doLogout(response);
                 break;
-            case 'landing_company':
-                Header.upgradeMessageVisibility();
-                break;
-            case 'get_self_exclusion':
-                SessionDurationLimit.exclusionResponseHandler(response);
-                break;
-            case 'get_settings':
-                if (response.get_settings) {
-                    setResidence(response.get_settings.country_code);
-                    Client.set('email', response.get_settings.email);
-                    GTM.eventHandler(response.get_settings);
-                    if (response.get_settings.is_authenticated_payment_agent) {
-                        $('#topMenuPaymentAgent').setVisibility(1);
-                    }
-                }
-                break;
             case 'transaction':
                 GTM.pushTransactionData(response, { bom_ui: 'new' });
                 break;
             // no default
-        }
-    };
-
-    const setResidence = (residence) => {
-        if (residence) {
-            Client.set('residence', residence);
-            BinarySocket.send({ landing_company: residence });
         }
     };
 
@@ -94,15 +61,12 @@ const BinarySocketGeneral = (() => {
             return;
         }
         
-        const msg_type   = response.msg_type;
         const error_code = getPropertyValue(response, ['error', 'code']);
         switch (error_code) {
             case 'WrongResponse':
             case 'InternalServerError':
             case 'OutputValidationFailed': {
-                if (msg_type !== 'mt5_login_list') {
-                    showNoticeMessage(response.error.message);
-                }
+                showNoticeMessage(response.error.message);
                 break;
             }
             case 'RateLimit':

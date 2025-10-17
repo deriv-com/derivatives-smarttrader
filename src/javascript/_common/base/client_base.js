@@ -223,13 +223,6 @@ const ClientBase = (() => {
         });
     };
 
-    const shouldAcceptTnc = () => {
-        if (get('is_virtual')) return false;
-        const website_tnc_version = State.getResponse('website_status.terms_conditions_version');
-        const client_tnc_status   = State.getResponse('get_settings.client_tnc_status');
-        return typeof client_tnc_status !== 'undefined' && client_tnc_status !== website_tnc_version;
-    };
-
     const clearAllAccounts = () => {
         current_loginid = undefined;
         current_account = {};
@@ -259,16 +252,6 @@ const ClientBase = (() => {
             this_shortcode === landing_company_response[key].shortcode
         ));
         return landing_company_response[landing_company_prop] || {};
-    };
-
-    const shouldCompleteTax = () => isAccountOfType('financial') &&
-        !/crs_tin_information/.test((State.getResponse('get_account_status') || {}).status);
-
-    const isAuthenticationAllowed = () => {
-        const { status, authentication } = State.getResponse('get_account_status');
-        const has_allow_document_upload = /allow_document_upload/.test(status);
-        const has_verification_flags = authentication.needs_verification.length;
-        return has_allow_document_upload || has_verification_flags;
     };
 
     // * MT5 login list returns these:
@@ -371,16 +354,6 @@ const ClientBase = (() => {
         return (landing_company_object || {})[key];
     };
 
-    const getRiskAssessment = () => {
-        const status = State.getResponse('get_account_status.status');
-
-        return (
-            isAccountOfType('financial') ?
-                /(financial_assessment|trading_experience)_not_complete/.test(status) :
-                /financial_assessment_not_complete/.test(status)
-        );
-    };
-
     // API_V3: send a list of accounts the client can transfer to
     const canTransferFunds = (account) => {
         if (account) {
@@ -395,18 +368,15 @@ const ClientBase = (() => {
 
     const hasSvgAccount = () => current_account.loginid && /^CR/.test(current_account.loginid);
 
-    const canChangeCurrency = (statement, mt5_login_list, is_current = true) => {
+    const canChangeCurrency = (statement, is_current = true) => {
         const currency             = get('currency');
-        const has_no_mt5           = !mt5_login_list || !mt5_login_list.length;
         const has_no_transaction   = (statement.count === 0 && statement.transactions.length === 0);
-        const has_account_criteria = has_no_transaction && has_no_mt5;
 
         // Current API requirements for currently logged-in user successfully changing their account's currency:
         // 1. User must not have made any transactions
-        // 2. User must not have any MT5 account
-        // 3. Not be a crypto account
-        // 4. Not be a virtual account
-        return is_current ? currency && !get('is_virtual') && has_account_criteria && !isCryptocurrency(currency) : has_account_criteria;
+        // 2. Not be a crypto account
+        // 3. Not be a virtual account
+        return is_current ? currency && !get('is_virtual') && has_no_transaction && !isCryptocurrency(currency) : has_no_transaction;
     };
 
     const isMF = () => {
@@ -434,7 +404,6 @@ const ClientBase = (() => {
 
     const isHighRisk = () => {
         const landing_companies = State.getResponse('landing_company');
-        const risk_classification = State.getResponse('get_account_status.risk_classification');
 
         if (landing_companies) {
             let financial_company_shortcode, gaming_company_shortcode;
@@ -453,7 +422,7 @@ const ClientBase = (() => {
                 (gaming_company_shortcode === 'svg' && financial_company_shortcode !== 'maltainvest');
                 
             const high_risk = financial_company_shortcode === 'svg' && gaming_company_shortcode === 'svg';
-            return high_risk || restricted_countries || risk_classification === 'high' || financial_restricted_countries || CFDs_restricted_countries;
+            return high_risk || restricted_countries || financial_restricted_countries || CFDs_restricted_countries;
         }
 
         return false;
@@ -492,7 +461,6 @@ const ClientBase = (() => {
         getTotalBalance,
         getAccountType,
         isAccountOfType,
-        isAuthenticationAllowed,
         isHighRisk,
         isLowRisk,
         isOptionsBlocked,
@@ -503,16 +471,13 @@ const ClientBase = (() => {
         hasOnlyCurrencyType,
         getAccountTitle,
         responseAuthorizeSessionToken,
-        shouldAcceptTnc,
         clearAllAccounts,
         setNewAccount,
         currentLandingCompany,
-        shouldCompleteTax,
         getCurrentAccount,
         getMT5AccountDisplays,
         getBasicUpgradeInfo,
         getLandingCompanyValue,
-        getRiskAssessment,
         canTransferFunds,
         hasSvgAccount,
         canChangeCurrency,

@@ -51,7 +51,7 @@ const ContentVisibility = (() => {
 
     const init = () =>
         new Promise(resolve => {
-            BinarySocket.wait('authorize', 'landing_company', 'website_status').then(() => {
+            BinarySocket.wait('authorize').then(() => {
                 resolve();
             });
         })
@@ -95,7 +95,7 @@ const ContentVisibility = (() => {
         const eu_excluded_regex   = /^mt$/;
         const financial_shortcode = State.getResponse('landing_company.financial_company.shortcode');
         const gaming_shortcode    = State.getResponse('landing_company.gaming_company.shortcode');
-        const clients_country     = Client.get('residence') || State.getResponse('website_status.clients_country');
+        const clients_country     = Client.get('residence');
         return (
             (financial_shortcode || gaming_shortcode) ?
                 (eu_shortcode_regex.test(financial_shortcode) || eu_shortcode_regex.test(gaming_shortcode)) :
