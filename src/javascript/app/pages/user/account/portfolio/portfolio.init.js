@@ -221,7 +221,7 @@ const PortfolioInit = (() => {
     };
 
     const onReconnect = () => {
-        BinarySocket.wait('authorize', 'website_status').then(() => {
+        BinarySocket.wait('authorize').then(() => {
             BinarySocket.send({ forget_all: ['proposal_open_contract'] });
             SubscriptionManager.forgetAll('transaction').then(() => {
                 $('#portfolio-body').empty();

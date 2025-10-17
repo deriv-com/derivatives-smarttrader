@@ -92,8 +92,8 @@ const BinaryLoader = (() => {
 
         // Make sure content is properly loaded or visible before scrolling to anchor.
         ContentVisibility.init().then(() => {
-            BinarySocket.wait('authorize', 'website_status', 'landing_company').then(() => {
-                GTM.pushDataLayer({ event: 'page_load' }); // we need website_status.clients_country
+            BinarySocket.wait('authorize').then(() => {
+                GTM.pushDataLayer({ event: 'page_load' });
 
                 // reroute LiveChat group
                 LiveChat.rerouteGroup();
@@ -143,7 +143,7 @@ const BinaryLoader = (() => {
                         } else if (config.only_real && Client.get('is_virtual')) {
                             displayMessage(error_messages.only_real());
                         } else {
-                            loadActiveScript(config);
+                            loadActiveScript();
                         }
                     });
             }
@@ -154,7 +154,7 @@ const BinaryLoader = (() => {
                 handleNotAuthenticated();
             }
         } else {
-            loadActiveScript(config);
+            loadActiveScript();
         }
         
         BinarySocket.wait('authorize').then(() => {
@@ -165,16 +165,10 @@ const BinaryLoader = (() => {
         BinarySocket.setOnDisconnect(active_script.onDisconnect);
     };
 
-    const loadActiveScript = (config) => {
+    const loadActiveScript = () => {
         if (active_script && typeof active_script.onLoad === 'function') {
-            // only pages that call formatMoney should wait for website_status
-            if (config.needs_currency) {
-                BinarySocket.wait('website_status').then(() => {
-                    active_script.onLoad();
-                });
-            } else {
-                active_script.onLoad();
-            }
+            // Load script directly without waiting for website_status
+            active_script.onLoad();
         }
     };
 

@@ -222,7 +222,7 @@ const Header = (() => {
             // Set up header account info for single-account mode immediately
             setupSingleAccountHeader();
             
-            await BinarySocket.wait('authorize', 'landing_company');
+            await BinarySocket.wait('authorize');
 
         } catch (error) {
             // eslint-disable-next-line no-console
@@ -1101,9 +1101,6 @@ const Header = (() => {
     const upgradeMessageVisibility = () => {
         BinarySocket.wait(
             'authorize',
-            'landing_company',
-            'get_settings',
-            'get_account_status'
         ).then(() => {
             const upgrade_msg = document.getElementsByClassName('upgrademessage');
 

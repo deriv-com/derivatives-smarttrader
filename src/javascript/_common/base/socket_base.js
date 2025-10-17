@@ -55,9 +55,6 @@ const BinarySocketBase = (() => {
 
     const no_duplicate_requests = [
         'authorize',
-        'get_settings',
-        'residence_list',
-        'landing_company',
         'asset_index',
     ];
 
@@ -198,7 +195,7 @@ const BinarySocketBase = (() => {
         if (isReady() && !availability.is_down && config.isOnline() && binary_socket.readyState === 1) {
             is_disconnect_called = false;
             // Don't add passthrough to time API calls - they should only have req_id and time
-            if (!getPropertyValue(data, 'passthrough') && !getPropertyValue(data, 'verify_email') && !getPropertyValue(data, 'time')) {
+            if (!getPropertyValue(data, 'passthrough') && !getPropertyValue(data, 'time')) {
                 data.passthrough = {};
             }
 

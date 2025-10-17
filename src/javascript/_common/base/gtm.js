@@ -16,7 +16,7 @@ const GTM = (() => {
     const isGtmAvailable = () => (window.dataLayer !== (null || undefined));
 
     const getCommonVariables = () => ({
-        country_ip: State.getResponse('website_status.clients_country'),
+        country_ip: ClientBase.get('residence'),
         language  : getLanguage(),
         pageTitle : pageTitle(),
         pjax      : State.get('is_loaded_by_pjax'),

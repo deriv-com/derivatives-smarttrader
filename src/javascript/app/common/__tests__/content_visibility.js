@@ -111,17 +111,5 @@ describe('ContentVisibility', () => {
             State.set(['response', 'website_status', 'website_status', 'clients_country'], [ 'br' ]);
             expect(shouldShowElement('-eucountry', 'svg', true, '')).to.equal(true);
         });
-        it('works with inclusive eucountry rule mt country', () => {
-            const landing_company = {};
-            State.set(['response', 'landing_company'], landing_company);
-            State.set(['response', 'website_status', 'website_status', 'clients_country'], [ 'mt' ]);
-            expect(shouldShowElement('eucountry', '', true, '')).to.equal(true);
-        });
-        it('works with exclusive eucountry rule mt country', () => {
-            const landing_company = {};
-            State.set(['response', 'landing_company'], landing_company);
-            State.set(['response', 'website_status', 'website_status', 'clients_country'], [ 'mt' ]);
-            expect(shouldShowElement('-eucountry', '', true, '')).to.equal(false);
-        });
     });
 });

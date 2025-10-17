@@ -29,9 +29,8 @@ const SocketCache = (() => {
     //     string  : the property value from echo_req
     //     function: return value of the function
     const config = {
-        active_symbols: { expire: 10, map_to: ['product_type', 'landing_company', getLanguage] },
+        active_symbols: { expire: 10, map_to: ['product_type', getLanguage] },
         contracts_for : { expire: 10, map_to: ['contracts_for', 'product_type', 'currency'] },
-        exchange_rates: { expire: 60, map_to: ['base_currency'] },
     };
 
     const storage_key = 'ws_cache';

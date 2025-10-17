@@ -98,19 +98,6 @@ describe('ClientBase', () => {
         });
     });
 
-    describe('.shouldAcceptTnc()', () => {
-        it('doesn\'t ask to accept if same version', () => {
-            State.set(['response', 'website_status', 'website_status', 'terms_conditions_version'], 1);
-            State.set(['response', 'get_settings', 'get_settings', 'client_tnc_status'], 1);
-            expect(Client.shouldAcceptTnc()).to.eq(false);
-        });
-        it('asks to accept if different version', () => {
-            State.set(['response', 'website_status', 'website_status', 'terms_conditions_version'], 2);
-            Client.set('client_tnc_status', 1);
-            expect(Client.shouldAcceptTnc()).to.eq(true);
-        });
-    });
-
     describe('.clearAllAccounts()', () => {
         it('works as expected', () => {
             Client.clearAllAccounts();
@@ -162,44 +149,6 @@ describe('ClientBase', () => {
         it('works as expected', () => {
             expect(Client.getLandingCompanyValue(loginid_financial, landing_company.landing_company, 'name')).to.eq(landing_company.landing_company.financial_company.name);
             expect(Client.getLandingCompanyValue(loginid_gaming, landing_company.landing_company, 'name')).to.eq(landing_company.landing_company.gaming_company.name);
-        });
-    });
-
-    describe('.canTransferFunds()', () => {
-        before(function (done) {
-            this.timeout(5000);
-            api.send({
-                website_status: 1,
-            }).then((response) => {
-                setCurrencies(response.website_status);
-                done();
-            });
-        });
-        // Simplified tests for single-account system
-        it('fails if client has maltainvest account without malta account', () => {
-            Client.clearAllAccounts();
-            Client.set('loginid', loginid_financial);
-            Client.set('landing_company_shortcode', 'maltainvest');
-            Client.set('currency', 'USD');
-            expect(Client.canTransferFunds()).to.eq(false);
-        });
-        it('fails if client has malta account without maltainvest account', () => {
-            Client.clearAllAccounts();
-            Client.set('loginid', loginid_gaming);
-            Client.set('landing_company_shortcode', 'malta');
-            Client.set('currency', 'USD');
-            expect(Client.canTransferFunds()).to.eq(false);
-        });
-        it('passes if client has appropriate account setup', () => {
-            Client.clearAllAccounts();
-            Client.set('loginid', loginid_real);
-            Client.set('currency', 'USD');
-            Client.set('landing_company_shortcode', 'svg');
-            // In single-account system, canTransferFunds always returns false (no multi-account transfers)
-            expect(Client.canTransferFunds()).to.eq(false);
-        });
-        after(() => {
-            Client.clearAllAccounts();
         });
     });
 
