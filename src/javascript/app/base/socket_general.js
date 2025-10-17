@@ -36,6 +36,7 @@ const BinarySocketGeneral = (() => {
                 } else if (!isLoginPages() && !/authorize/.test(State.get('skip_response'))) {
                     // Pure session token authentication - single path only
                     Client.responseAuthorizeSessionToken(response);
+                    Client.activateByClientType();
                     BinarySocket.send({ balance: 1, subscribe: 1 });
                     BinarySocket.send({ get_settings: 1 });
                     BinarySocket.send({ get_account_status: 1 });

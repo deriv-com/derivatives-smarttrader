@@ -1094,8 +1094,7 @@ const Header = (() => {
         }
     };
 
-    const logoutOnClick = async () => {
-        await Chat.clear();
+    const logoutOnClick = () => {
         Client.sendLogoutRequest();
     };
 
