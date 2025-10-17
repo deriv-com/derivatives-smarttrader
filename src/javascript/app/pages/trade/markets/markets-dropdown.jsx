@@ -76,6 +76,28 @@ export const MarketsDropdown = () => {
 
     const { close: closeMarketDropdown } = useDropdown();
 
+    const filterCrashIndexSubmarkets = (marketsData) => {
+        const filteredData = JSON.parse(JSON.stringify(marketsData));
+        
+        Object.keys(filteredData).forEach((marketKey) => {
+            const market = filteredData[marketKey];
+            
+            // Remove crash_index submarkets
+            Object.keys(market.submarkets).forEach((submarketKey) => {
+                if (submarketKey === 'crash_index') {
+                    delete market.submarkets[submarketKey];
+                }
+            });
+            
+            // Remove markets that become empty after submarket removal
+            if (Object.keys(market.submarkets).length === 0) {
+                delete filteredData[marketKey];
+            }
+        });
+        
+        return filteredData;
+    };
+
     const filterMarkets = () => {
         const data = JSON.parse(JSON.stringify(defaultMarkets));
         const searchStr = searchKey?.toLowerCase();
@@ -85,6 +107,12 @@ export const MarketsDropdown = () => {
             const market = data[marketKey];
 
             Object.keys(market.submarkets).forEach((submarketKey) => {
+                // Skip crash_index submarkets entirely
+                if (submarketKey === 'crash_index') {
+                    delete market.submarkets[submarketKey];
+                    return;
+                }
+                
                 const submarket = market.submarkets[submarketKey];
                 const subMarketName = submarket.name.toLowerCase();
 
@@ -114,9 +142,9 @@ export const MarketsDropdown = () => {
             }
         });
 
-        // If no matching symbols were found, return the original markets object
+        // If no matching symbols were found, return the filtered default markets
         if (!foundMatchingSymbol) {
-            return defaultMarkets;
+            return filterCrashIndexSubmarkets(defaultMarkets);
         }
 
         return data;
@@ -129,8 +157,9 @@ export const MarketsDropdown = () => {
     useEffect(() => {
         const marketList = Symbols.markets();
         const originalMarkets = sortObjectByKeys(marketList, marketOrder);
-        setDefaultMarkets(originalMarkets);
-        setMarkets(originalMarkets);
+        const filteredMarkets = filterCrashIndexSubmarkets(originalMarkets);
+        setDefaultMarkets(filteredMarkets);
+        setMarkets(filteredMarkets);
         setIsMounted(true);
 
         return () => clearTimeout(disableScrollTimer.current);
