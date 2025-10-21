@@ -18,6 +18,13 @@ import { triggerMarketChange } from '../../../hooks/events';
 import { localize } from '../../../../_common/localize';
 import dataManager from '../../../common/data_manager';
 
+// Configuration for market filtering
+const MARKET_FILTERS = {
+    excludedMarkets   : ['cryptocurrency'],
+    excludedSubmarkets: ['crash_index'],
+    excludedSymbols   : ['OTC_IBEX35'],
+};
+
 export const getMarketName = () => {
     const obj =  ActiveSymbols.getMarkets();
     const symbolKey = Defaults.get(PARAM_NAMES.UNDERLYING) || 'frxAUDJPY';
@@ -75,13 +82,6 @@ export const MarketsDropdown = () => {
     const disableScrollTimer = useRef();
 
     const { close: closeMarketDropdown } = useDropdown();
-
-    // Configuration for market filtering
-    const MARKET_FILTERS = {
-        excludedMarkets   : ['cryptocurrency'],
-        excludedSubmarkets: ['crash_index'],
-        excludedSymbols   : ['OTC_IBEX35'],
-    };
 
     const removeExcludedMarkets = (marketsData) => {
         const filteredData = JSON.parse(JSON.stringify(marketsData));
