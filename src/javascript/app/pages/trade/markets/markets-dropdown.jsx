@@ -18,6 +18,13 @@ import { triggerMarketChange } from '../../../hooks/events';
 import { localize } from '../../../../_common/localize';
 import dataManager from '../../../common/data_manager';
 
+// Configuration for market filtering
+const MARKET_FILTERS = {
+    excludedMarkets   : ['cryptocurrency'],
+    excludedSubmarkets: ['crash_index'],
+    excludedSymbols   : ['OTC_IBEX35'],
+};
+
 export const getMarketName = () => {
     const obj =  ActiveSymbols.getMarkets();
     const symbolKey = Defaults.get(PARAM_NAMES.UNDERLYING) || 'frxAUDJPY';
@@ -76,20 +83,33 @@ export const MarketsDropdown = () => {
 
     const { close: closeMarketDropdown } = useDropdown();
 
-    const filterCrashIndexSubmarkets = (marketsData) => {
+    const removeExcludedMarkets = (marketsData) => {
         const filteredData = JSON.parse(JSON.stringify(marketsData));
         
-        Object.keys(filteredData).forEach((marketKey) => {
+        // Remove excluded markets
+        MARKET_FILTERS.excludedMarkets.forEach(key => delete filteredData[key]);
+        
+        // Process remaining markets
+        Object.keys(filteredData).forEach(marketKey => {
             const market = filteredData[marketKey];
             
-            // Remove crash_index submarkets
-            Object.keys(market.submarkets).forEach((submarketKey) => {
-                if (submarketKey === 'crash_index') {
+            // Remove excluded submarkets
+            MARKET_FILTERS.excludedSubmarkets.forEach(key => delete market.submarkets[key]);
+            
+            // Process remaining submarkets
+            Object.keys(market.submarkets).forEach(submarketKey => {
+                const submarket = market.submarkets[submarketKey];
+                
+                // Remove excluded symbols
+                MARKET_FILTERS.excludedSymbols.forEach(key => delete submarket.symbols[key]);
+                
+                // Remove empty submarket
+                if (Object.keys(submarket.symbols).length === 0) {
                     delete market.submarkets[submarketKey];
                 }
             });
             
-            // Remove markets that become empty after submarket removal
+            // Remove empty market
             if (Object.keys(market.submarkets).length === 0) {
                 delete filteredData[marketKey];
             }
@@ -107,12 +127,6 @@ export const MarketsDropdown = () => {
             const market = data[marketKey];
 
             Object.keys(market.submarkets).forEach((submarketKey) => {
-                // Skip crash_index submarkets entirely
-                if (submarketKey === 'crash_index') {
-                    delete market.submarkets[submarketKey];
-                    return;
-                }
-                
                 const submarket = market.submarkets[submarketKey];
                 const subMarketName = submarket.name.toLowerCase();
 
@@ -142,9 +156,9 @@ export const MarketsDropdown = () => {
             }
         });
 
-        // If no matching symbols were found, return the filtered default markets
+        // If no matching symbols were found, return the original markets object
         if (!foundMatchingSymbol) {
-            return filterCrashIndexSubmarkets(defaultMarkets);
+            return defaultMarkets;
         }
 
         return data;
@@ -157,9 +171,9 @@ export const MarketsDropdown = () => {
     useEffect(() => {
         const marketList = Symbols.markets();
         const originalMarkets = sortObjectByKeys(marketList, marketOrder);
-        const filteredMarkets = filterCrashIndexSubmarkets(originalMarkets);
-        setDefaultMarkets(filteredMarkets);
-        setMarkets(filteredMarkets);
+        const availableMarkets = removeExcludedMarkets(originalMarkets);
+        setDefaultMarkets(availableMarkets);
+        setMarkets(availableMarkets);
         setIsMounted(true);
 
         return () => clearTimeout(disableScrollTimer.current);

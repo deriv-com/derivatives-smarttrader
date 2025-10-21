@@ -9,7 +9,7 @@ const Portal = ({ children }) => {
         document.body?.appendChild(el);
 
         return () => {
-            if (document.body.contains(el)) {
+            if (document.body?.contains(el)) {
                 document.body.removeChild(el);
             }
         };
