@@ -319,12 +319,9 @@ export const MarketsDropdown = () => {
                         const market = markets[market_key];
                         const { submarkets } = market;
 
-                        const sortedSubmarketKeys = Object.keys(submarkets).sort((a, b) => {
-                            const pairs = ['major_pairs', 'minor_pairs'];
-                            if (pairs.includes(a)) return -1;
-                            if (pairs.includes(b)) return 1;
-                            return 0;
-                        });
+                        const sortedSubmarketKeys = Object.keys(submarkets).sort((a, b) =>
+                            ActiveSymbols.sortSubmarket(a, b)
+                        );
 
                         return (
                             <div id={`${market_key}-dropdown-list`} key={market_key} data-id={market_key}>
