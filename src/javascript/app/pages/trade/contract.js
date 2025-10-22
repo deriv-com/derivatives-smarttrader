@@ -64,6 +64,61 @@ const CATEGORY_ITEMS = {
     callputspread: 'Call Spread/Put Spread',
 };
 
+/**
+ * Get display name for contract type
+ * @param {string} contract_type - The contract type code (e.g., 'DIGITMATCH')
+ * @returns {string} - Human readable display name
+ */
+const getContractTypeDisplayName = (contract_type) => {
+    const contractTypeMapping = {
+        // Basic Call/Put
+        CALL  : localize('Rise'),
+        CALLE : localize('Rise or equal'),
+        PUT   : localize('Fall'),
+        PUTE  : localize('Fall or equal'),
+        HIGHER: localize('Higher'),
+        LOWER : localize('Lower'),
+        
+        // Asian Options
+        ASIANU: localize('Asian Up'),
+        ASIAND: localize('Asian Down'),
+        
+        // Digit Contracts
+        DIGITMATCH: localize('Digit Matches'),
+        DIGITDIFF : localize('Digit Differs'),
+        DIGITODD  : localize('Digit Odd'),
+        DIGITEVEN : localize('Digit Even'),
+        DIGITOVER : localize('Digit Over'),
+        DIGITUNDER: localize('Digit Under'),
+        
+        // Expiry Contracts
+        EXPIRYMISS  : localize('Ends Outside'),
+        EXPIRYMISSE : localize('Ends Outside'),
+        EXPIRYRANGE : localize('Ends Between'),
+        EXPIRYRANGEE: localize('Ends Between'),
+        
+        // Range/Touch Contracts
+        RANGE   : localize('Stays Between'),
+        UPORDOWN: localize('Goes Outside'),
+        ONETOUCH: localize('Touches'),
+        NOTOUCH : localize('Does Not Touch'),
+        
+        // Reset Contracts
+        RESETCALL: localize('Reset Call'),
+        RESETPUT : localize('Reset Put'),
+        
+        // Tick Contracts
+        TICKHIGH: localize('High Tick'),
+        TICKLOW : localize('Low Tick'),
+        
+        // Run Contracts
+        RUNHIGH: localize('Only Ups'),
+        RUNLOW : localize('Only Downs'),
+    };
+    
+    return contractTypeMapping[contract_type] || contract_type;
+};
+
 const Contract = (() => {
     const contract_type = {};
 
@@ -146,8 +201,8 @@ const Contract = (() => {
 
                 const type = current_obj.contract_type;
                 if (!getPropertyValue(contract_type[contract_category], type)) {
-                    const display_text = current_obj.contract_display || current_obj.contract_type || type;
-                    contract_type[contract_category][type] = localize(display_text /* localize-ignore */);
+                    const display_text = getContractTypeDisplayName(type);
+                    contract_type[contract_category][type] = display_text;
                 }
             }
         });

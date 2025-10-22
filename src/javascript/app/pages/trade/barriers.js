@@ -18,14 +18,14 @@ const localize           = require('../../../_common/localize').localize;
 
 const Barriers = (() => {
     let is_barrier_updated = false;
-    const { BARRIER, BARRIER_HIGH, BARRIER_LOW, FORM_NAME, UNDERLYING } = Defaults.PARAM_NAMES;
+    const { BARRIER, BARRIER_HIGH, BARRIER_LOW, UNDERLYING } = Defaults.PARAM_NAMES;
 
     const display = () => {
         const barriers  = Contract.barriers()[Defaults.get(UNDERLYING)];
         const form_name = Contract.form();
 
         // TODO: remove `reset` when API stops sending barrier for Resets in contracts_for response
-        if (barriers && form_name && barriers[form_name] && !/risefall|reset/i.test(Defaults.get(FORM_NAME))) {
+        if (barriers && form_name && barriers[form_name] && !/callput|reset/i.test(form_name)) {
             const unit     = getElementById('duration_units');
             const end_time = getElementById('expiry_date');
             const is_daily = (unit && isVisible(unit) && unit.value === 'd') ||
