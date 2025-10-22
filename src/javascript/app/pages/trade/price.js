@@ -29,7 +29,7 @@ const Price = (() => {
     let type_display_id_mapping = {};
     let form_id                 = 0;
     let is_resubscribing        = false;
-    const { DURATION_AMOUNT, DURATION_UNITS, EXPIRY_TIME, FORM_NAME } = Defaults.PARAM_NAMES;
+    const { DURATION_AMOUNT, DURATION_UNITS, EXPIRY_TIME } = Defaults.PARAM_NAMES;
 
     const createProposal = (type_of_contract) => {
         const proposal = {
@@ -171,16 +171,7 @@ const Price = (() => {
 
         if (!h4) return;
 
-        const form_name = Defaults.get(FORM_NAME);
-        let display_text = type && contract_type ? contract_type[type] : '';
-
-        if (form_name === 'risefall' || form_name === 'callputequal') {
-            if (type === 'CALL' || type === 'CALLE') {
-                display_text = localize('Rise');
-            } else {
-                display_text = localize('Fall');
-            }
-        }
+        const display_text = type && contract_type ? contract_type[type] : '';
      
         if (display_text) {
             h4.setAttribute('class', `contract_heading ${type}`);
