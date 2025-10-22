@@ -16,16 +16,6 @@ const Endpoint = () => (
                             attributes={{ maxLength: 30 }}
                             hint={it.L('e.g. frontend.derivws.com')}
                         />
-                        <FormRow
-                            id='app_id'
-                            className='input-class'
-                            type='text'
-                            label={it.L('OAuth App ID')}
-                            attributes={{ maxLength: 7 }}
-                            hint={it.L(
-                                'You have to register and get App ID before you can use different OAuth server for authentication. For more information refer to OAuth details on https://api.deriv.com/.'
-                            )}
-                        />
                     </Fieldset>
                     <div className='center-text'>
                         <button
