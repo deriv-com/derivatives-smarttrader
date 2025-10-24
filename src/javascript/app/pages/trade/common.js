@@ -83,7 +83,9 @@ const commonTrading = (() => {
      */
     const getFormNameBarrierCategory = (form_name = '') => {
         let name = form_name;
-        if (/risefall|callput/.test(form_name)) {
+        if (/callputequal/.test(form_name)) {
+            name = 'callputequal';
+        } else if (/risefall|callput/.test(form_name)) {
             name = 'callput';
         } else if (/overunder|evenodd|matchdiff/.test(form_name)) {
             name = 'digits';
