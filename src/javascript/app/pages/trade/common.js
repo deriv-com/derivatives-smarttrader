@@ -275,7 +275,7 @@ const commonTrading = (() => {
 
     /*
      * check if selected market is allowed for current user
-     * Enhanced to prefer market containing 1HZ100V symbol
+     * Enhanced to prefer synthetic markets (which contain volatility indices)
      */
     const getDefaultMarket = () => {
         let mkt = Defaults.get(MARKET);
@@ -283,28 +283,10 @@ const commonTrading = (() => {
         const allMarkets = Symbols.markets();
         
         if (!mkt || !markets[mkt]) {
-            // First, try to find market containing preferred symbol (1HZ100V)
-            const preferredSymbol = '1HZ100V';
-            
-            // Use ActiveSymbols.getSymbols() to get full symbol data with market info
-            const allSymbolsData = ActiveSymbols.getSymbols() || {};
-            
-            if (allSymbolsData[preferredSymbol]) {
-                const symbolData = allSymbolsData[preferredSymbol];
-                // For synthetic_index symbols, market info is in the 'market' field
-                const preferredMarket = symbolData.market;
-                
-                if (allMarkets[preferredMarket] && allMarkets[preferredMarket].is_active) {
-                    mkt = preferredMarket;
-                }
-            }
-            
-            if (!mkt) {
-                const sorted_markets = Object.keys(allMarkets || {})
-                    .filter(v => allMarkets[v] && allMarkets[v].is_active)
-                    .sort((a, b) => getMarketsOrder(a) - getMarketsOrder(b));
-                mkt = sorted_markets[0] || Object.keys(allMarkets || {})[0];
-            }
+            const sorted_markets = Object.keys(allMarkets || {})
+                .filter(v => allMarkets[v] && allMarkets[v].is_active)
+                .sort((a, b) => getMarketsOrder(a) - getMarketsOrder(b));
+            mkt = sorted_markets[0] || Object.keys(allMarkets || {})[0];
         }
         
         return mkt;
@@ -312,12 +294,12 @@ const commonTrading = (() => {
 
     // Order
     const market_order = {
-        synthetic_index: 1,
-        forex          : 2,
-        indices        : 3,
-        commodities    : 4,
-        baskets        : 5,
-        synthetics     : 6,
+        synthetics    : 1,
+        forex         : 2,
+        indices       : 3,
+        commodities   : 4,
+        baskets       : 5,
+        cryptocurrency: 6,
     };
 
     const getMarketsOrder = market => market_order[market] || 100;
