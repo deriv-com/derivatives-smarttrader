@@ -7,7 +7,6 @@ const LocalStore                   = require('../storage').LocalStore;
 const SessionStore                 = require('../storage').SessionStore;
 const State                        = require('../storage').State;
 const getPropertyValue             = require('../utility').getPropertyValue;
-const getTopLevelDomain            = require('../utility').getTopLevelDomain;
 const isEmptyObject                = require('../utility').isEmptyObject;
 
 const ClientBase = (() => {
@@ -223,10 +222,10 @@ const ClientBase = (() => {
             path  : '/',
         });
         
-        // Save session token as cookie for dtrader access
+        // Save session token as cookie under same domain as client_information for dtrader access
         if (sessionToken) {
             Cookies.set('session_token', sessionToken, {
-                domain  : `.deriv.${getTopLevelDomain()}`,
+                domain  : currentDomain,
                 path    : '/',
                 secure  : window.location.protocol === 'https:',
                 sameSite: 'Lax',
