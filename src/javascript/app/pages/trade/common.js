@@ -275,28 +275,31 @@ const commonTrading = (() => {
 
     /*
      * check if selected market is allowed for current user
+     * Enhanced to prefer synthetic markets (which contain volatility indices)
      */
     const getDefaultMarket = () => {
-        let mkt       = Defaults.get(MARKET);
+        let mkt = Defaults.get(MARKET);
         const markets = Symbols.markets(1);
         const allMarkets = Symbols.markets();
         
         if (!mkt || !markets[mkt]) {
-            const sorted_markets = Object.keys(allMarkets || {}).filter(v => allMarkets[v] && allMarkets[v].is_active)
+            const sorted_markets = Object.keys(allMarkets || {})
+                .filter(v => allMarkets[v] && allMarkets[v].is_active)
                 .sort((a, b) => getMarketsOrder(a) - getMarketsOrder(b));
             mkt = sorted_markets[0] || Object.keys(allMarkets || {})[0];
         }
+        
         return mkt;
     };
 
     // Order
     const market_order = {
-        forex          : 1,
-        indices        : 2,
-        commodities    : 3,
-        baskets        : 4,
-        synthetics     : 5,
-        synthetic_index: 6,
+        synthetics    : 1,
+        forex         : 2,
+        indices       : 3,
+        commodities   : 4,
+        baskets       : 5,
+        cryptocurrency: 6,
     };
 
     const getMarketsOrder = market => market_order[market] || 100;
