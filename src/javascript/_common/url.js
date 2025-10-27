@@ -122,7 +122,14 @@ const Url = (() => {
         }${pars ? `&${pars}` : ''}`;
 
     const urlForReports = (path, redirect_url, account_type) => {
-        const dtrader_domain = `https://dtrader.deriv.${getTopLevelDomain()}`;
+        let dtrader_domain;
+        
+        if (process.env.NODE_ENV !== 'production') {
+            dtrader_domain = 'https://staging-dtrader.deriv.com';
+        } else {
+            dtrader_domain = `https://dtrader.deriv.${getTopLevelDomain()}`;
+        }
+        
         const encoded_redirect = encodeURIComponent(redirect_url);
         return `${dtrader_domain}/${path}?redirect=${encoded_redirect}&account=${account_type}`;
     };

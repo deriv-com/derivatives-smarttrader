@@ -1,11 +1,15 @@
 // Login functionality redirects to Deriv dashboard
 // SmartTrader now uses token-based authentication (oneTimeToken -> sessionToken -> authorize)
 
-const { getBrandLoginUrl, getBrandSignupUrl } = require('../../../templates/_common/brand.config');
+const { getBrandLoginUrl, getBrandSignupUrl, getPlatformHostname } = require('../../../templates/_common/brand.config');
 
 const Login = (() => {
     const redirectToLogin = () => {
-        window.location.href = getBrandLoginUrl();
+        const baseLoginUrl = getBrandLoginUrl();
+        const platformHostname = getPlatformHostname();
+        const loginUrlWithRedirect = `${baseLoginUrl}?redirect=${encodeURIComponent(platformHostname)}`;
+        
+        window.location.href = loginUrlWithRedirect;
     };
 
     const redirectToSignup = () => {
