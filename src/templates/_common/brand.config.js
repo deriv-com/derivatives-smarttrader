@@ -12,8 +12,8 @@ const brand_config_data = {
         name    : 'Derivatives SmartTrader',
         logo    : 'logo_smart_trader.svg',
         hostname: {
-            staging   : 'staging.derivatives-smarttrader.pages.dev',
-            production: 'derivatives-smarttrader.pages.dev',
+            staging   : 'staging-dsmarttrader.deriv.com',
+            production: 'dsmarttrader.deriv.com',
         },
     },
 };
