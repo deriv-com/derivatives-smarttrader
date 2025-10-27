@@ -8,14 +8,13 @@ import { MarketsDropdown, getContractName, getMarketName } from './markets-dropd
 import { ContractDropdown } from './contracts-dropdown.jsx';
 import { getElementById } from '../../../../_common/common_functions';
 import { localize } from '../../../../_common/localize';
-import { useContractChange, useMarketChange, useActiveSymbolsLoaded } from '../../../hooks/events.js';
+import { useContractChange, useMarketChange } from '../../../hooks/events.js';
 
 const MarketSelector = () => {
     const [market_label, setMarketLabel] = useState(getMarketName());
     const [tradeTypeLabel, setTradeTypeLabel] = useState(getContractName());
     const has_contract_change = useContractChange();
     const has_market_change = useMarketChange();
-    const has_active_symbols_loaded = useActiveSymbolsLoaded();
   
     useEffect(() => {
         setTradeTypeLabel(getContractName());
@@ -24,11 +23,6 @@ const MarketSelector = () => {
     useEffect(() => {
         setMarketLabel(getMarketName());
     }, [has_market_change]);
-
-    // Update market label when active symbols are loaded
-    useEffect(() => {
-        setMarketLabel(getMarketName());
-    }, [has_active_symbols_loaded]);
 
     return (
         <BreakpointProvider>

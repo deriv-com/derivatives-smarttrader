@@ -26,7 +26,7 @@ const MARKET_FILTERS = {
 };
 
 export const getMarketName = () => {
-    const obj =  ActiveSymbols.getMarkets();
+    const obj = ActiveSymbols.getMarkets();
     const symbolKey = Defaults.get(PARAM_NAMES.UNDERLYING);
     
     // Find the market and submarket where the symbolKey exists
@@ -42,7 +42,6 @@ export const getMarketName = () => {
     )]?.symbols[symbolKey]?.display;
 
     return displayValue || '';
-
 };
 
 export const getContractName = () => {

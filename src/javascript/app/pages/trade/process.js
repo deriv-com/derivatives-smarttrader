@@ -12,7 +12,7 @@ const Symbols           = require('./symbols');
 const Tick              = require('./tick');
 const NotAvailable      = require('./not-available.jsx');
 const BinarySocket       = require('../../base/socket');
-const { triggerActiveSymbolsLoaded } = require('../../hooks/events');
+const { triggerMarketChange } = require('../../hooks/events');
 const dataManager       = require('../../common/data_manager.js').default;
 const isCryptocurrency  = require('../../common/currency').isCryptocurrency;
 const elementInnerHtml  = require('../../../_common/common_functions').elementInnerHtml;
@@ -75,8 +75,6 @@ const Process = (() => {
                 commonTrading.displayMarkets();
                 processMarket();
                 
-                // Trigger event to notify components that active symbols are loaded
-                triggerActiveSymbolsLoaded();
             } else {
                 // Show generic error if no active symbols are available
 
@@ -137,6 +135,9 @@ const Process = (() => {
         const underlying = underlying_element?.value;
 
         Defaults.set(UNDERLYING, underlying);
+
+        // Trigger market change event to update React components
+        triggerMarketChange();
 
         commonTrading.showFormOverlay();
 
