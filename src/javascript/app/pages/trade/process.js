@@ -12,6 +12,7 @@ const Symbols           = require('./symbols');
 const Tick              = require('./tick');
 const NotAvailable      = require('./not-available.jsx');
 const BinarySocket       = require('../../base/socket');
+const { triggerActiveSymbolsLoaded } = require('../../hooks/events');
 const dataManager       = require('../../common/data_manager.js').default;
 const isCryptocurrency  = require('../../common/currency').isCryptocurrency;
 const elementInnerHtml  = require('../../../_common/common_functions').elementInnerHtml;
@@ -73,6 +74,9 @@ const Process = (() => {
 
                 commonTrading.displayMarkets();
                 processMarket();
+                
+                // Trigger event to notify components that active symbols are loaded
+                triggerActiveSymbolsLoaded();
             } else {
                 // Show generic error if no active symbols are available
 
@@ -115,20 +119,11 @@ const Process = (() => {
         // we can get market from sessionStorage as allowed market
         // is already set when this is called
         let market = Defaults.get(MARKET);
-        let symbol = Defaults.get(UNDERLYING);
 
         // change to default market if query string contains an invalid market
         if (!market || !Symbols.underlyings()[market]) {
             market = commonTrading.getDefaultMarket();
             Defaults.set(MARKET, market);
-        }
-        
-        // Add safety check before accessing market data
-        const marketData = Symbols.underlyings()[market];
-        if (!marketData) {
-            symbol = undefined;
-        } else if ((!symbol || !marketData[symbol])) {
-            symbol = undefined;
         }
 
         processMarketUnderlying();
@@ -243,12 +238,13 @@ const Process = (() => {
         }
     };
 
-    const handleNotOfferedSymbol = async () => {
-        const { active_symbols } = await BinarySocket.send({ active_symbols: 'brief' });
-        const default_open_symbol = await Symbols.getDefaultOpenSymbol(active_symbols);
-
-        Defaults.set(MARKET, default_open_symbol.market);
-        Defaults.set(UNDERLYING, default_open_symbol.underlying_symbol);
+    const handleNotOfferedSymbol = () => {
+        const market = commonTrading.getDefaultMarket();
+        Defaults.set(MARKET, market);
+        
+        const underlyings = Symbols.underlyings()[market] || {};
+        const underlying = Object.keys(underlyings)[0];
+        Defaults.set(UNDERLYING, underlying);
     };
 
     /*

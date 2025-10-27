@@ -27,7 +27,7 @@ const MARKET_FILTERS = {
 
 export const getMarketName = () => {
     const obj =  ActiveSymbols.getMarkets();
-    const symbolKey = Defaults.get(PARAM_NAMES.UNDERLYING) || 'frxAUDJPY';
+    const symbolKey = Defaults.get(PARAM_NAMES.UNDERLYING);
     
     // Find the market and submarket where the symbolKey exists
     const marketKey = Object.keys(obj).find(market =>

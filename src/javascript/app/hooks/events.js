@@ -82,3 +82,7 @@ export const triggerBarrierChange = () => triggerCustomEvent('barrierChange');
 // Start/End Time Change
 export const useTimeChange = () => useCustomEvent('timeChange');
 export const triggerTimeChange = () => triggerCustomEvent('timeChange');
+
+// Active Symbols Loaded
+export const useActiveSymbolsLoaded = () => useCustomEvent('activeSymbolsLoaded');
+export const triggerActiveSymbolsLoaded = () => triggerCustomEvent('activeSymbolsLoaded');

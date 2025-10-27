@@ -38,6 +38,7 @@ const Defaults = (() => {
         MULTIPLIER     : 'multiplier',
         PREDICTION     : 'prediction',
         SELECTED_TICK  : 'selected_tick',
+        TRADE_TYPE     : 'trade_type',
         UNDERLYING     : 'underlying',
     };
     const getDefault = (key) => {
@@ -51,6 +52,14 @@ const Defaults = (() => {
                 // Set the underlying parameter and remove symbol parameter
                 setDefault(PARAM_NAMES.UNDERLYING, symbol_value);
                 removeDefault('symbol');
+            }
+        }
+        
+        // Handle trade_type parameter as alias for formname (trade_type takes precedence)
+        if (key === PARAM_NAMES.FORM_NAME && !p_value) {
+            const trade_type_value = params.trade_type || Url.param('trade_type');
+            if (trade_type_value) {
+                p_value = trade_type_value;
             }
         }
         
@@ -102,7 +111,15 @@ const Defaults = (() => {
 
     const updateURL = () => {
         if (!State.get('is_trading')) return;
-        Url.updateParamsWithoutReload(params, false);
+        const url_params = { ...params };
+        
+        // Use trade_type instead of formname in URLs for cleaner appearance
+        if (url_params[PARAM_NAMES.FORM_NAME]) {
+            url_params[PARAM_NAMES.TRADE_TYPE] = url_params[PARAM_NAMES.FORM_NAME];
+            delete url_params[PARAM_NAMES.FORM_NAME];
+        }
+        
+        Url.updateParamsWithoutReload(url_params, false);
     };
 
     return {
