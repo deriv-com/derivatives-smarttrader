@@ -162,7 +162,10 @@ const DigitInfo = (() => {
             if (typeof new_spots === 'undefined' || new_spots.length <= 0) {
                 return;
             }
-            const dec = new_spots[0].split('.')[1].length;
+            
+            const dec = new_spots[0] && new_spots[0].includes('.')
+                ? new_spots[0].split('.')[1].length
+                : 0;
             for (let i = 0; i < new_spots.length; i++) {
                 const val    = parseFloat(new_spots[i]).toFixed(dec);
                 new_spots[i] = val.substr(val.length - 1);
