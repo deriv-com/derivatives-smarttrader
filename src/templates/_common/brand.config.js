@@ -37,8 +37,8 @@ const getBrandSignupUrl = () => getBrandUrl('signup');
 const getPlatformName = () => brand_config_data.platform.name;
 const getPlatformLogo = () => brand_config_data.platform.logo;
 const getPlatformHostname = () => isProduction
-    ? `https://${brand_config_data.platform.hostname.production}`
-    : `https://${brand_config_data.platform.hostname.staging}`;
+    ? brand_config_data.platform.hostname.production
+    : brand_config_data.platform.hostname.staging;
 
 // Legacy compatibility function - now returns smarttrader platform info
 const getPlatformSettings = (platform_key) => {
