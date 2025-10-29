@@ -28,8 +28,7 @@ const TimeTooltipWrapper = (element, time) => {
 };
 
 const setMinMaxTime = (selector, check_end_time) => {
-    const $date_start        = $('#date_start');
-    const $expiry_date       = $('#expiry_date');
+    const $expiry_date = $('#expiry_date');
     let min_time, max_time;
 
     // For expiry_time, use expiry_date instead of date_start since API changes removed start time functionality
@@ -39,19 +38,6 @@ const setMinMaxTime = (selector, check_end_time) => {
 
         min_time = min_max_time.minTime;
         max_time = min_max_time.maxTime;
-    } else if ($date_start && $date_start.val()) {
-        const date_start_val    = $date_start.val();
-        const moment_date_start = moment.unix(date_start_val).utc();
-        const moment_now        = (window.time || moment.utc()).clone();
-
-        if (check_end_time) {
-            const min_max_time = common_independent.getMinMaxTimeEnd(moment_now);
-
-            min_time = min_max_time.minTime;
-            max_time = min_max_time.maxTime;
-        } else if (moment_date_start.isSame(moment_now, 'day')) {
-            min_time = moment_now.clone();
-        }
     }
     const init_obj = { selector };
     if (min_time) {
