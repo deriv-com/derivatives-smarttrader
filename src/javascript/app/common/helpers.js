@@ -28,23 +28,16 @@ const TimeTooltipWrapper = (element, time) => {
 };
 
 const setMinMaxTime = (selector, check_end_time) => {
-    const $date_start        = $('#date_start');
-    const $time_start        = $('#time_start');
+    const $expiry_date = $('#expiry_date');
     let min_time, max_time;
 
-    if ($date_start && $date_start.val()) {
-        const date_start_val    = $date_start.val();
-        const moment_date_start = moment.unix(date_start_val).utc();
-        const moment_now        = (window.time || moment.utc()).clone();
+    // For expiry_time, use expiry_date instead of date_start since API changes removed start time functionality
+    if (check_end_time && selector === 'expiry_time' && $expiry_date && $expiry_date.attr('data-value')) {
+        const moment_now = (window.time || moment.utc()).clone();
+        const min_max_time = common_independent.getMinMaxTimeEnd(moment_now, $expiry_date);
 
-        if (check_end_time) {
-            const min_max_time = common_independent.getMinMaxTimeEnd($date_start, $time_start, moment_now);
-
-            min_time = min_max_time.minTime;
-            max_time = min_max_time.maxTime;
-        } else if (moment_date_start.isSame(moment_now, 'day')) {
-            min_time = moment_now.clone();
-        }
+        min_time = min_max_time.minTime;
+        max_time = min_max_time.maxTime;
     }
     const init_obj = { selector };
     if (min_time) {
@@ -75,10 +68,10 @@ const setMinMaxTimeObj = (options) => {
             options.minTime.minutes(60);
         }
         obj_config.minTime = { hour: parseInt(options.minTime.hour()), minute: parseInt(options.minTime.minute()) };
-        if (options.selector === 'time_start') {
+        if (options.selector === 'time_start' || options.selector === '#time_start') {
             starttime_obj.minTime = obj_config.minTime;
         }
-        if (options.selector === 'expiry_time') {
+        if (options.selector === 'expiry_time' || options.selector === '#expiry_time') {
             expirytime_obj.minTime = obj_config.minTime;
         }
     }
@@ -94,10 +87,10 @@ const setMinMaxTimeObj = (options) => {
         }
 
         obj_config.maxTime = { hour, minute };
-        if (options.selector === '#time_start') {
+        if (options.selector === 'time_start' || options.selector === '#time_start') {
             starttime_obj.maxTime = obj_config.maxTime;
         }
-        if (options.selector === '#expiry_time') {
+        if (options.selector === 'expiry_time' || options.selector === '#expiry_time') {
             expirytime_obj.maxTime = obj_config.maxTime;
         }
     }
