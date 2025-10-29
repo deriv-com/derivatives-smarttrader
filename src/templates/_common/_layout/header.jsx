@@ -9,6 +9,11 @@ const Header = () => (
                 <span className='header__hamburger--container'>
                     <img id='header__hamburger' className='header__hamburger mobile-show' />
                 </span>
+                <div className='header-menu-item header-menu-links mobile-show'>
+                    <a className='url-deriv-com-mobile'>
+                        <img className='deriv-com-logo-mobile' />
+                    </a>
+                </div>
                 <div className='header-menu-item header-menu-links client_logged_in invisible mobile-hide'>
                     <a className='url-deriv-com'>
                         <img className='deriv-com-logo' />
