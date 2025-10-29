@@ -20,7 +20,7 @@ const expected_markets_str = `{
                         "display": "EUR/USD",
                         "symbol_type": "forex",
                         "is_active": 1,
-                        "pip": 0.00001,
+                        "pip_size": 0.00001,
                         "market": "forex",
                         "submarket": "major_pairs"
                     }
@@ -41,7 +41,7 @@ const expected_markets_str = `{
                         "display": "AUD Basket",
                         "symbol_type": "forex_basket",
                         "is_active": 1,
-                        "pip": 0.001,
+                        "pip_size": 0.001,
                         "market": "baskets",
                         "submarket": "forex_basket"
                     }
