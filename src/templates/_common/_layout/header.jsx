@@ -9,17 +9,7 @@ const Header = () => (
                 <span className='header__hamburger--container'>
                     <img id='header__hamburger' className='header__hamburger mobile-show' />
                 </span>
-                <div className='header-menu-item header-menu-links mobile-show'>
-                    <a className='url-deriv-com-mobile'>
-                        <img className='deriv-com-logo-mobile' />
-                    </a>
-                </div>
-                <div className='header-menu-item header-menu-links client_logged_in invisible mobile-hide'>
-                    <a className='url-deriv-com'>
-                        <img className='deriv-com-logo' />
-                    </a>
-                </div>
-                <div className='header-menu-item header-menu-links is-logout'>
+                <div className='header-menu-item header-menu-links'>
                     <a className='url-deriv-com'>
                         <img className='deriv-com-logo' />
                     </a>
@@ -38,7 +28,7 @@ const Header = () => (
                 <div className='header__divider mobile-hide' />
                 {/* Modern account info structure matching bot project */}
                 <div className='acc-info__wrapper'>
-                    <div className='acc-info__separator' />
+                    <div className='acc-info__separator mobile-hide' />
                     <div className='account-info-wrapper'>
                         <div data-testid='dt_acc_info' id='dt_core_account-info_acc-info' className='acc-info'>
                             <span className='acc-info__id'>
