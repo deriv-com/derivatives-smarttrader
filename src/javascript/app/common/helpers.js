@@ -32,7 +32,6 @@ const setMinMaxTime = (selector, check_end_time) => {
     const $expiry_date       = $('#expiry_date');
     let min_time, max_time;
 
-    // [AI]
     // For expiry_time, use expiry_date instead of date_start since API changes removed start time functionality
     if (check_end_time && selector === 'expiry_time' && $expiry_date && $expiry_date.attr('data-value')) {
         const moment_now = (window.time || moment.utc()).clone();
