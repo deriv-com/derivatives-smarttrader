@@ -99,39 +99,31 @@ const getMinMaxTimeStart = ($min_max_selector = $('#date_start'), moment_now = (
     };
 };
 
-const getMinMaxTimeEnd = ($date_start = $('#date_start'), $time_start = $('#time_start'), moment_now = (window.time || moment.utc()).clone(), $expiry_time = $('#expiry_time'), $expiry_date = $('#expiry_date')) => {
+const getMinMaxTimeEnd = (moment_now = (window.time || moment.utc()).clone(), $expiry_date = $('#expiry_date')) => {
     let min_time,
         max_time;
-    const date_start_val = $date_start.val();
-    if (date_start_val === 'now') {
-        const min_max_time = getMinMaxTimeStart();
-        min_time = min_max_time.minTime.clone().add(1, 'minute'); // round up seconds (previously 9:05 endtime was available, when time is 9:05:12)
-        max_time = min_max_time.maxTime;
+    // Since start time functionality has been removed from API, we now use current time
+    // to determine the minimum end time instead of relying on start time
+    const expiry_date_val = $expiry_date.attr('data-value');
+    const selected_expiry_date = moment.utc(expiry_date_val);
+    
+    // Check if the selected expiry date is today
+    const is_today = selected_expiry_date.isSame(moment_now, 'day');
+    
+    if (is_today) {
+        // For today's date, minimum time should be current time + 5 minutes buffer
+        min_time = moment_now.clone().add(5, 'minutes');
+        // Round up to next 5-minute interval to match TimePicker options
+        const minutes = min_time.minute();
+        const rounded_minutes = Math.ceil(minutes / 5) * 5;
+        min_time.minute(rounded_minutes).second(0);
+        
+        // Maximum time is end of trading day (23:55)
+        max_time = selected_expiry_date.clone().hour(23).minute(55).second(0);
     } else {
-        const expiry_time_val = ($expiry_time.val() || '').split(':');
-        let end_time          = moment.utc($expiry_date.attr('data-value'));
-        if (expiry_time_val.length > 1) {
-            end_time = end_time.hour(expiry_time_val[0]).minute(expiry_time_val[1]);
-        }
-        const moment_date_start = moment.unix(date_start_val).utc();
-        const start_time_val    = ($time_start.val() || '').split(':');
-        const compare           = isNaN(+date_start_val) ? moment_now.clone() :
-            moment_date_start.hour(start_time_val[0]).minute(start_time_val[1]);
-        // if expiry time is one day after start time, minTime can be 0
-        // but maxTime should be 24 hours after start time, so exact value of start time
-        if (end_time.isAfter(compare, 'day')) {
-            min_time = moment.utc().startOf('day'); // Use moment object instead of 0
-            max_time = start_time_val.length > 1 ?
-                end_time.clone().hour(start_time_val[0] || 0).minute(start_time_val[1] || 0) : end_time.clone();
-        } else {
-            // if expiry time is same as today, min time should be the selected start time plus five minutes
-            min_time = moment_date_start.clone();
-            min_time = min_time.hour(start_time_val[0] || 0).minute(start_time_val[1] || 0);
-            if (!(+start_time_val[0] === 23 && +start_time_val[1] === 55)) {
-                min_time = min_time.add(5, 'minutes');
-            }
-            max_time = getMinMaxTimeStart().maxTime;
-        }
+        // For future dates, allow any time from start of day
+        min_time = selected_expiry_date.clone().startOf('day');
+        max_time = selected_expiry_date.clone().hour(23).minute(55).second(0);
     }
     return {
         minTime: min_time,
