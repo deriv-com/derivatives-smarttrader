@@ -28,7 +28,7 @@ const Header = () => (
                 <div className='header__divider mobile-hide' />
                 {/* Modern account info structure matching bot project */}
                 <div className='acc-info__wrapper'>
-                    <div className='acc-info__separator' />
+                    <div className='acc-info__separator mobile-hide' />
                     <div className='account-info-wrapper'>
                         <div data-testid='dt_acc_info' id='dt_core_account-info_acc-info' className='acc-info'>
                             <span className='acc-info__id'>
