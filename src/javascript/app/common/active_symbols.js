@@ -213,7 +213,7 @@ const ActiveSymbols = (() => {
                         display    : generateSymbolDisplayName(symbolKey),
                         symbol_type: symbol.underlying_symbol_type,
                         is_active  : !symbol.is_trading_suspended && symbol.exchange_is_open,
-                        pip        : symbol.pip_size,
+                        pip_size   : symbol.pip_size,
                         market     : symbol.market !== 'synthetic_index' ? symbol.market : symbol.subgroup,
                         submarket  : symbol.submarket,
                     };
