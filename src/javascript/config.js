@@ -109,8 +109,16 @@ const getSocketURL = () => {
     if (!server_url) {
         // Get account type
         const accountType = getAccountType();
-        // Map account type to new v2 endpoints
-        server_url = accountType === 'real' ? 'realv2.derivws.com' : 'demov2.derivws.com';
+        // Environment-based server selection
+        const isProductionEnv = process.env.NODE_ENV === 'production';
+        
+        if (isProductionEnv) {
+            // Production environment - use v2 servers
+            server_url = accountType === 'real' ? 'realv2.derivws.com' : 'demov2.derivws.com';
+        } else {
+            // Staging environment - use QA servers
+            server_url = accountType === 'real' ? 'qa197.deriv.dev' : 'qa194.deriv.dev';
+        }
     }
     
     return `wss://${server_url}/websockets/v3`;
