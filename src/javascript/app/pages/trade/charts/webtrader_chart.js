@@ -1,9 +1,11 @@
+const moment           = require('moment');
 const getAllSymbols    = require('../symbols').getAllSymbols;
 const getElementById   = require('../../../../_common/common_functions').getElementById;
 const getLanguage      = require('../../../../_common/language').get;
 const localize         = require('../../../../_common/localize').localize;
 const State            = require('../../../../_common/storage').State;
 const getPropertyValue = require('../../../../_common/utility').getPropertyValue;
+const ServerTime       = require('../../../../_common/base/server_time');
 const Config           = require('../../../../config');
 
 const WebtraderChart = (() => {
@@ -52,6 +54,39 @@ const WebtraderChart = (() => {
                         brand : 'binary',
                         lang  : getLanguage().toLowerCase(),
                     });
+                    
+                    // Override addNewChart to fix tooltip functionality
+                    if (WebtraderCharts.chartWindow?.addNewChart) {
+                        const original = WebtraderCharts.chartWindow.addNewChart;
+                        WebtraderCharts.chartWindow.addNewChart = function(container, config, customOptions) {
+                            customOptions.tooltip = {
+                                ...customOptions.tooltip,
+                                enabled   : true,
+                                shared    : true,
+                                crosshairs: true,
+                                useHTML   : true,
+                                formatter() {
+                                    if (!this.points?.length) return false;
+                                    
+                                    const point = this.points[0];
+                                    const symbolName = config.instrumentName || config.instrumentCode;
+                                    
+                                    const server_time = ServerTime.get();
+                                    if (!server_time) return false;
+
+                                    const chart_time = moment.utc(this.x);
+                                    const datePart = chart_time.format('ddd DD MMM');
+                                    const timePart = chart_time.format('HH:mm:ss');
+                                    const timeString = `${datePart} ${timePart}`;
+
+                                    return `${timeString}<br/>${symbolName}: <strong>${point.y.toFixed(2)}</strong>`;
+                                },
+                            };
+                            
+                            return original.call(this, container, config, customOptions);
+                        };
+                    }
+                    
                     is_initialized = true;
                     addChart();
                 }, 'webtrader-charts');
