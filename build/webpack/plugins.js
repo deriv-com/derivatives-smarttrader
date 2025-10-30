@@ -53,7 +53,7 @@ const getPlugins = (app, grunt) => ([
             new webpack.DefinePlugin({
                 'process.env': {
                     BUILD_HASH           : JSON.stringify(CryptoJS.MD5(Date.now().toString()).toString()),
-                    NODE_ENV             : JSON.stringify(global.release_target === 'production' ? 'production' : 'staging'),
+                    NODE_ENV             : JSON.stringify(process.env.NODE_ENV),
                     GROWTHBOOK_CLIENT_KEY: JSON.stringify(process.env.GROWTHBOOK_CLIENT_KEY),
                     RUDDERSTACK_KEY      : JSON.stringify(process.env.RUDDERSTACK_KEY),
                     REMOTE_CONFIG_URL    : JSON.stringify(process.env.REMOTE_CONFIG_URL),
@@ -72,7 +72,7 @@ const getPlugins = (app, grunt) => ([
             new webpack.DefinePlugin({
                 'process.env': {
                     BUILD_HASH           : JSON.stringify(CryptoJS.MD5(Date.now().toString()).toString()),
-                    NODE_ENV             : JSON.stringify('development'),
+                    NODE_ENV             : JSON.stringify(process.env.NODE_ENV),
                     GROWTHBOOK_CLIENT_KEY: JSON.stringify(process.env.GROWTHBOOK_CLIENT_KEY),
                     RUDDERSTACK_KEY      : JSON.stringify(process.env.RUDDERSTACK_KEY),
                     REMOTE_CONFIG_URL    : JSON.stringify(process.env.REMOTE_CONFIG_URL),
