@@ -5,7 +5,6 @@ const getLanguage      = require('../../../../_common/language').get;
 const localize         = require('../../../../_common/localize').localize;
 const State            = require('../../../../_common/storage').State;
 const getPropertyValue = require('../../../../_common/utility').getPropertyValue;
-const ServerTime       = require('../../../../_common/base/server_time');
 const Config           = require('../../../../config');
 
 const WebtraderChart = (() => {
@@ -70,16 +69,12 @@ const WebtraderChart = (() => {
                                     
                                     const point = this.points[0];
                                     const symbolName = config.instrumentName || config.instrumentCode;
-                                    
-                                    const server_time = ServerTime.get();
-                                    if (!server_time) return false;
-
                                     const chart_time = moment.utc(this.x);
                                     const datePart = chart_time.format('ddd DD MMM');
                                     const timePart = chart_time.format('HH:mm:ss');
                                     const timeString = `${datePart} ${timePart}`;
 
-                                    return `${timeString}<br/>${symbolName}: <strong>${point.y.toFixed(2)}</strong>`;
+                                    return `${timeString}<br/>${symbolName}: <strong>${point.y}</strong>`;
                                 },
                             };
                             
