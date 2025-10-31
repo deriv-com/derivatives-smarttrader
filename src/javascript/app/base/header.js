@@ -539,11 +539,13 @@ const Header = (() => {
         // Check if user is logged out
         const is_logged_out = !Client.isLoggedIn();
         
-        // Check if there's a token in URL and user is not logged in - if so, show skeleton loaders
-        const urlParams = new URLSearchParams(window.location.search);
-        const oneTimeToken = urlParams.get('token');
-
-        if (oneTimeToken && is_logged_out) {
+        // If user is logged in, reset token exchange flag (authentication completed successfully)
+        if (!is_logged_out && window.tokenExchangeInProgress) {
+            window.tokenExchangeInProgress = false;
+        }
+        
+        // Check if token exchange is in progress and user is not logged in - if so, show skeleton loaders
+        if (window.tokenExchangeInProgress && is_logged_out) {
             showHeaderSkeletonLoaders();
             return;
         }
