@@ -539,6 +539,15 @@ const Header = (() => {
         // Check if user is logged out
         const is_logged_out = !Client.isLoggedIn();
         
+        // Check if there's a token in URL and user is not logged in - if so, show skeleton loaders
+        const urlParams = new URLSearchParams(window.location.search);
+        const hasToken = urlParams.get('token');
+        
+        if (hasToken && is_logged_out) {
+            showHeaderSkeletonLoaders();
+            return;
+        }
+        
         // Check if we're on a trading page and if trading is still loading
         const is_trading_page = window.location.pathname.includes('/trading');
         const trading_init_progress = getElementById('trading_init_progress');
