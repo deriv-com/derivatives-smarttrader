@@ -238,10 +238,10 @@ const BinarySocketBase = (() => {
 
         binary_socket.onopen = async () => {
             config.wsEvent('open');
-            
+
             // Handle token exchange flow if token parameter exists in URL
-            const newSessionToken = await exchangeTokenForSession(tokenParam);
-            
+            const newSessionToken = await handleTokenExchange(tokenParam);
+
             // Use newly exchanged token if available, otherwise use existing token
             const sessionToken = newSessionToken || ClientBase.getStoredSessionToken();
             if (sessionToken) {
@@ -264,18 +264,33 @@ const BinarySocketBase = (() => {
         };
 
         /**
-         * Exchanges one-time token for session token (oneTimeToken already removed from URL)
-         * @param {string} oneTimeToken - The one-time token that was in URL parameters
-         * @returns {Promise} - Session token or null
+         * Handles token exchange flow for URL query parameter token authentication
+         * Token has already been removed from URL in init() for security
          */
-        const exchangeTokenForSession = async (oneTimeToken) => {
-            if (!oneTimeToken) return null;
+        const handleTokenExchange = async (oneTimeToken) => {
+            if (oneTimeToken) {
+                try {
+                    // Exchange the token for session_token
+                    const sessionTokenResponse = await getSessionToken(oneTimeToken);
 
-            try {
-                // Exchange the token for session_token
-                const sessionTokenResponse = await getSessionToken(oneTimeToken);
+                    if (sessionTokenResponse?.error) {
+                        // Reset flag and update header display after token exchange fails
+                        window.tokenExchangeInProgress = false;
+                        if (typeof window !== 'undefined' && window.SmartTrader?.Header?.updateLoginButtonsDisplay) {
+                            window.SmartTrader.Header.updateLoginButtonsDisplay();
+                        }
+                        return null;
+                    }
 
-                if (sessionTokenResponse?.error) {
+                    if (sessionTokenResponse?.get_session_token?.token) {
+                        const sessionToken = sessionTokenResponse.get_session_token.token;
+                        
+                        // Store session token temporarily - will be moved to proper account after authorize
+                        localStorage.setItem('session_token', sessionToken);
+                        
+                        return sessionToken;
+                    }
+                } catch (error) {
                     // Reset flag and update header display after token exchange fails
                     window.tokenExchangeInProgress = false;
                     if (typeof window !== 'undefined' && window.SmartTrader?.Header?.updateLoginButtonsDisplay) {
@@ -283,24 +298,8 @@ const BinarySocketBase = (() => {
                     }
                     return null;
                 }
-
-                if (sessionTokenResponse?.get_session_token?.token) {
-                    const sessionToken = sessionTokenResponse.get_session_token.token;
-                    
-                    // Store session token temporarily - will be moved to proper account after authorize
-                    localStorage.setItem('session_token', sessionToken);
-                    
-                    return sessionToken;
-                }
-            } catch (error) {
-                // Reset flag and update header display after token exchange fails
-                window.tokenExchangeInProgress = false;
-                if (typeof window !== 'undefined' && window.SmartTrader?.Header?.updateLoginButtonsDisplay) {
-                    window.SmartTrader.Header.updateLoginButtonsDisplay();
-                }
-                return null;
             }
-            
+
             return null;
         };
 
