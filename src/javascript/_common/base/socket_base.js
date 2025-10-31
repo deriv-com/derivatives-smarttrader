@@ -301,8 +301,6 @@ const BinarySocketBase = (() => {
                 return null;
             }
             
-            // Reset flag if we reach here without success
-            window.tokenExchangeInProgress = false;
             return null;
         };
 
