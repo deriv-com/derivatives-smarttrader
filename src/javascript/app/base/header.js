@@ -541,9 +541,9 @@ const Header = (() => {
         
         // Check if there's a token in URL and user is not logged in - if so, show skeleton loaders
         const urlParams = new URLSearchParams(window.location.search);
-        const hasToken = urlParams.get('token');
-        
-        if (hasToken && is_logged_out) {
+        const oneTimeToken = urlParams.get('token');
+
+        if (oneTimeToken && is_logged_out) {
             showHeaderSkeletonLoaders();
             return;
         }
