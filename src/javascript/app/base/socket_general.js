@@ -29,6 +29,11 @@ const BinarySocketGeneral = (() => {
                     showNoticeMessage(response.error.message);
                     localStorage.removeItem('session_token');
                     
+                    // Update header display after authorization fails
+                    if (typeof window !== 'undefined' && window.SmartTrader?.Header?.updateLoginButtonsDisplay) {
+                        window.SmartTrader.Header.updateLoginButtonsDisplay();
+                    }
+                    
                     if (is_active_tab) {
                         sessionStorage.removeItem('active_tab');
                     }

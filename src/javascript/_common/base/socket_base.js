@@ -271,6 +271,10 @@ const BinarySocketBase = (() => {
                     const sessionTokenResponse = await getSessionToken(oneTimeToken);
 
                     if (sessionTokenResponse?.error) {
+                        // Update header display after token exchange fails
+                        if (typeof window !== 'undefined' && window.SmartTrader?.Header?.updateLoginButtonsDisplay) {
+                            window.SmartTrader.Header.updateLoginButtonsDisplay();
+                        }
                         return null;
                     }
 
@@ -283,6 +287,10 @@ const BinarySocketBase = (() => {
                         return sessionToken;
                     }
                 } catch (error) {
+                    // Update header display after token exchange fails
+                    if (typeof window !== 'undefined' && window.SmartTrader?.Header?.updateLoginButtonsDisplay) {
+                        window.SmartTrader.Header.updateLoginButtonsDisplay();
+                    }
                     return null;
                 }
             }
