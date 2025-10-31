@@ -1,7 +1,3 @@
-const {
-    LocalStorageConstants,
-    LocalStorageUtils,
-} = require('@deriv-com/utils');
 const ClientBase       = require('./client_base');
 const SocketCache      = require('./socket_cache');
 const getLanguage      = require('../language').get;
@@ -12,22 +8,6 @@ const isEmptyObject    = require('../utility').isEmptyObject;
 const PromiseClass     = require('../utility').PromiseClass;
 const getAppId         = require('../../config').getAppId;
 const getSocketURL     = require('../../config').getSocketURL;
-
-/**
- * Get server configuration without circular dependency
- */
-const getServerInfo = () => {
-    // Use the same server URL logic as the main WebSocket connection
-    const serverUrl = LocalStorageUtils.getValue(LocalStorageConstants.configServerURL) ||
-                     localStorage.getItem('config.server_url') ||
-                     getSocketURL().replace(/^wss?:\/\//, ''); // Extract domain from main socket URL
-    const lang = LocalStorageUtils.getValue(LocalStorageConstants.i18nLanguage) || 'en';
-
-    return {
-        lang,
-        serverUrl,
-    };
-};
 
 /*
  * An abstraction layer over native javascript WebSocket,
@@ -314,10 +294,8 @@ const BinarySocketBase = (() => {
                 return;
             }
 
-            // Create direct API call
-            const { serverUrl } = getServerInfo();
-            const appId = getAppId(); // Get app_id separately using the fixed function
-            const wsUrl = `wss://${serverUrl}/websockets/v3?app_id=${appId}&l=en`;
+            // Use the same WebSocket URL construction as the main socket
+            const wsUrl = `${getSocketURL()}?app_id=${getAppId()}&l=${getLanguage()}&brand=Deriv`;
             
             const ws = new WebSocket(wsUrl);
                 
