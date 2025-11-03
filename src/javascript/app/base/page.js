@@ -85,6 +85,13 @@ const Page = (() => {
             // So, fall back to a more basic solution.
             const handleStorageEvent = (evt) => {
                 switch (evt.key) {
+                    case 'session_token':
+                        if (evt.newValue !== evt.oldValue) {
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 100);
+                        }
+                        break;
                     case 'current_account':
                         if (evt.newValue !== evt.oldValue) {
                             handleAccountsChange(evt.newValue, evt.oldValue);
