@@ -157,6 +157,16 @@ const WebtraderChart = (() => {
                     style: {
                         color: 'var(--text-prominent)',
                     },
+                    // Fix for y-axis labels not appearing - provide fallback when symbol data unavailable
+                    formatter() {
+                        const current_symbol = this.chart?.userOptions?.current_symbol;
+                        if (!current_symbol || !current_symbol.pip) {
+                            return this.value.toFixed(2);
+                        }
+                        
+                        const digits_after_decimal = `${current_symbol.pip}`.split('.')[1].length;
+                        return this.value.toFixed(digits_after_decimal);
+                    },
                 },
             }],
             tooltip: {
