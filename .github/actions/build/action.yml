@@ -20,6 +20,7 @@ runs:
     - name: Building dist for ${{ inputs.target }}
       env:
         TARGET_ENV: ${{ inputs.target }}
+        NODE_ENV: ${{ inputs.target }}
         # RUDDERSTACK_KEY: ${{ inputs.RUDDERSTACK_KEY }}
         # GROWTHBOOK_CLIENT_KEY: ${{ inputs.GROWTHBOOK_CLIENT_KEY }}
         # REMOTE_CONFIG_URL: ${{ inputs.REMOTE_CONFIG_URL }}
