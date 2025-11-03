@@ -159,13 +159,58 @@ const WebtraderChart = (() => {
                     },
                     // Fix for y-axis labels not appearing - provide fallback when symbol data unavailable
                     formatter() {
-                        const current_symbol = this.chart?.userOptions?.current_symbol;
-                        if (!current_symbol || !current_symbol.pip) {
-                            return this.value.toFixed(2);
+                        // Extract precision from the chart's data points to match tooltip formatting
+                        if (this.chart && this.chart.series && this.chart.series[0] && this.chart.series[0].data) {
+                            const samplePoint = this.chart.series[0].data.find(point => point && point.y !== null);
+                            if (samplePoint) {
+                                const sampleValue = samplePoint.y.toString();
+                                const decimalPlaces = sampleValue.includes('.') ? sampleValue.split('.')[1].length : 0;
+                                return this.value.toFixed(Math.min(decimalPlaces, 5)); // Cap at 5 decimals for readability
+                            }
                         }
-                        
-                        const digits_after_decimal = `${current_symbol.pip}`.split('.')[1].length;
-                        return this.value.toFixed(digits_after_decimal);
+                        // Fallback to 2 decimal places if data analysis fails
+                        return this.value.toFixed(2);
+                    },
+                },
+                crosshair: {
+                    enabled  : true,
+                    snap     : false,
+                    color    : '#2a3052',
+                    dashStyle: 'LongDashDot',
+                    label    : {
+                        enabled        : true,
+                        align          : 'left',
+                        backgroundColor: '#2a3052',
+                        padding        : 1,
+                        borderRadius   : 0,
+                        // Fix for crosshair hover label not appearing - provide fallback when symbol data unavailable
+                        formatter(value) {
+                            if (!value) return '';
+                            
+                            // Check for overlay mode
+                            if (this.chart.get_overlay_count && this.chart.get_overlay_count() > 0) {
+                                return `${value.toFixed(2)}%`;
+                            }
+                            
+                            // Extract precision from the chart's data points to match tooltip formatting
+                            if (this.chart && this.chart.series && this.chart.series[0] && this.chart.series[0].data) {
+                                const samplePoint = this.chart.series[0].data.find(point => point && point.y !== null);
+                                if (samplePoint) {
+                                    const sampleValue = samplePoint.y.toString();
+                                    const decimalPlaces = sampleValue.includes('.') ? sampleValue.split('.')[1].length : 0;
+                                    return value.toFixed(Math.min(decimalPlaces, 5)); // Cap at 5 decimals for readability
+                                }
+                            }
+                            // Fallback to 2 decimal places if data analysis fails
+                            return value.toFixed(2);
+                        },
+                        style: {
+                            color    : 'white',
+                            fontSize : '10px',
+                            textAlign: 'left',
+                        },
+                        x: 0,
+                        y: 4,
                     },
                 },
             }],
