@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import ReactDOM from 'react-dom';
 import {
     BreakpointProvider,
     CustomDropdown,
 } from '@deriv-com/quill-ui';
+import { localize } from '@deriv-com/translations';
 import { MarketsDropdown, getContractName, getMarketName } from './markets-dropdown.jsx';
 import { ContractDropdown } from './contracts-dropdown.jsx';
 import { getElementById } from '../../../../_common/common_functions';
-import { localize } from '../../../../_common/localize';
+import { renderReactComponent } from '../../../../_common/react_root_manager';
 import { useContractChange, useMarketChange } from '../../../hooks/events.js';
 
 const MarketSelector = () => {
@@ -47,7 +47,7 @@ const MarketSelector = () => {
 };
 
 export const init = () => {
-    ReactDOM.render(
+    renderReactComponent(
         <MarketSelector />,
         getElementById('markets-dropdown-container')
     );

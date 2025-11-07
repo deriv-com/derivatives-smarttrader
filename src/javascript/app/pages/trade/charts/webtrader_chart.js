@@ -1,8 +1,8 @@
 const moment           = require('moment');
+const { localize }     = require('@deriv-com/translations');
 const getAllSymbols    = require('../symbols').getAllSymbols;
 const getElementById   = require('../../../../_common/common_functions').getElementById;
 const getLanguage      = require('../../../../_common/language').get;
-const localize         = require('../../../../_common/localize').localize;
 const State            = require('../../../../_common/storage').State;
 const getPropertyValue = require('../../../../_common/utility').getPropertyValue;
 const Config           = require('../../../../config');

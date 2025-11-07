@@ -1,6 +1,7 @@
+const { localize } = require('@deriv-com/translations');
+
 const moment           = require('moment');
 const checkInput       = require('../../_common/common_functions').checkInput;
-const localize         = require('../../_common/localize').localize;
 const padLeft          = require('../../_common/string_util').padLeft;
 const toReadableFormat = require('../../_common/string_util').toReadableFormat;
 const clearable        = require('../../_common/utility').clearable;
@@ -16,12 +17,26 @@ const DatePicker = (() => {
 
         if (isEmptyObject(localizations)) {
             localizations = {
-                monthNames     : localize(['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']),
-                monthNamesShort: localize(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']),
-                dayNames       : localize(['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']),
-                dayNamesMin    : localize(['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']),
-                nextText       : localize('Next'),
-                prevText       : localize('Previous'),
+                monthNames: [
+                    localize('January'), localize('February'), localize('March'), localize('April'),
+                    localize('May'), localize('June'), localize('July'), localize('August'),
+                    localize('September'), localize('October'), localize('November'), localize('December'),
+                ],
+                monthNamesShort: [
+                    localize('Jan'), localize('Feb'), localize('Mar'), localize('Apr'),
+                    localize('May'), localize('Jun'), localize('Jul'), localize('Aug'),
+                    localize('Sep'), localize('Oct'), localize('Nov'), localize('Dec'),
+                ],
+                dayNames: [
+                    localize('Sunday'), localize('Monday'), localize('Tuesday'), localize('Wednesday'),
+                    localize('Thursday'), localize('Friday'), localize('Saturday'),
+                ],
+                dayNamesMin: [
+                    localize('Su'), localize('Mo'), localize('Tu'), localize('We'),
+                    localize('Th'), localize('Fr'), localize('Sa'),
+                ],
+                nextText: localize('Next'),
+                prevText: localize('Previous'),
             };
         }
 

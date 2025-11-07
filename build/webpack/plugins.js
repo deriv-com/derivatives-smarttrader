@@ -57,6 +57,9 @@ const getPlugins = (app, grunt) => ([
                     GROWTHBOOK_CLIENT_KEY: JSON.stringify(process.env.GROWTHBOOK_CLIENT_KEY),
                     RUDDERSTACK_KEY      : JSON.stringify(process.env.RUDDERSTACK_KEY),
                     REMOTE_CONFIG_URL    : JSON.stringify(process.env.REMOTE_CONFIG_URL),
+                    CROWDIN_URL          : JSON.stringify(process.env.CROWDIN_URL),
+                    R2_PROJECT_NAME      : JSON.stringify(process.env.R2_PROJECT_NAME),
+                    CROWDIN_BRANCH_NAME  : JSON.stringify(process.env.CROWDIN_BRANCH_NAME),
                 },
             }),
         ]
@@ -76,6 +79,9 @@ const getPlugins = (app, grunt) => ([
                     GROWTHBOOK_CLIENT_KEY: JSON.stringify(process.env.GROWTHBOOK_CLIENT_KEY),
                     RUDDERSTACK_KEY      : JSON.stringify(process.env.RUDDERSTACK_KEY),
                     REMOTE_CONFIG_URL    : JSON.stringify(process.env.REMOTE_CONFIG_URL),
+                    CROWDIN_URL          : JSON.stringify(process.env.CROWDIN_URL),
+                    R2_PROJECT_NAME      : JSON.stringify(process.env.R2_PROJECT_NAME),
+                    CROWDIN_BRANCH_NAME  : JSON.stringify(process.env.CROWDIN_BRANCH_NAME),
                 },
             }),
         ]

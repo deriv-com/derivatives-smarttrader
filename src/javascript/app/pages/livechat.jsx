@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
-import ReactDOM from 'react-dom';
 import useFreshChat from '../hooks/useFreshChat';
 import useInterComChat from '../hooks/useInterComChat';
 import useGrowthbookGetFeatureValue from '../hooks/useGrowthbookGetFeatureValue';
 import { getElementById } from '../../_common/common_functions';
+import { renderReactComponent } from '../../_common/react_root_manager';
 
 const LiveChat = ({ cs_live_chat }) => {
 
@@ -52,7 +52,7 @@ const LiveChat = ({ cs_live_chat }) => {
 };
 
 export const init = (cs_chat_livechat) => {
-    ReactDOM.render(
+    renderReactComponent(
         <LiveChat cs_live_chat={cs_chat_livechat} />,
         document.getElementById('deriv_livechat')
     );

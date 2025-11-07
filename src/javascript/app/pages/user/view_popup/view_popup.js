@@ -1,3 +1,5 @@
+const { localize } = require('@deriv-com/translations');
+
 const moment                   = require('moment');
 const ViewPopupUI              = require('./view_popup.ui');
 const Highchart                = require('../../trade/charts/highchart');
@@ -13,7 +15,6 @@ const addComma                 = require('../../../common/currency').addComma;
 const formatMoney              = require('../../../common/currency').formatMoney;
 const changePocNumbersToString = require('../../../common/request_middleware').changePocNumbersToString;
 const getElementById           = require('../../../../_common/common_functions').getElementById;
-const localize                 = require('../../../../_common/localize').localize;
 const urlFor                   = require('../../../../_common/url').urlFor;
 const Utility                  = require('../../../../_common/utility');
 const dataManager              = require('../../../common/data_manager').default;

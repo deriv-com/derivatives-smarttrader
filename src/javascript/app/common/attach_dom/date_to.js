@@ -1,7 +1,7 @@
 const moment           = require('moment');
+const { localize }     = require('@deriv-com/translations');
 const DatePicker       = require('../../components/date_picker');
 const dateValueChanged = require('../../../_common/common_functions').dateValueChanged;
-const localize         = require('../../../_common/localize').localize;
 const toISOFormat      = require('../../../_common/string_util').toISOFormat;
 
 const getDatePickerValue = (selector, is_end_of_day) => {

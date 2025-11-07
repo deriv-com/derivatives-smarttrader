@@ -1,9 +1,9 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
+import { localize } from '@deriv-com/translations';
 import Defaults from './defaults';
 import { getElementById } from '../../../_common/common_functions';
-import { localize } from '../../../_common/localize';
+import { renderReactComponent } from '../../../_common/react_root_manager';
 
 class Contracts extends React.Component {
     constructor (props) {
@@ -171,12 +171,12 @@ class Contracts extends React.Component {
         );
     }
 }
-/* eslint-disable react/no-render-return-value */
-export const init = (contracts, contracts_tree, selected) => ReactDOM.render(
-    <Contracts contracts={contracts} contracts_tree={contracts_tree} selected={selected} />,
-    getElementById('contract_component')
-);
-/* eslint-enable react/no-render-return-value */
+export const init = (contracts, contracts_tree, selected) => {
+    renderReactComponent(
+        <Contracts contracts={contracts} contracts_tree={contracts_tree} selected={selected} />,
+        getElementById('contract_component')
+    );
+};
 
 Contracts.propTypes = {
     contracts     : PropTypes.object,

@@ -1,3 +1,5 @@
+const { localize } = require('@deriv-com/translations');
+
 const Portfolio           = require('./portfolio').Portfolio;
 const ViewPopup           = require('../../view_popup/view_popup');
 const Client              = require('../../../../base/client');
@@ -5,7 +7,6 @@ const BinarySocket        = require('../../../../base/socket');
 const formatMoney         = require('../../../../common/currency').formatMoney;
 const GetAppDetails       = require('../../../../common/get_app_details');
 const SubscriptionManager = require('../../../../../_common/base/subscription_manager').default;
-const localize            = require('../../../../../_common/localize').localize;
 const urlParam            = require('../../../../../_common/url').param;
 const getPropertyValue    = require('../../../../../_common/utility').getPropertyValue;
 const showLoadingImage    = require('../../../../../_common/utility').showLoadingImage;

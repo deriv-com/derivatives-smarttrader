@@ -1,6 +1,6 @@
 const moment      = require('moment');
+const { localize } = require('@deriv-com/translations');
 const formatMoney = require('../../../common/currency').formatMoney;
-const localize    = require('../../../../_common/localize').localize;
 const LocalStore  = require('../../../../_common/storage').LocalStore;
 
 const RealityCheckData = (() => {

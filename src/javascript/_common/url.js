@@ -1,5 +1,3 @@
-const urlForLanguage         = require('./language').urlFor;
-const urlLang                = require('./language').urlLang;
 const createElement          = require('./utility').createElement;
 const isEmptyObject          = require('./utility').isEmptyObject;
 const getTopLevelDomain      = require('./utility').getTopLevelDomain;
@@ -50,17 +48,23 @@ const Url = (() => {
     const normalizePath = path => (path ? path.replace(/(^\/|\/$|[^a-zA-Z0-9-_/])/g, '') : '');
 
     const urlFor = (path, pars, language, should_change_to_legacy = false) => {
-        const lang = (language || urlLang()).toLowerCase();
-        // url language might differ from passed language, so we will always replace using the url language
-        const url_lang = (language ? urlLang().toLowerCase() : lang);
-        const url = window.location.href;
-        let domain = url.substring(0, url.indexOf(`/${url_lang}/`) + url_lang.length + 2);
+        // Generate clean URLs without language parameters
+        let domain = window.location.origin;
+        
         if (should_change_to_legacy) {
-            domain = domain.replace(/\/app/,'');
+            domain = domain.replace(/\/app/, '');
         }
-        const new_url = `${domain}${(normalizePath(path) || 'trading')}.html${(pars ? `?${pars}` : '')}`;
-        // replace old lang with new lang
-        return urlForLanguage(lang, new_url);
+        
+        const base_path = normalizePath(path) || 'trading';
+        const base_url = `${domain}/${base_path}.html`;
+        
+        // Only include non-language parameters
+        const url_params = new URLSearchParams(pars || '');
+        // Remove any language parameter that might have been passed
+        url_params.delete('lang');
+        
+        const query_string = url_params.toString();
+        return `${base_url}${query_string ? `?${query_string}` : ''}`;
     };
 
     const default_domain = 'binary.com';
@@ -175,7 +179,18 @@ const Url = (() => {
         window.history.replaceState({ url: url.href }, '', url.href);
     };
 
-    const getSection = (url = window.location.href) => (url.match(new RegExp(`/${urlLang()}/(.*)/`, 'i')) || [])[1];
+    const getSection = (url = window.location.href) => {
+        // Extract section from new URL format (no language path)
+        try {
+            const urlObj = new URL(url);
+            const pathname = urlObj.pathname;
+            // Remove leading slash and .html extension, then get the page name
+            const section = pathname.replace(/^\//, '').replace(/\.html$/, '');
+            return section || 'trading'; // default to trading
+        } catch (error) {
+            return 'trading';
+        }
+    };
 
     const getHashValue = (name) => {
         const hash  = (location_url || window.location).hash;

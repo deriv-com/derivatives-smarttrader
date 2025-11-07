@@ -2,11 +2,11 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Skeleton, Text } from '@deriv-com/quill-ui';
 import { LabelPairedArrowLeftMdRegularIcon } from '@deriv/quill-icons/LabelPaired';
+import { localize } from '@deriv-com/translations';
 import ContractTable from './contract-table';
 import Portal from '../../portal';
 import dataManager from '../../../common/data_manager';
 import { usePurchaseChange } from '../../../hooks/events';
-import { localize } from '../../../../_common/localize';
 import { Explanation } from '../../bottom/explanation';
 import { TimeTooltipWrapper, triggerClick } from '../../../common/helpers';
 

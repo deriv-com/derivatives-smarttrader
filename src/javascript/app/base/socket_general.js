@@ -1,3 +1,5 @@
+const { localize } = require('@deriv-com/translations');
+
 const Client                 = require('./client');
 const Clock                  = require('./clock');
 const Header                 = require('./header');
@@ -5,7 +7,6 @@ const BinarySocket           = require('./socket');
 const updateBalance          = require('../pages/user/update_balance');
 const GTM                    = require('../../_common/base/gtm');
 const SubscriptionManager    = require('../../_common/base/subscription_manager').default;
-const localize               = require('../../_common/localize').localize;
 const LocalStore             = require('../../_common/storage').LocalStore;
 const State                  = require('../../_common/storage').State;
 const getPropertyValue       = require('../../_common/utility').getPropertyValue;

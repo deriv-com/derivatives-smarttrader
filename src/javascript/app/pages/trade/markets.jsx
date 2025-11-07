@@ -1,12 +1,12 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import classNames from 'classnames';
+import { localize } from '@deriv-com/translations';
 import Symbols from './symbols';
 // Should be remove in the future
 import Defaults from './defaults';
 import { sortSubmarket, getAvailableUnderlyings } from '../../common/active_symbols';
 import { getElementById } from '../../../_common/common_functions';
-import { localize } from '../../../_common/localize';
+import { renderReactComponent } from '../../../_common/react_root_manager';
 import { isMobile } from '../../../_common/os_detect';
 
 function scrollToPosition (element, to, duration) {
@@ -626,7 +626,7 @@ class Markets extends React.Component {
 }
 
 export const init = () => {
-    ReactDOM.render(
+    renderReactComponent(
         <Markets />,
         getElementById('underlying_component')
     );

@@ -1,5 +1,5 @@
+const { localize }  = require('@deriv-com/translations');
 const ChartSettings = require('../../../common/chart_settings');
-const localize      = require('../../../../_common/localize').localize;
 
 const HighchartUI = (() => {
     let chart_options;

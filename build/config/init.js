@@ -1,6 +1,9 @@
 const Constants = require('./constants');
 const Helpers   = require('./helpers');
 
+// Load environment variables from .env file
+require('dotenv').config();
+
 const initGlobals = (grunt) => {
     // ----- global info -----
     global.node_modules_paths = Constants.node_modules_paths;

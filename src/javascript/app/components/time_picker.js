@@ -1,6 +1,7 @@
+const { localize } = require('@deriv-com/translations');
+
 const moment     = require('moment');
 const checkInput = require('../../_common/common_functions').checkInput;
-const localize   = require('../../_common/localize').localize;
 const padLeft    = require('../../_common/string_util').padLeft;
 const clearable  = require('../../_common/utility').clearable;
 
@@ -22,7 +23,7 @@ const TimePicker = (() => {
         const obj_config = {
             hourText  : localize('Hour'),
             minuteText: localize('Minute'),
-            amPmText  : localize(['AM', 'PM']),
+            amPmText  : [localize('AM'), localize('PM')],
         };
 
         if (options.minTime) {

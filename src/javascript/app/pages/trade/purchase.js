@@ -1,4 +1,5 @@
 const moment                   = require('moment');
+const { localize }             = require('@deriv-com/translations');
 const Contract                 = require('./contract');
 const countDecimalPlaces       = require('./common_independent').countDecimalPlaces;
 const DigitTicker              = require('./digit_ticker');
@@ -12,7 +13,6 @@ const formatMoney              = require('../../common/currency').formatMoney;
 const changePocNumbersToString = require('../../common/request_middleware').changePocNumbersToString;
 const addComma                 = require('../../../_common/base/currency_base').addComma;
 const CommonFunctions          = require('../../../_common/common_functions');
-const localize                 = require('../../../_common/localize').localize;
 const Url                      = require('../../../_common/url');
 const dataManager              = require('../../common/data_manager').default;
 const createElement            = require('../../../_common/utility').createElement;

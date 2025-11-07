@@ -1,5 +1,5 @@
+const { localize }               = require('@deriv-com/translations');
 const getFormNameBarrierCategory = require('./common').getFormNameBarrierCategory;
-const localize                   = require('../../../_common/localize').localize;
 const getPropertyValue           = require('../../../_common/utility').getPropertyValue;
 const isEmptyObject              = require('../../../_common/utility').isEmptyObject;
 
@@ -152,7 +152,7 @@ const Contract = (() => {
     const details = (form_name) => {
         const contracts = Contract.contracts().contracts_for;
 
-        if (!contracts) return;
+        if (!contracts || !contracts.available) return;
 
         durations   = {};
         open        = contracts.open;
@@ -219,8 +219,8 @@ const Contract = (() => {
         const contracts           = Contract.contracts().contracts_for;
         const contract_categories = {};
         
-        // Check if contracts are available
-        if (!contracts.available) {
+        // Check if contracts and contracts.available are available
+        if (!contracts || !contracts.available) {
             return contract_categories;
         }
         

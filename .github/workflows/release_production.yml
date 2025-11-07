@@ -25,6 +25,9 @@ jobs:
         uses: "./.github/actions/build"
         with:
           target: production
+          R2_PROJECT_NAME: ${{ vars.R2_PROJECT_NAME }}
+          CROWDIN_URL: ${{ vars.CROWDIN_URL }}
+          CROWDIN_BRANCH_NAME: ${{ vars.CROWDIN_BRANCH_NAME }}
           # RUDDERSTACK_KEY:  ${{ vars.RUDDERSTACK_KEY }}
           # GROWTHBOOK_CLIENT_KEY: ${{ vars.GROWTHBOOK_CLIENT_KEY }}
           # REMOTE_CONFIG_URL:  ${{ vars.REMOTE_CONFIG_URL }}

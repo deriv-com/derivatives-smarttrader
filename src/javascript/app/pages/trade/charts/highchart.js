@@ -1,3 +1,4 @@
+const { localize }         = require('@deriv-com/translations');
 const HighchartUI          = require('./highchart.ui');
 const getHighstock         = require('../common').requireHighstock;
 const getUnderlyingPipSize = require('../symbols').getUnderlyingPipSize;
@@ -8,7 +9,6 @@ const Reset                = require('../reset');
 const ViewPopupUI          = require('../../user/view_popup/view_popup.ui');
 const BinarySocket         = require('../../../base/socket');
 const addComma             = require('../../../common/currency').addComma;
-const localize             = require('../../../../_common/localize').localize;
 const State                = require('../../../../_common/storage').State;
 const getPropertyValue     = require('../../../../_common/utility').getPropertyValue;
 const isEmptyObject        = require('../../../../_common/utility').isEmptyObject;

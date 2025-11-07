@@ -1,3 +1,4 @@
+const { localize }        = require('@deriv-com/translations');
 const CreateDropdown      = require('@binary-com/binary-style').selectDropdown;
 const getHighstock        = require('../common').requireHighstock;
 const Defaults            = require('../defaults');
@@ -6,7 +7,6 @@ const BinarySocket        = require('../../../base/socket');
 const { getElementById } = require('../../../../_common/common_functions');
 const getSymbolsForMarket = require('../../../common/active_symbols').getSymbolsForMarket;
 const addComma            = require('../../../../_common/base/currency_base').addComma;
-const localize            = require('../../../../_common/localize').localize;
 const State               = require('../../../../_common/storage').State;
 const template            = require('../../../../_common/utility').template;
 

@@ -7,6 +7,7 @@ import {
     Divider,
     useDropdown,
 } from '@deriv-com/quill-ui';
+import { localize } from '@deriv-com/translations';
 import Symbols from '../symbols';
 import ActiveSymbols, {
     marketOrder,
@@ -15,7 +16,6 @@ import ActiveSymbols, {
 } from '../../../common/active_symbols';
 import Defaults, { PARAM_NAMES } from '../defaults';
 import { triggerMarketChange } from '../../../hooks/events';
-import { localize } from '../../../../_common/localize';
 import dataManager from '../../../common/data_manager';
 
 // Configuration for market filtering

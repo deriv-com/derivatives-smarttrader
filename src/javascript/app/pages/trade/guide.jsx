@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
-import ReactDOM from 'react-dom';
 import { Button } from '@deriv-com/quill-ui';
 // eslint-disable-next-line import/no-unresolved
 import { LabelPairedPresentationScreenMdBoldIcon } from '@deriv/quill-icons/LabelPaired';
+import { localize } from '@deriv-com/translations';
 import { getElementById } from '../../../_common/common_functions';
-import { localize } from '../../../_common/localize.js';
+import { renderReactComponent } from '../../../_common/react_root_manager';
 import Guide from '../../common/guide.js';
 import dataManager from '../../common/data_manager.js';
 
@@ -35,7 +35,7 @@ const GuideBtn = () => {
 };
 
 export const init = () => {
-    ReactDOM.render(
+    renderReactComponent(
         <GuideBtn />,
         getElementById('onboarding-container')
     );

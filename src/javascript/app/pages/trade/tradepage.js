@@ -48,8 +48,6 @@ const TradePage = (() => {
 
         // Use robust initialization manager for API-dependent initialization
         BinarySocket.wait('authorize').then(() => {
-            const country = State.getResponse('authorize.country') || Client.get('residence');
-
             // Handle virtual account setup
             if (Client.get('is_virtual')) {
                 Header.upgradeMessageVisibility(); // To handle the upgrade buttons visibility
@@ -77,7 +75,7 @@ const TradePage = (() => {
                     }
                 },
                 onActiveSymbolsLoaded: (response) => {
-                    Process.processActiveSymbols(country, response);
+                    Process.processActiveSymbols(null, response);
                 },
             });
         });

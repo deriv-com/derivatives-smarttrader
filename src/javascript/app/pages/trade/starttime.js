@@ -1,3 +1,5 @@
+const { localize } = require('@deriv-com/translations');
+
 const Dropdown          = require('@binary-com/binary-style').selectDropdown;
 const moment            = require('moment');
 const CommonIndependent = require('./common_independent');
@@ -5,9 +7,7 @@ const Contract          = require('./contract');
 const Defaults          = require('./defaults');
 const Durations         = require('./duration');
 const getElementById    = require('../../../_common/common_functions').getElementById;
-const localize          = require('../../../_common/localize').localize;
-const localizeForLang   = require('../../../_common/localize').forLang;
-const urlLang           = require('../../../_common/language').urlLang;
+const Language          = require('../../../_common/language');
 const State             = require('../../../_common/storage').State;
 const createElement     = require('../../../_common/utility').createElement;
 const dataManager       = require('../../common/data_manager').default;
@@ -70,7 +70,8 @@ const StartDates = (() => {
             const default_start = Defaults.get(DATE_START) || 'now';
 
             const rounding = 5 * 60 * 1000;
-            localizeForLang(urlLang());
+            // Language changes are now handled automatically by @deriv-com/translations
+            moment.locale(Language.get().toLowerCase());
             const now      = moment.utc();
             start_dates.list.forEach((start_date) => {
                 let date_open    = moment.unix(start_date.open).utc();

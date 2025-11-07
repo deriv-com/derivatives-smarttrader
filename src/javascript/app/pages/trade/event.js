@@ -1,4 +1,5 @@
 const moment                = require('moment');
+const { localize }          = require('@deriv-com/translations');
 const TradingAnalysis       = require('./analysis');
 const Barriers              = require('./barriers');
 const CommonTrading         = require('./common');
@@ -19,7 +20,6 @@ const GTM                   = require('../../../_common/base/gtm');
 const dateValueChanged      = require('../../../_common/common_functions').dateValueChanged;
 const isVisible             = require('../../../_common/common_functions').isVisible;
 const getElementById        = require('../../../_common/common_functions').getElementById;
-const localize              = require('../../../_common/localize').localize;
 
 /*
  * TradingEvents object contains all the event handler function for

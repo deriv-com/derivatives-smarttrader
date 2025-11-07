@@ -1,9 +1,9 @@
 /* eslint-disable import/no-unresolved */
 import React, { useEffect, useState } from 'react';
-import ReactDOM from 'react-dom';
 import { Skeleton } from '@deriv-com/quill-ui';
 import Portal from './portal';
 import { getElementById } from '../../_common/common_functions';
+import { renderReactComponent } from '../../_common/react_root_manager';
 import { useContractChange } from '../hooks/events';
 import dataManager from '../common/data_manager';
 
@@ -123,7 +123,7 @@ const Loader = () => {
 };
 
 export const init = () => {
-    ReactDOM.render(
+    renderReactComponent(
         <Loader />,
         getElementById('app-loader')
     );

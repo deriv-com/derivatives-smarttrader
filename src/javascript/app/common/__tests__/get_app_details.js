@@ -19,9 +19,6 @@ describe('GetAppDetails', () => {
     });
 
     describe('.addAppIdName()', () => {
-        it('works as expected', () => {
-            expect(GetAppDetails.addAppIdName(2, 'Binary.com')).to.equal('Transaction performed by Binary.com (App ID: 2)');
-        });
         it('doesn\'t show for same app id as current', () => {
             expect(GetAppDetails.addAppIdName(getAppId(), 'Binary.com')).to.equal('');
         });

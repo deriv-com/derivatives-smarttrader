@@ -1,4 +1,5 @@
 const moment               = require('moment');
+const { localize }         = require('@deriv-com/translations');
 const commonTrading        = require('./common');
 const displayPriceMovement = require('./common_independent').displayPriceMovement;
 const getTradingTimes      = require('./common_independent').getTradingTimes;
@@ -9,7 +10,6 @@ const formatMoney          = require('../../common/currency').formatMoney;
 const CommonFunctions      = require('../../../_common/common_functions');
 const { getCurrencyDisplayCode } = require('../../../_common/base/currency_base');
 const  dataManager     = require('../../common/data_manager').default;
-const localize             = require('../../../_common/localize').localize;
 const getPropertyValue     = require('../../../_common/utility').getPropertyValue;
 
 /*

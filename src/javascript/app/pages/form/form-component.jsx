@@ -8,6 +8,7 @@ import {
     BreakpointProvider,
 } from '@deriv-com/quill-ui';
 import moment from 'moment';
+import { localize } from '@deriv-com/translations';
 import { CurrencyDropdown } from './currency-dropdown.jsx';
 import { NumbersDropdown } from './numbers-dropdown.jsx';
 import BarrierFields from './barrier-fields.jsx';
@@ -22,7 +23,6 @@ import {
     useContractChange,
 } from '../../hooks/events.js';
 import common_functions from '../../../_common/common_functions.js';
-import { localize } from '../../../_common/localize.js';
 import dataManager from '../../common/data_manager.js';
 import { setDefaultParams } from '../../common/helpers.js';
 import { isCryptocurrency, getMinPayout } from '../../../_common/base/currency_base.js';
