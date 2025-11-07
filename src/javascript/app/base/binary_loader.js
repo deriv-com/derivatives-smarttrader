@@ -1,5 +1,4 @@
 const { localize } = require('@deriv-com/translations');
-
 const BinaryPjax = require('./binary_pjax');
 const pages_config = require('./binary_pages');
 const Client = require('./client');
