@@ -1,5 +1,4 @@
 const { localize } = require('@deriv-com/translations');
-
 /* eslint-disable no-nested-ternary */
 const addComma        = require('./currency').addComma;
 const isCallputspread = require('../pages/trade/callputspread').isCallputspread;

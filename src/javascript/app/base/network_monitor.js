@@ -1,5 +1,4 @@
 const { localize } = require('@deriv-com/translations');
-
 const Header              = require('./header');
 const BinarySocketGeneral = require('./socket_general');
 const NetworkMonitorBase  = require('../../_common/base/network_monitor_base');

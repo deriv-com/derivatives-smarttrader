@@ -1,5 +1,4 @@
 const { localize } = require('@deriv-com/translations');
-
 const Portfolio           = require('./portfolio').Portfolio;
 const ViewPopup           = require('../../view_popup/view_popup');
 const Client              = require('../../../../base/client');

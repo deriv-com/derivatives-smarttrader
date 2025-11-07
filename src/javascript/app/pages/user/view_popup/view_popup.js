@@ -1,5 +1,4 @@
-const { localize } = require('@deriv-com/translations');
-
+const { localize }             = require('@deriv-com/translations');
 const moment                   = require('moment');
 const ViewPopupUI              = require('./view_popup.ui');
 const Highchart                = require('../../trade/charts/highchart');

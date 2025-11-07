@@ -1,5 +1,4 @@
 const { localize } = require('@deriv-com/translations');
-
 const Cookies   = require('js-cookie');
 const EnjoyHint = require('../../_common/lib/guide.enjoyhint');
 

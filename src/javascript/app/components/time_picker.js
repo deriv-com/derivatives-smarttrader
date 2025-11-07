@@ -1,5 +1,4 @@
 const { localize } = require('@deriv-com/translations');
-
 const moment     = require('moment');
 const checkInput = require('../../_common/common_functions').checkInput;
 const padLeft    = require('../../_common/string_util').padLeft;

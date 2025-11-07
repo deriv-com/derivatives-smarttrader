@@ -1,5 +1,4 @@
 const { localize } = require('@deriv-com/translations');
-
 const Client                 = require('./client');
 const Clock                  = require('./clock');
 const Header                 = require('./header');

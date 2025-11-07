@@ -1,5 +1,4 @@
 const { localize } = require('@deriv-com/translations');
-
 const ClientBase    = require('./client_base');
 const GTM           = require('./gtm');
 // const { livechatFallback } = require('./livechat');

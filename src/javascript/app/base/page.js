@@ -1,5 +1,4 @@
 const { localize } = require('@deriv-com/translations');
-
 const Cookies          = require('js-cookie');
 const moment           = require('moment');
 const Client           = require('./client');

@@ -1,5 +1,4 @@
 const { localize } = require('@deriv-com/translations');
-
 const zxcvbn = require('./lib/zxcvbn/zxcvbn');
 
 // all existing warning phrases from zxcvbn

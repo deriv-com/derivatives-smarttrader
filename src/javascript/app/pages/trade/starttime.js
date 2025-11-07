@@ -1,5 +1,4 @@
 const { localize } = require('@deriv-com/translations');
-
 const Dropdown          = require('@binary-com/binary-style').selectDropdown;
 const moment            = require('moment');
 const CommonIndependent = require('./common_independent');

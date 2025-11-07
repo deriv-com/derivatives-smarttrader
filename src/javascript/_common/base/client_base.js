@@ -1,5 +1,4 @@
 const { localize } = require('@deriv-com/translations');
-
 const moment                       = require('moment');
 const Cookies                      = require('js-cookie');
 const isCryptocurrency             = require('./currency_base').isCryptocurrency;

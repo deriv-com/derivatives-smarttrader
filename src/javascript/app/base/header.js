@@ -1,8 +1,6 @@
 const { localize } = require('@deriv-com/translations');
-
 const Client = require('./client');
 const BinarySocket = require('./socket');
-
 const Login = require('../../_common/base/login');
 const { getBrandHomeUrl, getPlatformHostname } = require('../../../templates/_common/brand.config');
 const { getAccountType } = require('../../config');

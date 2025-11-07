@@ -1,5 +1,4 @@
 const { localize } = require('@deriv-com/translations');
-
 const BinarySocket = require('./socket_base');
 
 /*
