@@ -129,10 +129,7 @@ const createUrlFinder = (default_lang, section_path, root_url = getConfig().root
         const pathname   = Path.join(url_object.pathname.replace(/^\//, '')); // convert a/b/../c to a/c
 
         if (common.pages.filter(page => page.save_as === pathname).length) {
-            // Use new URL structure - no language parameter for default (English)
             url_object.pathname = Path.join(root_url, section_final_path, `${pathname}.html`);
-            // Don't add lang parameter for English (default language)
-            // Language will be handled by localStorage and @deriv-com/translations
             return Url.format(url_object);
         }
 
@@ -209,7 +206,6 @@ const createContextBuilder = async (sections) => {
 };
 
 const getFilePath = (save_path_template, language, is_pjax) => (
-    // Remove language from path - save all files to root directory
     save_path_template.replace('/LANG_PLACEHOLDER', `${is_pjax ? '/pjax' : ''}`)
 );
 
@@ -219,7 +215,6 @@ const getFilePath = (save_path_template, language, is_pjax) => (
 let context_builder;
 async function compile(page) {
     const config              = getConfig();
-    // Only compile for English since we're using @deriv-com/translations for runtime translation
     const languages           = ['EN'];
     const CONTENT_PLACEHOLDER = 'CONTENT_PLACEHOLDER'; // used in layout.jsx
     const section_path        = common.sections_config[page.section].path;

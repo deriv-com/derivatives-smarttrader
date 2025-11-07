@@ -179,19 +179,6 @@ const Url = (() => {
         window.history.replaceState({ url: url.href }, '', url.href);
     };
 
-    const getSection = (url = window.location.href) => {
-        // Extract section from new URL format (no language path)
-        try {
-            const urlObj = new URL(url);
-            const pathname = urlObj.pathname;
-            // Remove leading slash and .html extension, then get the page name
-            const section = pathname.replace(/^\//, '').replace(/\.html$/, '');
-            return section || 'trading'; // default to trading
-        } catch (error) {
-            return 'trading';
-        }
-    };
-
     const getHashValue = (name) => {
         const hash  = (location_url || window.location).hash;
         const value = hash.split('=');
@@ -230,7 +217,6 @@ const Url = (() => {
         urlForReports,
         urlForTradersHub,
         getAllowedLocalStorageOrigin,
-        getSection,
         getHashValue,
         updateParamsWithoutReload,
         getStaticUrl,

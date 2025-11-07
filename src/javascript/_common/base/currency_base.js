@@ -1,5 +1,4 @@
 const { localize } = require('@deriv-com/translations');
-
 const getLanguage      = require('../language').get;
 const getPropertyValue = require('../utility').getPropertyValue;
 

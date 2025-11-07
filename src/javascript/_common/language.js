@@ -87,7 +87,6 @@ const Language = (() => {
         languageFromUrl();
         
         // Language detection based only on localStorage
-        // Note: @deriv-com/translations stores language as JSON.stringify(lang)
         let storedLang = localStorage.getItem('i18n_language');
         
         if (storedLang) {
