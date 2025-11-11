@@ -1,6 +1,5 @@
 import React from 'react';
 import { Skeleton } from '@deriv-com/quill-ui';
-import { localize } from '@deriv-com/translations';
 import MobileMenu from '../components/mobile_menu.jsx';
 
 const Header = () => (
@@ -20,7 +19,7 @@ const Header = () => (
                     <a className='url-reports-positions header__menu-links-item'>
                         <span className='header__menu-item--label'>
                             <img className='header__icon-text reports-icon' />
-                            {localize('Reports')}
+                            <span id='header__reports-text'>Reports</span>
                         </span>
                     </a>
                 </div>
@@ -51,7 +50,7 @@ const Header = () => (
                 <div className='header__divider mobile-hide' />
                 {/* Desktop logout button */}
                 <a id='btn__logout' className='btn header__btn-logout logout mobile-hide'>
-                    {localize('Log out')}
+                    Log out
                 </a>
             </div>
             <div className='header__menu-right is-logout'>
@@ -62,8 +61,8 @@ const Header = () => (
                         <Skeleton.Square width={72} height={32} className='btn header__btn-login skeleton-btn-signup' />
                     </div>
                             
-                    <a id='btn__login' className='btn btn--tertiary header__btn-login' style={{ display: 'none' }}>{localize('Log in')}</a>
-                    <a id='btn__signup' className='btn btn--primary header__btn-signup' style={{ display: 'none' }}>{localize('Sign up')}</a>
+                    <a id='btn__login' className='btn btn--tertiary header__btn-login' style={{ display: 'none' }}>Log in</a>
+                    <a id='btn__signup' className='btn btn--primary header__btn-signup' style={{ display: 'none' }}>Sign up</a>
                 </div>
             </div>
         </div>
