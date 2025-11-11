@@ -1,4 +1,5 @@
 import React from 'react';
+import { localize } from '@deriv-com/translations';
 import Explanation from './explanation.jsx';
 import { TabContainer, TabsSubtabs, TabContentContainer, TabContent } from '../../_common/components/tabs.jsx';
 
@@ -25,9 +26,9 @@ const Analysis = ({ no_graph }) => (
                 id='trade_analysis'
                 className='gr-padding-20 gr-parent tab-selector-wrapper invisible'
                 items={[
-                    { id: 'tab_graph',        disabled: no_graph, text: it.L('Chart') },
-                    { id: 'tab_explanation',  text: it.L('Explanation') },
-                    { id: 'tab_last_digit',   className: 'invisible', text: it.L('Last Digit Stats') },
+                    { id: 'tab_graph',        disabled: no_graph, text: localize('Chart') },
+                    { id: 'tab_explanation',  text: localize('Explanation') },
+                    { id: 'tab_last_digit',   className: 'invisible', text: localize('Last Digit Stats') },
                     { id: 'trade_analysis_selector', className: 'tab-selector' },
                 ]}
             />

@@ -1,11 +1,12 @@
 /* eslint-disable */
 import React from 'react';
+import { localize } from '@deriv-com/translations';
 
 const Elevio = () => (
     <React.Fragment>
         <div id='elevio-shell'>
             <span className='text'>
-                {it.L('NEED HELP?')}
+                {localize('NEED HELP?')}
             </span>
             <span className='icon'>
                 <svg viewBox="0 0 74.2 74.2">

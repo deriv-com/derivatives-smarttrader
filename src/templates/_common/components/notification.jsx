@@ -1,4 +1,5 @@
 import React from 'react';
+import { localize } from '@deriv-com/translations';
 
 const Notification = () => (
     <div id='header__notification' className='header__notification header__menu-item'>
@@ -8,14 +9,14 @@ const Notification = () => (
         </div>
         <div id='header__notification-container' className='header__notification-container' >
             <div className='header__notification-header'>
-                <span>{it.L('Notifications')}</span>
+                <span>{localize('Notifications')}</span>
                 <img id='header__notification-close' className='btn__close mobile-show' />
             </div>
             <div id='header__notification-content' className='header__notification-content'>
                 <div id='header__notification-empty' className='header__notification-empty'>
                     <img id='header__notification-empty-img' />
-                    <div className='header__notification-empty-text'>{it.L('No notifications')}</div>
-                    <div className='header__notification-empty-desc'>{it.L('You have yet to receive any notifications')}</div>
+                    <div className='header__notification-empty-text'>{localize('No notifications')}</div>
+                    <div className='header__notification-empty-desc'>{localize('You have yet to receive any notifications')}</div>
                 </div>
             </div>
         </div>

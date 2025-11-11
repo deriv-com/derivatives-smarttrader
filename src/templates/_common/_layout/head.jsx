@@ -1,4 +1,5 @@
 import React from 'react';
+import { localize } from '@deriv-com/translations';
 import Title from '../components/title.jsx';
 import Favicons from '../includes/favicons.jsx';
 import AntiClickjack from '../includes/anti_clickjack.jsx';
@@ -8,8 +9,8 @@ const Head = () => (
         <AntiClickjack />
         <meta httpEquiv='Content-Type' content='text/html;charset=UTF-8' />
         <meta httpEquiv='Content-Language' content={it.language} />
-        <meta name='description' content={` ${it.L('Trade digital options on the world’s markets with SmartTrader, a powerful, user-friendly online trading platform.', it.broker_name)}`} />
-        <meta name='keywords' content={` ${it.L('binary options, forex, forex trading, online trading, financial trading, binary trading, index trading, trading stock indices, forex trades, trading commodities, binary options strategy, binary broker, binary bet, binary options trading platform, binary strategy, finance, investment, trading')}`} />
+        <meta name='description' content={` ${localize('Trade digital options on the world\'s markets with SmartTrader, a powerful, user-friendly online trading platform.')}`} />
+        <meta name='keywords' content={` ${localize('binary options, forex, forex trading, online trading, financial trading, binary trading, index trading, trading stock indices, forex trades, trading commodities, binary options strategy, binary broker, binary bet, binary options trading platform, binary strategy, finance, investment, trading')}`} />
         <meta name='author' content={it.broker_name} />
         <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' />
         <meta name='version' content='1.0' />
