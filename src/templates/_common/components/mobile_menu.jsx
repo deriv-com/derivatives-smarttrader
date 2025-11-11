@@ -1,4 +1,5 @@
 import React from 'react';
+import { Localize } from '@deriv-com/translations';
 
 const MobileMenu = () => (
     <div id='mobile__container' className='mobile__container mobile-show'>
@@ -6,7 +7,7 @@ const MobileMenu = () => (
             <div className='mobile__menu-header'>
                 <img id='mobile__menu-close' className='btn__close' />
                 <div className='mobile__menu-header-wrapper'>
-                    <div id='mobile__menu-header-text' className='mobile__menu-header-text'>Menu</div>
+                    <div className='mobile__menu-header-text'><Localize i18n_default_text='Menu' /></div>
                     <div id='mobile__menu-language-selector' className='mobile__menu-language-selector'>
                         <img id='mobile__menu-language-flag' className='mobile__menu-language-flag' src='../images/languages/ic-flag-uk.svg' alt='English' />
                         <span id='mobile__menu-language-text' className='mobile__menu-language-text'>EN</span>
@@ -17,36 +18,36 @@ const MobileMenu = () => (
                 <div className='mobile__platform-switcher-lists'>
                     <div className='mobile__platform-switcher-item'>
                         <img id='mobile__platform-switcher-icon-trade' className='mobile__platform-switcher-icon' />
-                        <div id='mobile__menu-trade-text' className='mobile__platform-switcher-text mobile__platform-switcher-text-bold'>Trade</div>
+                        <div className='mobile__platform-switcher-text mobile__platform-switcher-text-bold'><Localize i18n_default_text='Trade' /></div>
                     </div>
                     <div id='mobile__platform-switcher-item-reports' className='mobile__platform-switcher-item client_logged_in invisible'>
                         <img className='mobile__platform-switcher-icon reports-icon' />
-                        <div id='mobile__menu-reports-text' className='mobile__platform-switcher-text'>Reports</div>
+                        <div className='mobile__platform-switcher-text'><Localize i18n_default_text='Reports' /></div>
                         <img id='mobile__platform-switcher-icon-arrowright' className='mobile__platform-switcher-icon-right' />
                     </div>
                     <div className='mobile__platform-switcher-item client_logged_in invisible logout'>
                         <img className='mobile__platform-switcher-icon logout-icon' />
-                        <div id='mobile__menu-logout-text' className='mobile__platform-switcher-text'>Log out</div>
+                        <div className='mobile__platform-switcher-text'><Localize i18n_default_text='Log out' /></div>
                     </div>
                 </div>
             </div>
             <div id='mobile__menu-content-submenu' className='mobile__menu-content-submenu mobile__menu-content client_logged_in invisible'>
                 <div id='mobile__menu-content-submenu-header' className='mobile__menu-content-submenu-header mobile__platform-switcher-item'>
                     <img id='mobile__menu-content-submenu-icon-back' className='mobile__menu-content-submenu-icon' />
-                    <div id='mobile__menu-submenu-reports-text' className='mobile__menu-content-submenu-header-text'>Reports</div>
+                    <div className='mobile__menu-content-submenu-header-text'><Localize i18n_default_text='Reports' /></div>
                 </div>
                 <div className='mobile__menu-content-submenu-lists'>
                     <a className='url-reports-positions mobile__menu-content-submenu-item mobile__platform-switcher-item'>
                         <img id='mobile__menu-content-submenu-icon-open' className='mobile__menu-content-submenu-icon' />
-                        <div id='mobile__menu-open-positions-text' className='mobile__menu-content-submenu-item-text'>Open positions</div>
+                        <div className='mobile__menu-content-submenu-item-text'><Localize i18n_default_text='Open positions' /></div>
                     </a>
                     <a className='url-reports-profit mobile__menu-content-submenu-item mobile__platform-switcher-item'>
                         <img id='mobile__menu-content-submenu-icon-profit' className='mobile__menu-content-submenu-icon' />
-                        <div id='mobile__menu-profit-table-text' className='mobile__menu-content-submenu-item-text'>Profit table</div>
+                        <div className='mobile__menu-content-submenu-item-text'><Localize i18n_default_text='Profit table' /></div>
                     </a>
                     <a className='url-reports-statement mobile__menu-content-submenu-item mobile__platform-switcher-item'>
                         <img id='mobile__menu-content-submenu-icon-statement' className='mobile__menu-content-submenu-icon' />
-                        <div id='mobile__menu-statements-text' className='mobile__menu-content-submenu-item-text'>Statements</div>
+                        <div className='mobile__menu-content-submenu-item-text'><Localize i18n_default_text='Statements' /></div>
                     </a>
                 </div>
             </div>
@@ -54,7 +55,7 @@ const MobileMenu = () => (
             <div id='mobile__menu-content-submenu-language' className='mobile__menu-content-submenu mobile__menu-content-submenu-language'>
                 <div id='mobile__menu-content-submenu-language-header' className='mobile__menu-content-submenu-header mobile__platform-switcher-item mobile__menu-content-submenu-language-header'>
                     <img id='mobile__menu-content-submenu-language-icon-back' className='mobile__menu-content-submenu-icon' />
-                    <div id='mobile__menu-select-language-text' className='mobile__menu-content-submenu-header-text'>Select language</div>
+                    <div className='mobile__menu-content-submenu-header-text'><Localize i18n_default_text='Select language' /></div>
                 </div>
                 <div className='mobile__menu-content-submenu-lists mobile__language-grid'>
                     <div className='mobile__language-item' data-language='EN'>

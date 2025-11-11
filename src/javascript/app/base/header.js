@@ -531,10 +531,6 @@ const Header = (() => {
         
         if (!btn_login || !btn_signup) return;
 
-        // Translate button text using localize() from @deriv-com/translations
-        btn_login.textContent = localize('Log in');
-        btn_signup.textContent = localize('Sign up');
-
         // Hide buttons initially
         btn_login.style.display = 'none';
         btn_signup.style.display = 'none';
@@ -620,19 +616,6 @@ const Header = (() => {
             btn_signup.onclick = Login.redirectToSignup;
         }
 
-        // Translate header buttons using localize() from @deriv-com/translations
-        const reports_text = getElementById('header__reports-text');
-        if (reports_text) {
-            reports_text.textContent = localize('Reports');
-        }
-        
-        const btn_logout = getElementById('btn__logout');
-        if (btn_logout) {
-            btn_logout.textContent = localize('Log out');
-        }
-        
-        // Translate mobile menu items
-        translateMobileMenuItems();
 
         applyToAllElements('.logout', (el) => {
             el.addEventListener('click', logoutOnClick);
@@ -1100,57 +1083,6 @@ const Header = (() => {
         );
         el_language_menu_close_btn.addEventListener('click', toggleLanguagePopup);
 
-    };
-
-    const translateMobileMenuItems = () => {
-        // Mobile menu header
-        const menu_header_text = getElementById('mobile__menu-header-text');
-        if (menu_header_text) {
-            menu_header_text.textContent = localize('Menu');
-        }
-        
-        // Main menu items
-        const trade_text = getElementById('mobile__menu-trade-text');
-        if (trade_text) {
-            trade_text.textContent = localize('Trade');
-        }
-        
-        const mobile_reports_text = getElementById('mobile__menu-reports-text');
-        if (mobile_reports_text) {
-            mobile_reports_text.textContent = localize('Reports');
-        }
-        
-        const mobile_logout_text = getElementById('mobile__menu-logout-text');
-        if (mobile_logout_text) {
-            mobile_logout_text.textContent = localize('Log out');
-        }
-        
-        // Reports submenu
-        const submenu_reports_text = getElementById('mobile__menu-submenu-reports-text');
-        if (submenu_reports_text) {
-            submenu_reports_text.textContent = localize('Reports');
-        }
-        
-        const open_positions_text = getElementById('mobile__menu-open-positions-text');
-        if (open_positions_text) {
-            open_positions_text.textContent = localize('Open positions');
-        }
-        
-        const profit_table_text = getElementById('mobile__menu-profit-table-text');
-        if (profit_table_text) {
-            profit_table_text.textContent = localize('Profit table');
-        }
-        
-        const statements_text = getElementById('mobile__menu-statements-text');
-        if (statements_text) {
-            statements_text.textContent = localize('Statements');
-        }
-        
-        // Language submenu
-        const select_language_text = getElementById('mobile__menu-select-language-text');
-        if (select_language_text) {
-            select_language_text.textContent = localize('Select language');
-        }
     };
 
     const toggleLanguagePopup = () => {
