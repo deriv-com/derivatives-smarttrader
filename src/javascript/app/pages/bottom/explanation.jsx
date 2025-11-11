@@ -33,9 +33,16 @@ export const Explanation = ({ explanation_only = false }) => {
        
     }, [has_contract_changes]);
 
-    const language = Language.get();
+    const language = Language.get().toLowerCase();
+    
+    // Languages with available explanation images
+    const available_languages = ['de', 'en', 'es', 'fr', 'id', 'it', 'pl', 'pt', 'ru', 'th', 'vi', 'zh_cn', 'zh_tw'];
+    
+    // Use English as fallback if language images don't exist
+    const image_lang = available_languages.includes(language) ? language : 'en';
+    
     const image_path = Url.urlForStatic(
-        `images/pages/trade-explanation/${language}/`
+        `images/pages/trade-explanation/${image_lang}/`
     );
     const Notes = () => (
         <>

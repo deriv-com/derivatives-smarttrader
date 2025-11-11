@@ -1,5 +1,4 @@
-const { localize } = require('@deriv-com/translations');
-
+const { localize }          = require('@deriv-com/translations');
 const BinarySocket           = require('../app/base/socket');
 const Dialog                 = require('../app/common/attach_dom/dialog');
 const isEuCountry            = require('../app/common/country_base').isEuCountry;
