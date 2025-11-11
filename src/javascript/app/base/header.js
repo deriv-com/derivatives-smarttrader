@@ -616,7 +616,6 @@ const Header = (() => {
             btn_signup.onclick = Login.redirectToSignup;
         }
 
-
         applyToAllElements('.logout', (el) => {
             el.addEventListener('click', logoutOnClick);
         });
