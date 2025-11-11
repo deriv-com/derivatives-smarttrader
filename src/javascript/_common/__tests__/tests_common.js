@@ -8,10 +8,14 @@ const Url         = require('../url');
 require.extensions['.svg'] = () => '<svg></svg>';
 
 const setURL = (url) => {
-    const dom = new JSDOM('<!DOCTYPE html>', { url });
+    // Ensure proper URL format to avoid localStorage security errors with opaque origins
+    const validUrl = url && url.startsWith('http') ? url : `https://example.com${url || ''}`;
+    const dom = new JSDOM('<!DOCTYPE html>', { url: validUrl });
     global.window = dom.window;
     global.document = dom.window.document;
     global.location = dom.window.location;
+    global.localStorage = dom.window.localStorage;
+    global.sessionStorage = dom.window.sessionStorage;
     Url.reset();
     Language.reset();
 };

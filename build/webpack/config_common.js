@@ -34,7 +34,7 @@ const commonConfig = (grunt) => ({
         rules: [
             {
                 test   : /\.jsx?$/,
-                exclude: /node_modules/,
+                exclude: /node_modules\/(?!@deriv-com\/translations)/,
                 loader : 'babel-loader',
                 options: {
                     presets: ['@babel/preset-env', '@babel/preset-react'],

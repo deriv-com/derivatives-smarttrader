@@ -1,6 +1,6 @@
+const { localize } = require('@deriv-com/translations');
 const dataManager  = require('./data_manager').default;
 const CurrencyBase = require('../../_common/base/currency_base');
-const localize     = require('../../_common/localize').localize;
 
 const getCurrencyFullName = (currency) => CurrencyBase.isCryptocurrency(currency) ? `${CurrencyBase.getCurrencyName(currency)} (${CurrencyBase.getCurrencyDisplayCode(currency)})` : currency;
 

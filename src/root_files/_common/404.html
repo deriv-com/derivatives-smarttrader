@@ -43,15 +43,19 @@
     function redirect(lang) {
         var base = /^(.+?).github.io$/.test(window.location.hostname) ? window.location.origin + '/binary-static' : window.location.origin;
 
+        // Save language to localStorage for @deriv-com/translations
+        if (lang) {
+            localStorage.setItem('i18n_language', JSON.stringify(lang.toUpperCase()));
+        }
+
         // redirect to /en/ page if pathname contains an unsupported language:
         const supported_langs_regex = Object.keys(langs).join('|');
         if (new RegExp(`^/(?!${supported_langs_regex})\\w{2,5}/\\w+`).test(window.location.pathname.toLowerCase())) {
-            lang = 'en';
-            window.location.href = base + '/' + lang + '/' + 'trading.html';
+            window.location.href = base + '/trading.html';
             return;
         }
 
-        window.location.href = base + '/' + lang.toLowerCase() + '/' + '404.html';
+        window.location.href = base + '/404.html';
     }
 
     function openWSAndGetLanguage(cb) {

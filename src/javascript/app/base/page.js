@@ -1,3 +1,4 @@
+const { localize } = require('@deriv-com/translations');
 const Cookies          = require('js-cookie');
 const moment           = require('moment');
 const Client           = require('./client');
@@ -11,10 +12,8 @@ const Elevio           = require('../../_common/base/elevio');
 const Login            = require('../../_common/base/login');
 const elementInnerHtml = require('../../_common/common_functions').elementInnerHtml;
 const getElementById   = require('../../_common/common_functions').getElementById;
-const Crowdin          = require('../../_common/crowdin');
 const GTM              = require('../../_common/gtm');
 const Language         = require('../../_common/language');
-const localize         = require('../../_common/localize').localize;
 const isMobile         = require('../../_common/os_detect').isMobile;
 const LocalStore       = require('../../_common/storage').LocalStore;
 const SessionStore     = require('../../_common/storage').SessionStore;
@@ -38,7 +37,7 @@ const Page = (() => {
         Url.init();
         Elevio.init();
         onDocumentReady();
-        Crowdin.init();
+        // Crowdin removed - using @deriv-com/translations instead
         Analytics.init();
     };
 
@@ -149,7 +148,8 @@ const Page = (() => {
             requestSingleLogout(Client.sendLogoutRequest);
 
             if (!isLoginPages()) {
-                Language.setCookie(Language.urlLang());
+                // Use proper language detection instead of urlLang
+                Language.setCookie(Language.get());
                 const url_query_strings = Url.paramsHash();
 
                 if (url_query_strings['data-elevio-article']) {

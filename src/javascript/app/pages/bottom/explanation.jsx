@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import parse from 'html-react-parser';
 import { SectionMessage, Skeleton, Text } from '@deriv-com/quill-ui';
+import { localize } from '@deriv-com/translations';
 import { contract_explanation_data } from './data/explanation.js';
 import Language from '../../../_common/language';
 import Url from '../../../_common/url';
-import { localize } from '../../../_common/localize.js';
 import dataManager from '../../common/data_manager.js';
 import { useContractChange } from '../../hooks/events.js';
 

@@ -1,10 +1,11 @@
+const { localize } = require('@deriv-com/translations');
 const Dropdown                 = require('@binary-com/binary-style').selectDropdown;
 const addComma                 = require('./currency').addComma;
 const getDecimalPlaces         = require('./currency').getDecimalPlaces;
 const Client                   = require('../base/client');
 const Password                 = require('../../_common/check_password');
-const localize                 = require('../../_common/localize').localize;
-const localizeKeepPlaceholders = require('../../_common/localize').localizeKeepPlaceholders;
+
+const localizeKeepPlaceholders = localize;
 const compareBigUnsignedInt    = require('../../_common/string_util').compareBigUnsignedInt;
 const getHashValue             = require('../../_common/url').getHashValue;
 const cloneObject              = require('../../_common/utility').cloneObject;

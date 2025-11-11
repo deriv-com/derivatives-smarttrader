@@ -1,3 +1,4 @@
+const { localize }               = require('@deriv-com/translations');
 const Defaults                   = require('./defaults');
 const Symbols                    = require('./symbols');
 const Tick                       = require('./tick');
@@ -12,7 +13,6 @@ const ActiveSymbols              = require('../../common/active_symbols');
 const dataManager                = require('../../common/data_manager.js').default;
 const elementInnerHtml           = require('../../../_common/common_functions').elementInnerHtml;
 const getElementById             = require('../../../_common/common_functions').getElementById;
-const localize                   = require('../../../_common/localize').localize;
 const urlFor                     = require('../../../_common/url').urlFor;
 const cloneObject                = require('../../../_common/utility').cloneObject;
 

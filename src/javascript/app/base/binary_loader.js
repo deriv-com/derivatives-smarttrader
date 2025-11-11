@@ -1,3 +1,4 @@
+const { localize } = require('@deriv-com/translations');
 const BinaryPjax = require('./binary_pjax');
 const pages_config = require('./binary_pages');
 const Client = require('./client');
@@ -11,31 +12,23 @@ const GTM = require('../../_common/base/gtm');
 const Login = require('../../_common/base/login');
 const LiveChat = require('../../_common/base/livechat');
 const getElementById = require('../../_common/common_functions').getElementById;
-const getAll = require('../../_common/language').getAll;
-const urlLang = require('../../_common/language').urlLang;
-const localizeForLang = require('../../_common/localize').forLang;
-const localize = require('../../_common/localize').localize;
 const ScrollToAnchor = require('../../_common/scroll_to_anchor');
 const isStorageSupported = require('../../_common/storage').isStorageSupported;
 const ThirdPartyLinks = require('../../_common/third_party_links');
 const urlFor = require('../../_common/url').urlFor;
 const createElement = require('../../_common/utility').createElement;
 const DevShortcuts = require('../../_common/dev_shortcuts');
+const { getI18nInstance, isTranslationsInitialized } = require('../../_common/translation-init');
 
 const BinaryLoader = (() => {
     let container;
     let active_script = null;
 
     const init = () => {
-        const supported_langs_regex = Object.keys(getAll()).map(lang => lang.toLowerCase()).join('|');
-        const pathname = window.location.pathname;
-        const search = window.location.search;
-        const pattern = `/(?!${supported_langs_regex})\\w{2,5}/`;
-        // redirect to /en/ page if pathname contains an unsupported language:
-        if (new RegExp(`^${pattern}\\w+`).test(pathname)) {
-            const en_pathname  = pathname.replace(new RegExp(pattern), '/en/');
-            const en_href = `${window.location.origin}${en_pathname}${search || ''}`;
-            window.history.replaceState({ url: en_href }, document.title, en_href);
+        // Ensure translations are initialized
+        if (!isTranslationsInitialized()) {
+            // eslint-disable-next-line no-console
+            console.warn('Translations not initialized, falling back to legacy system');
         }
 
         if (!isStorageSupported(localStorage) || !isStorageSupported(sessionStorage)) {
@@ -43,7 +36,11 @@ const BinaryLoader = (() => {
             getElementById('btn_login').classList.add('button-disabled');
         }
 
-        localizeForLang(urlLang());
+        // Make i18n instance globally available
+        const i18nInstance = getI18nInstance();
+        if (i18nInstance) {
+            window.smartTraderI18n = i18nInstance;
+        }
 
         Page.showNotificationOutdatedBrowser();
 

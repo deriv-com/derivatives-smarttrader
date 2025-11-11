@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import ReactDOM from 'react-dom';
 import { SegmentedControlSingleChoice } from '@deriv-com/quill-ui';
+import { localize } from '@deriv-com/translations';
 import { Explanation } from './explanation.jsx';
 import Graph from './graph.jsx';
 import { getElementById } from '../../../_common/common_functions';
+import { renderReactComponent } from '../../../_common/react_root_manager';
 import WebtraderChart from '../trade/charts/webtrader_chart';
 import { useMarketChange, useContractChange } from '../../hooks/events';
-import { localize } from '../../../_common/localize';
 import dataManager from '../../common/data_manager.js';
 import LastDigit from '../trade/last_digit.jsx';
 
@@ -101,7 +101,7 @@ const BottomTabs = () => {
 };
 
 export const init = () => {
-    ReactDOM.render(
+    renderReactComponent(
         <BottomTabs />,
         getElementById('trading_bottom_content_tabs')
     );

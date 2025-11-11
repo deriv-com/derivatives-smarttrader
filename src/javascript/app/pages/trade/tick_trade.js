@@ -1,4 +1,5 @@
 const moment               = require('moment');
+const { localize }         = require('@deriv-com/translations');
 const HighchartUI          = require('./charts/highchart.ui');
 const requireHighstock     = require('./common').requireHighstock;
 const Reset                = require('./reset');
@@ -9,7 +10,6 @@ const ChartSettings        = require('../../common/chart_settings');
 const addComma             = require('../../../_common/base/currency_base').addComma;
 const CommonFunctions      = require('../../../_common/common_functions');
 const dataManager          = require('../../common/data_manager').default;
-const localize             = require('../../../_common/localize').localize;
 
 const TickDisplay = (() => {
     let display_decimals,

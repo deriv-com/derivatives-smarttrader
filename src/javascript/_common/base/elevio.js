@@ -1,9 +1,9 @@
+const { localize } = require('@deriv-com/translations');
 const ClientBase    = require('./client_base');
 const GTM           = require('./gtm');
 // const { livechatFallback } = require('./livechat');
 const BinarySocket  = require('./socket_base');
 const getLanguage   = require('../language').get;
-const localize      = require('../localize').localize;
 const createElement = require('../utility').createElement;
 // const isLoginPages  = require('../utility').isLoginPages;
 

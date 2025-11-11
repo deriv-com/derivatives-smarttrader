@@ -1,4 +1,4 @@
-const localize = require('../../_common/localize').localize;
+const { localize } = require('@deriv-com/translations');
 const getAppId = require('../../config').getAppId;
 
 const buildOauthApps = (response) => {

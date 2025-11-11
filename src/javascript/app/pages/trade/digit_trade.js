@@ -1,9 +1,9 @@
 const moment               = require('moment');
+const { localize }         = require('@deriv-com/translations');
 const DigitTicker          = require('./digit_ticker');
 const ViewPopupUI          = require('../user/view_popup/view_popup.ui');
 const showLocalTimeOnHover = require('../../base/clock').showLocalTimeOnHover;
 const LoadingSpinner       = require('../../components/loading-spinner');
-const localize             = require('../../../_common/localize').localize;
 
 const DigitDisplay = (() => {
     let $container;

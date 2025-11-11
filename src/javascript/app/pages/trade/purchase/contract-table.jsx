@@ -1,8 +1,8 @@
 /* eslint-disable import/no-unresolved */
 import React from 'react';
 import { Button, SectionMessage, Text } from '@deriv-com/quill-ui';
+import { localize } from '@deriv-com/translations';
 import { StandaloneCircleInfoRegularIcon } from '@deriv/quill-icons/Standalone';
-import { localize } from '../../../../_common/localize';
 import { parseData, TimeTooltipWrapper, triggerClick } from '../../../common/helpers';
 
 const ContractTable = ({ data }) => (

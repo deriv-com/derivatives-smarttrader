@@ -1,7 +1,7 @@
+const { localize }    = require('@deriv-com/translations');
 const Client          = require('../../base/client');
 const dataManager     = require('../../common/data_manager').default;
 const formatMoney     = require('../../common/currency').formatMoney;
-const localize        = require('../../../_common/localize').localize;
 
 const updatePurchaseStatus = (final_price, pnl, profit, localized_contract_status) => {
     $('#contract_purchase_heading').text(localized_contract_status);

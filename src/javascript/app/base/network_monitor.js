@@ -1,8 +1,8 @@
+const { localize } = require('@deriv-com/translations');
 const Header              = require('./header');
 const BinarySocketGeneral = require('./socket_general');
 const NetworkMonitorBase  = require('../../_common/base/network_monitor_base');
 const applyToAllElements  = require('../../_common/utility').applyToAllElements;
-const localize            = require('../../_common/localize').localize;
 
 const NetworkMonitor = (() => {
     const connection_error_code = 'you_are_offline';

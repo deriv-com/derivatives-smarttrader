@@ -1,4 +1,5 @@
 const moment             = require('moment');
+const { localize }       = require('@deriv-com/translations');
 const Contract           = require('./contract');
 const Defaults           = require('./defaults');
 const Tick               = require('./tick');
@@ -7,7 +8,6 @@ const addComma           = require('../../../_common/base/currency_base').addCom
 const elementTextContent = require('../../../_common/common_functions').elementTextContent;
 const getElementById     = require('../../../_common/common_functions').getElementById;
 const isVisible          = require('../../../_common/common_functions').isVisible;
-const localize           = require('../../../_common/localize').localize;
 
 /*
  * Handles barrier processing and display

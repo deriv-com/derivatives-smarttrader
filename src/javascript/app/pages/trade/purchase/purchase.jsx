@@ -1,15 +1,15 @@
 /* eslint-disable import/no-unresolved */
 import React, { Fragment, useEffect, useRef, useState } from 'react';
-import ReactDOM from 'react-dom';
 import {  Button, CaptionText,  Skeleton, Text, Tooltip } from '@deriv-com/quill-ui';
 import {  LabelPairedXmarkMdRegularIcon } from '@deriv/quill-icons/LabelPaired';
 import parse from 'html-react-parser';
+import { localize } from '@deriv-com/translations';
 import ContractDetails from './contract-details';
 import Defaults, { PARAM_NAMES } from '../defaults';
 import { getElementById } from '../../../../_common/common_functions';
+import { renderReactComponent } from '../../../../_common/react_root_manager';
 import { useContractChange, usePurchaseChange } from '../../../hooks/events';
 import dataManager from '../../../common/data_manager';
-import { localize } from '../../../../_common/localize';
 
 import { parseData, triggerClick } from '../../../common/helpers';
 
@@ -427,7 +427,7 @@ const Purchase = () => {
 };
 
 export const init = () => {
-    ReactDOM.render(
+    renderReactComponent(
         <Purchase />,
         getElementById('purchase_container')
     );

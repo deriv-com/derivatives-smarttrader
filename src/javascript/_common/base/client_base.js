@@ -1,8 +1,8 @@
+const { localize } = require('@deriv-com/translations');
 const moment                       = require('moment');
 const Cookies                      = require('js-cookie');
 const isCryptocurrency             = require('./currency_base').isCryptocurrency;
 const SocketCache                  = require('./socket_cache');
-const localize                     = require('../localize').localize;
 const LocalStore                   = require('../storage').LocalStore;
 const SessionStore                 = require('../storage').SessionStore;
 const State                        = require('../storage').State;

@@ -5,9 +5,9 @@ import {
 } from '@deriv-com/quill-ui';
 // eslint-disable-next-line import/no-unresolved
 import { StandaloneCircleInfoRegularIcon } from '@deriv/quill-icons/Standalone';
+import { localize } from '@deriv-com/translations';
 import { useBarrierChange } from '../../hooks/events.js';
 import dataManager from '../../common/data_manager.js';
-import { localize } from '../../../_common/localize.js';
 import Defaults, { PARAM_NAMES } from '../trade/defaults.js';
 
 const BarrierFields = ({ form_name, handleAmountChange }) => {

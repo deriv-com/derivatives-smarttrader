@@ -1,6 +1,6 @@
 const moment           = require('moment');
+const { localize }     = require('@deriv-com/translations');
 const Client           = require('../base/client');
-const localize         = require('../../_common/localize').localize;
 const getPropertyValue = require('../../_common/utility').getPropertyValue;
 
 const SessionDurationLimit = (() => {

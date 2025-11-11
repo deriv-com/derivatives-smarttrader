@@ -1,5 +1,6 @@
 const refreshDropdown   = require('@binary-com/binary-style').selectDropdown;
 const moment            = require('moment');
+const { localize }      = require('@deriv-com/translations');
 const TradingAnalysis   = require('./analysis');
 const commonTrading     = require('./common');
 const Contract          = require('./contract');
@@ -18,7 +19,6 @@ const isCryptocurrency  = require('../../common/currency').isCryptocurrency;
 const elementInnerHtml  = require('../../../_common/common_functions').elementInnerHtml;
 const getElementById    = require('../../../_common/common_functions').getElementById;
 const getVisibleElement = require('../../../_common/common_functions').getVisibleElement;
-const localize          = require('../../../_common/localize').localize;
 const State             = require('../../../_common/storage').State;
 const getPropertyValue  = require('../../../_common/utility').getPropertyValue;
 
@@ -63,7 +63,6 @@ const Process = (() => {
 
             // Removed country/EU restrictions - allow all accounts to access SmartTrader
             if (apiResponse && apiResponse.active_symbols && apiResponse.active_symbols.length) {
-                
                 // populate the Symbols object
                 Symbols.details(apiResponse);
 
@@ -71,6 +70,21 @@ const Process = (() => {
 
                 // store the market
                 Defaults.set(MARKET, market);
+
+                // Set default underlying before displaying markets to avoid race condition
+                // This ensures the underlying input has a value before React components render asynchronously
+                const underlyings = Symbols.underlyings()[market];
+                if (underlyings) {
+                    const underlying_keys = Object.keys(underlyings);
+                    if (underlying_keys.length > 0) {
+                        const default_underlying = Defaults.get(UNDERLYING) || underlying_keys[0];
+                        Defaults.set(UNDERLYING, default_underlying);
+                        const underlying_element = document.getElementById('underlying');
+                        if (underlying_element) {
+                            underlying_element.value = default_underlying;
+                        }
+                    }
+                }
 
                 commonTrading.displayMarkets();
                 processMarket();
@@ -156,6 +170,13 @@ const Process = (() => {
     };
 
     const getContracts = (underlying) => {
+        if (!underlying) {
+            // eslint-disable-next-line no-console
+            console.error('getContracts: underlying is null/undefined');
+            hideLoading();
+            return;
+        }
+        
         BinarySocket.send({ contracts_for: underlying }).then((response) => {
             processContract(response);
         }).catch((error) => {

@@ -1,5 +1,6 @@
 const Dropdown           = require('@binary-com/binary-style').selectDropdown;
 const moment             = require('moment');
+const { localize }       = require('@deriv-com/translations');
 const Barriers           = require('./barriers');
 const commonTrading      = require('./common');
 const commonIndependent  = require('./common_independent');
@@ -10,7 +11,6 @@ const Reset              = require('./reset');
 const BinarySocket       = require('../../base/socket');
 const DatePicker         = require('../../components/date_picker');
 const CommonFunctions    = require('../../../_common/common_functions');
-const localize           = require('../../../_common/localize').localize;
 const State              = require('../../../_common/storage').State;
 const toISOFormat        = require('../../../_common/string_util').toISOFormat;
 const toReadableFormat   = require('../../../_common/string_util').toReadableFormat;
@@ -252,11 +252,11 @@ const Durations = (() => {
         let duration_map;
 
         const initDurationMap = () => ({
-            t: localize(['tick',   'ticks']),
-            s: localize(['second', 'seconds']),
-            m: localize(['minute', 'minutes']),
-            h: localize(['hour',   'hours']),
-            d: localize(['day',    'days']),
+            t: { singular: localize('tick'),   plural: localize('ticks') },
+            s: { singular: localize('second'), plural: localize('seconds') },
+            m: { singular: localize('minute'), plural: localize('minutes') },
+            h: { singular: localize('hour'),   plural: localize('hours') },
+            d: { singular: localize('day'),    plural: localize('days') },
         });
 
         return {
@@ -264,7 +264,7 @@ const Durations = (() => {
                 if (!duration_map) {
                     duration_map = initDurationMap();
                 }
-                return duration_map[unit][is_plural ? 1 : 0];
+                return is_plural ? duration_map[unit].plural : duration_map[unit].singular;
             },
         };
     })();

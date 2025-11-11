@@ -17,8 +17,24 @@ require('./_common/lib/plugins');
 require('jquery.scrollto');
 
 const BinaryLoader = require('./app/base/binary_loader');
+// Add translation initialization - wait for translations to load before app starts
+const { initializeTranslations } = require('./_common/translation-init');
 
-document.addEventListener('DOMContentLoaded', BinaryLoader.init);
+// Wait for DOM and translations before initializing app
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        // Wait for translations to be fully loaded
+        await initializeTranslations();
+        // eslint-disable-next-line no-console
+        console.log('Translations loaded, initializing SmartTrader');
+    } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Translation initialization failed, continuing with fallback:', error);
+    }
+    
+    // Initialize SmartTrader after translations are ready
+    BinaryLoader.init();
+});
 window.onpageshow = function(event) {
     if (event.persisted) {
         window.location.reload();

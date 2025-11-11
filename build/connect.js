@@ -1,11 +1,8 @@
 const rewrite     = require('connect-modrewrite');
 const serveIndex  = require('serve-index');
 const serveStatic = require('serve-static');
-const languages   = require('../scripts/common').languages;
 
 module.exports = function (grunt) {
-    lang_regex = languages.join('|').toLowerCase();
-
     return {
         livereload: {
             options: {
@@ -26,10 +23,9 @@ module.exports = function (grunt) {
 
                     const rules = [
                         '^/smarttrader/(.*)$ /$1',
-                        `^/app/(${lang_regex})/index(\\.html)?/(.*)$ /app/$1/$2 [L]`,
-                        `^/app/(${lang_regex})/service-worker\\.js$ - [L]`,
-                        `^/app/(${lang_regex})/manifest\\.json$ - [L]`,
-                        `^/app/(${lang_regex})/.*$ /app/$1/ [L]`,
+                        '^/app/service-worker\\.js$ - [L]',
+                        '^/app/manifest\\.json$ - [L]',
+                        '^/app/.*$ /app/ [L]',
                     ];
                     middlewares.push(rewrite(rules));
 
@@ -44,24 +40,15 @@ module.exports = function (grunt) {
                     const directory = options.directory || options.base[options.base.length - 1];
                     middlewares.push(serveIndex(directory));
 
+                    // Simple 404 handler without language-based fallbacks
                     middlewares.push((req, res) => {
-                        const pathname = req.url.split('?')[0];
-                        const pattern = `/(?!${lang_regex})\\w{2,5}/`;
-                        if (new RegExp(`^${pattern}\\w+`).test(pathname)) {
-                            const en_pathname  = pathname.replace(new RegExp(pattern), '/en/');
-                            const en_file_path = `${options.base[0]}${en_pathname}`;
-                            if (grunt.file.exists(en_file_path)) {
-                                require('fs').createReadStream(en_file_path).pipe(res);
-                                return;
-                            }
-                        }
                         const path_404 = `${options.base[0]}/404.html`;
                         if (grunt.file.exists(path_404)) {
                             require('fs').createReadStream(path_404).pipe(res);
                             return;
                         }
-                        res.statusCode(404); // 404.html not found
-                        res.end();
+                        res.statusCode = 404;
+                        res.end('404 - Page not found');
                     });
 
                     return middlewares;

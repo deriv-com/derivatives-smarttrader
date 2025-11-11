@@ -1,7 +1,7 @@
 import React from 'react';
 import { CustomDropdown, DropdownItem, DropdownTitle, useDropdown } from '@deriv-com/quill-ui';
+import { localize } from '@deriv-com/translations';
 import { setDefaultParams } from '../../common/helpers';
-import { localize } from '../../../_common/localize';
 
 const CurrencyContent = ({ currency_list, currency, onUpdate, elementId }) => {
     const { close } = useDropdown();

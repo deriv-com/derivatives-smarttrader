@@ -1,6 +1,6 @@
+const { localize }    = require('@deriv-com/translations');
 const CommonFunctions = require('../../../_common/common_functions');
 const dataManager     = require('../../common/data_manager').default;
-const localize        = require('../../../_common/localize').localize;
 
 /*
  * Handle Reset option

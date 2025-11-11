@@ -1,12 +1,11 @@
+const { localize } = require('@deriv-com/translations');
 const Client = require('./client');
 const BinarySocket = require('./socket');
-
 const Login = require('../../_common/base/login');
 const { getBrandHomeUrl, getPlatformHostname } = require('../../../templates/_common/brand.config');
 const { getAccountType } = require('../../config');
 const SocketCache = require('../../_common/base/socket_cache');
 const getElementById = require('../../_common/common_functions').getElementById;
-const localize = require('../../_common/localize').localize;
 const Url = require('../../_common/url');
 const applyToAllElements = require('../../_common/utility').applyToAllElements;
 const Language = require('../../_common/language');
@@ -926,7 +925,7 @@ const Header = (() => {
         applyToAllElements(
             '.mobile__language-item',
             (el) => {
-                el.addEventListener('click', () => {
+                el.addEventListener('click', async () => {
                     const selectedLanguage = el.getAttribute('data-language');
                     const currentLanguage = Language.get();
                 
@@ -941,11 +940,8 @@ const Header = (() => {
                 
                     SocketCache.clear();
                 
-                    // Safely redirect using window.location.href to prevent XSS
-                    const sanitizedLanguage = encodeURIComponent(
-                        selectedLanguage.trim().toLowerCase()
-                    );
-                    window.location.href = Language.urlFor(sanitizedLanguage);
+                    // Use new translation system to change language
+                    await Language.changeSelectedLanguage(selectedLanguage.toUpperCase());
                 });
             },
             '',
@@ -1059,11 +1055,11 @@ const Header = (() => {
         applyToAllElements(
             '.language-menu-item',
             (el) => {
-                el.addEventListener('click', () => {
+                el.addEventListener('click', async () => {
                     const item_language = el.getAttribute('id');
                     if (item_language === current_language) return;
                 
-                    // Validate language before redirecting to prevent XSS
+                    // Validate language before changing
                     const allLanguages = Object.keys(Language.getAll());
                     if (!allLanguages.includes(item_language.toUpperCase())) {
                     // eslint-disable-next-line no-console
@@ -1073,8 +1069,8 @@ const Header = (() => {
                 
                     SocketCache.clear();
 
-                    // Safely redirect using window.location.href to prevent XSS
-                    window.location.href = Language.urlFor(item_language);
+                    // Use new translation system to change language
+                    await Language.changeSelectedLanguage(item_language);
                 });
             },
             '',

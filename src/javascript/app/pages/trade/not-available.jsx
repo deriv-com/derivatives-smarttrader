@@ -1,8 +1,8 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import { Text, Button } from '@deriv-com/quill-ui';
+import { localize } from '@deriv-com/translations';
 import { getElementById } from '../../../_common/common_functions';
-import { localize } from '../../../_common/localize.js';
+import { renderReactComponent } from '../../../_common/react_root_manager';
 import dataManager from '../../common/data_manager.js';
 
 const NotAvailable = ({ title, body }) => (
@@ -32,7 +32,7 @@ export const init = ({ ...props }) => {
     dataManager.setContract({
         hide_page_loader: true,
     });
-    ReactDOM.render(<NotAvailable {...props} />, getElementById('content'));
+    renderReactComponent(<NotAvailable {...props} />, getElementById('content'));
 };
 
 export default init;

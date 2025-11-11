@@ -5,7 +5,7 @@
         <script type="text/javascript">
             /* hardcode redirect for crawlers */
             if (/ia_archiver|bot|googlebot|crawler|spider|robot|crawling/i.test(navigator.userAgent)) {
-                window.location = '/en/trading.html';
+                window.location = '/trading.html';
             }
             if (self === top) {
                 var antiClickjack = document.getElementById("antiClickjack");
@@ -20,74 +20,39 @@
         <meta name='referrer' content='origin' />
         <meta name='version' content='1.0' />
         <script type="text/javascript">
-            var redirectTimeOut,
-                lang;
             function getCookieItem(sKey) {
                 'use strict';
                 if (!sKey) { return null; }
                 return decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || null;
             }
-            function getLanguage(country) {
-                var langs = {
-                    // TODO: uncomment if we enable de again
-                    // 'de': 'de|at|li',
-                    'es': 'ar|bo|cl|co|cr|cu|do|ec|sv|gt|hn|mx|ni|pa|py|pr|es|uy|ve',
-                    'fr': 'fr|ad|bj|bf|cf|cg|ga|gn|ml|mc|ne|sn|tg',
-                    'id': 'id',
-                    'it': 'it',
-                    'ko': 'kr',
-                    'pl': 'po',
-                    'pt': 'br|mz|ao|pt|gw|pg|cv|st',
-                    'ru': 'ru|ua|by|kz',
-                    // TODO: uncomment if we enable th again
-                    // 'th': 'th',
-                    'vi': 'vn',
-                    'zh_tw': 'tw|mo',
-                    'zh_cn': 'cn',
-                };
-                var conLang = 'en';
-                if (country) {
-                    Object.keys(langs).map(function(l) {
-                        if ((new RegExp(langs[l], 'i')).test(country)) conLang = l;
-                    });
-                }
-                return conLang;
-            }
-            function redirect() {
-                var loginid      = localStorage.getItem('active_loginid');
-                var client_info  = JSON.parse(localStorage.getItem('client.accounts') || '{}')[loginid];
-                var is_logged_in = client_info && client_info['token'];
 
+            function redirect() {
                 var search                = window.location.search ? window.location.search : '';
                 var has_external_referrer = document.referrer && !/\.(binary\.(com|me)|deriv\.com)/.test(document.referrer);
                 var has_utm_source        = /utm_source/.test(search);
                 var utm_source            = has_external_referrer && !has_utm_source ? ((search ? '&' : '?') + 'utm_source=' + new URL(document.referrer).hostname) : '';
-
-                window.location.href = (lang || 'en').toLowerCase() + '/trading.html' + search + utm_source;
+                
+                window.location.href = '/trading.html' + (search || utm_source ? '?' + search.replace(/^\?/, '') + (search && utm_source ? '&' : '') + utm_source.replace(/^\?/, '') : '');
             }
 
+            // Handle Crowdin in-context translation
             if (/^https:\/\/staging\.binary\.com\/translations\//i.test(window.location.href)) {
-                window.location.href = 'ach/trading.html'; // in-context translation
+                localStorage.setItem('i18n_language', JSON.stringify('ACH'));
+                window.location.href = '/trading.html';
             } else {
-                lang = getCookieItem('language');
-                if (lang) {
-                    redirect();
-                } else {
-                    var ws = new WebSocket('wss://frontend.derivws.com/websockets/v3?app_id=1&brand=binary');
-                    ws.onopen = function(e) {
-                        ws.send(JSON.stringify({'website_status': '1'}));
-                    };
-                    ws.onmessage = function(msg) {
-                        var response = JSON.parse(msg.data);
-                        if (response.msg_type === 'website_status') {
-                            if (!response.error && response.hasOwnProperty('website_status')) {
-                                lang = getLanguage(response.website_status.clients_country);
-                            }
-                            ws.close();
-                            redirect();
-                        }
-                    };
+                // Check if language is already set in localStorage or cookie
+                var storedLang = localStorage.getItem('i18n_language');
+                var cookieLang = getCookieItem('language');
+                
+                if (!storedLang && cookieLang) {
+                    // Migrate from cookie to localStorage
+                    localStorage.setItem('i18n_language', JSON.stringify(cookieLang.toUpperCase()));
+                } else if (!storedLang && !cookieLang) {
+                    // Set default language for first-time visitors
+                    localStorage.setItem('i18n_language', JSON.stringify('EN'));
                 }
+                
+                redirect();
             }
         </script>
     </head>
