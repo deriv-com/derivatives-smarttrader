@@ -179,10 +179,7 @@ const createContextBuilder = async (sections) => {
     const css_files_list = generateCSSFilesList(config, sections, static_hash);
 
     const extra = section => ({
-        js_files: [
-            Path.join(config.root_url, common.sections_config[section].path, 'js', 'texts', `{PLACEHOLDER_FOR_LANG}.js?${static_hash[section]}`),
-            ...js_files_list[section],
-        ],
+        js_files   : [...js_files_list[section]],
         css_files  : css_files_list[section],
         languages  : config.languages,
         broker_name: 'Deriv',

@@ -4,17 +4,17 @@ import { Fieldset, FormRow } from '../_common/components/forms.jsx';
 const Endpoint = () => (
     <div className='endpoint-config static-page-layout  static_full'>
         <div className='static-content'>
-            <h1>{it.L('Change API Endpoint')}</h1>
+            <h1>{'Change API Endpoint'}</h1>
             <div className='gr-padding-10'>
                 <form id='frm_endpoint'>
-                    <Fieldset legend={it.L('Details')}>
+                    <Fieldset legend={'Details'}>
                         <FormRow
                             id='server_url'
                             className='input-class'
                             type='text'
-                            label={it.L('Server')}
+                            label={'Server'}
                             attributes={{ maxLength: 30 }}
-                            hint={it.L('e.g. frontend.derivws.com')}
+                            hint={'e.g. frontend.derivws.com'}
                         />
                     </Fieldset>
                     <div className='center-text'>
@@ -23,11 +23,11 @@ const Endpoint = () => (
                             id='new_endpoint'
                             type='submit'
                         >
-                            {it.L('Submit')}
+                            {'Submit'}
                         </button>
                         <a className='button' id='reset_endpoint'>
                             <span className='button'>
-                                {it.L('Reset to original settings')}
+                                {'Reset to original settings'}
                             </span>
                         </a>
                     </div>

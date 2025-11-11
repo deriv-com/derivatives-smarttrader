@@ -1,4 +1,5 @@
 import React from 'react';
+import { localize } from '@deriv-com/translations';
 import Wrapper from './wrapper.jsx';
 import { Table } from '../../../_common/components/elements.jsx';
 
@@ -12,9 +13,9 @@ const RcRow = ({ string, id }) => (
 const Summary = () => (
     <React.Fragment>
         <Wrapper>
-            <RcRow string={it.L('Login time:')} id='login_time' />
-            <RcRow string={it.L('Current time:')} id='current_time' />
-            <RcRow string={it.L('Session duration:')} id='session_duration' />
+            <RcRow string={localize('Login time:')} id='login_time' />
+            <RcRow string={localize('Current time:')} id='current_time' />
+            <RcRow string={localize('Session duration:')} id='session_duration' />
 
             <p id='start_time' />
 
@@ -23,14 +24,14 @@ const Summary = () => (
                     data={{
                         tbody: [
                             [
-                                { header: it.L('Login ID') },
-                                { header: it.L('Currency') },
-                                { header: it.L('Turnover') },
-                                { header: it.L('Profit / Loss') },
-                                { header: it.L('Contracts bought') },
-                                { header: it.L('Contracts sold') },
-                                { header: it.L('Open contracts') },
-                                { header: it.L('Potential profit') },
+                                { header: localize('Login ID') },
+                                { header: localize('Currency') },
+                                { header: localize('Turnover') },
+                                { header: localize('Profit / Loss') },
+                                { header: localize('Contracts bought') },
+                                { header: localize('Contracts sold') },
+                                { header: localize('Open contracts') },
+                                { header: localize('Potential profit') },
                             ],
                             [
                                 { id: 'loginid' },

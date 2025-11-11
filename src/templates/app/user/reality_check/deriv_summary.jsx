@@ -1,4 +1,5 @@
 import React from 'react';
+import { localize } from '@deriv-com/translations';
 // import Wrapper from './wrapper.jsx';
 import { Table } from '../../../_common/components/elements.jsx';
 
@@ -25,13 +26,13 @@ const Summary = () => {
                                     data={{
                                         tbody: [
                                             [
-                                                { header: it.L('Login ID') },
-                                                { header: it.L('Currency') },
-                                                { header: it.L('Turnover') },
-                                                { header: it.L('Profit / Loss') },
-                                                { header: it.L('Contracts bought') },
-                                                { header: it.L('Contracts sold') },
-                                                { header: it.L('Potential profit') },
+                                                { header: localize('Login ID') },
+                                                { header: localize('Currency') },
+                                                { header: localize('Turnover') },
+                                                { header: localize('Profit / Loss') },
+                                                { header: localize('Contracts bought') },
+                                                { header: localize('Contracts sold') },
+                                                { header: localize('Potential profit') },
                                             ],
                                             [
                                                 { id: 'loginid' },
@@ -46,16 +47,16 @@ const Summary = () => {
                                     }}
                                 />
                             </div>
-                            <a className='btn btn--secondary reality-check__button reality-check__button-statement' id='statement'><span>{it.L('Go To Reports')}</span></a>
+                            <a className='btn btn--secondary reality-check__button reality-check__button-statement' id='statement'><span>{localize('Go To Reports')}</span></a>
                         </div>
                         <div className='reality-check__summary-wrapperright'>
-                            <RcRow string={it.L('Session duration:')} id='session_duration' />
-                            <RcRow string={it.L('Login at:')} id='login_time' />
-                            <RcRow string={it.L('Current time:')} id='current_time' />
+                            <RcRow string={localize('Session duration:')} id='session_duration' />
+                            <RcRow string={localize('Login at:')} id='login_time' />
+                            <RcRow string={localize('Current time:')} id='current_time' />
         
                             <hr className='reality-check__line reality-check__line-wrapperright' />
                             <div className='reality-check__interval reality-check__interval-summary'>
-                                <div htmlFor='num_reality_duration' className='reality-check__label reality-check__label-summary'>{it.L('Your preferred time interval between each report:')}</div>
+                                <div htmlFor='num_reality_duration' className='reality-check__label reality-check__label-summary'>{localize('Your preferred time interval between each report:')}</div>
                                 <div>
                                     <input placeholder='Time interval' id='num_reality_duration' className = 'reality-check__interval-input' step='1' min='1' size='6' type='number' />
                                 </div>
@@ -65,8 +66,8 @@ const Summary = () => {
                     </div>
                     <hr className='reality-check__line' />
                     <div className='center-text gr-padding-20 gr-child reality-check__button-wrapper'  id='reality_check_nav'>
-                        <a className='btn btn--secondary reality-check__button reality-check__button-logout' id='logout'><span>{it.L('Log out')}</span></a>
-                        <button className='btn btn--primary reality-check__button' type='submit'>{it.L('Continue trading')}</button>
+                        <a className='btn btn--secondary reality-check__button reality-check__button-logout' id='logout'><span>{localize('Log out')}</span></a>
+                        <button className='btn btn--primary reality-check__button' type='submit'>{localize('Continue trading')}</button>
                     </div>
                 </form>
             </div>

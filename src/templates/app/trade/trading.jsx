@@ -1,4 +1,5 @@
 import React from 'react';
+import { localize } from '@deriv-com/translations';
 import Analysis from './analysis.jsx';
 import Loading from '../../_common/components/loading.jsx';
 
@@ -62,7 +63,7 @@ const Trading = () => (
                                                     </div>
                                                     <div id='duration_wrapper' className='hint'>
                                                         <span id='duration_tooltip'>
-                                                            {it.L('Minimum:')}
+                                                            {localize('Minimum:')}
                                                         </span>{' '}
                                                         <span id='duration_minimum' />
                                                         <span id='duration_maximum' className='invisible' />
@@ -91,15 +92,15 @@ const Trading = () => (
                                             </div>
                                             <div className='row' id='highlowticks_expiry_row'>
                                                 <div className='col form_label'>
-                                                    <label>{it.L('Duration')}</label>
+                                                    <label>{localize('Duration')}</label>
                                                 </div>
                                                 <div className='big-col'>
                                                     <label className='gr-gutter'>5</label>
                                                     <label className='gr-gutter-left'>
-                                                        {it.L('Ticks')}
+                                                        {localize('Ticks')}
                                                     </label>
                                                     <div className='hint'>
-                                                        {it.L('This contract type only offers 5 ticks')}
+                                                        {localize('This contract type only offers 5 ticks')}
                                                     </div>
                                                 </div>
                                             </div>
@@ -107,9 +108,9 @@ const Trading = () => (
                                                 <div className='col form_label'>
                                                     <label htmlFor='H' id='barrier_label'>
                                                         <span id='barrier_tooltip'>
-                                                            {it.L('Barrier offset')}
+                                                            {localize('Barrier offset')}
                                                         </span>
-                                                        <span id='barrier_span'>{it.L('Barrier')}</span>
+                                                        <span id='barrier_span'>{localize('Barrier')}</span>
                                                     </label>
                                                 </div>
                                                 <div className='big-col'>
@@ -122,7 +123,7 @@ const Trading = () => (
                                                     />
                                                     <span
                                                         id='indicative_barrier_tooltip'
-                                                        data-balloon={it.L(
+                                                        data-balloon={localize(
                                                             'This is an indicative barrier. Actual barrier will be the entry spot plus the barrier offset.'
                                                         )}
                                                         data-balloon-length='xlarge'
@@ -133,10 +134,10 @@ const Trading = () => (
                                                 <div className='col form_label'>
                                                     <label htmlFor='H' id='barrier_high_label'>
                                                         <span id='barrier_high_tooltip'>
-                                                            {it.L('High barrier offset')}
+                                                            {localize('High barrier offset')}
                                                         </span>
                                                         <span id='barrier_high_span'>
-                                                            {it.L('High barrier')}
+                                                            {localize('High barrier')}
                                                         </span>
                                                     </label>
                                                 </div>
@@ -150,7 +151,7 @@ const Trading = () => (
                                                     />
                                                     <span
                                                         id='indicative_high_barrier_tooltip'
-                                                        data-balloon={it.L(
+                                                        data-balloon={localize(
                                                             'This is an indicative barrier. Actual barrier will be the entry spot plus the barrier offset.'
                                                         )}
                                                         data-balloon-length='xlarge'
@@ -160,7 +161,7 @@ const Trading = () => (
                                                             id='barrier_high_error'
                                                             className='error-msg invisible'
                                                         >
-                                                            {it.L(
+                                                            {localize(
                                                                 'High barrier must be higher than low barrier'
                                                             )}
                                                         </span>
@@ -171,10 +172,10 @@ const Trading = () => (
                                                 <div className='col form_label'>
                                                     <label htmlFor='L' id='barrier_low_label'>
                                                         <span id='barrier_low_tooltip'>
-                                                            {it.L('Low barrier offset')}
+                                                            {localize('Low barrier offset')}
                                                         </span>
                                                         <span id='barrier_low_span'>
-                                                            {it.L('Low barrier')}
+                                                            {localize('Low barrier')}
                                                         </span>
                                                     </label>
                                                 </div>
@@ -188,7 +189,7 @@ const Trading = () => (
                                                     />
                                                     <span
                                                         id='indicative_low_barrier_tooltip'
-                                                        data-balloon={it.L(
+                                                        data-balloon={localize(
                                                             'This is an indicative barrier. Actual barrier will be the entry spot plus the barrier offset.'
                                                         )}
                                                         data-balloon-length='xlarge'
@@ -198,7 +199,7 @@ const Trading = () => (
                                             <div className='row' id='prediction_row'>
                                                 <div className='col form_label'>
                                                     <label htmlFor='prediction' id='prediction_label'>
-                                                        {it.L('Last Digit Prediction')}
+                                                        {localize('Last Digit Prediction')}
                                                     </label>
                                                 </div>
                                                 <div className='big-col'>
@@ -217,7 +218,7 @@ const Trading = () => (
                                                         htmlFor='selected_tick'
                                                         id='selected_tick_label'
                                                     >
-                                                        {it.L('Tick Prediction')}
+                                                        {localize('Tick Prediction')}
                                                     </label>
                                                 </div>
                                                 <div className='big-col'>
@@ -236,7 +237,7 @@ const Trading = () => (
                                             <div className='row' id='multiplier_row'>
                                                 <div className='col form_label'>
                                                     <label htmlFor='multiplier' id='multiplier_label'>
-                                                        {it.L('Multiplier')}
+                                                        {localize('Multiplier')}
                                                     </label>
                                                 </div>
                                                 <div className='row-inner big-col'>
@@ -262,10 +263,10 @@ const Trading = () => (
                                                 <div className='col form_label'>
                                                     <select id='amount_type'>
                                                         <option value='stake' id='stake_option'>
-                                                            {it.L('Stake')}
+                                                            {localize('Stake')}
                                                         </option>
                                                         <option value='payout' id='payout_option'>
-                                                            {it.L('Payout')}
+                                                            {localize('Payout')}
                                                         </option>
                                                     </select>
                                                 </div>
@@ -292,11 +293,11 @@ const Trading = () => (
                                                 <input id='callputequal' type='checkbox' />
                                                 <label htmlFor='callputequal'>
                                                     <span
-                                                        data-balloon={it.L(
+                                                        data-balloon={localize(
                                                             'Win payout if exit spot is also equal to entry spot.'
                                                         )}
                                                     >
-                                                        {it.L('Allow equals')}
+                                                        {localize('Allow equals')}
                                                     </span>
                                                 </label>
                                             </div>
@@ -342,20 +343,20 @@ const Trading = () => (
                                 >
                                     <div className='authorization_error'>
                                         <h3 id='authorization_error_text'>
-                                            {it.L('Ready to trade?')}
+                                            {localize('Ready to trade?')}
                                         </h3>
                                         <a
                                             id='authorization_error_btn_signup'
                                             className='btn btn__large btn--primary'
                                         >
-                                            <span>{it.L('Open a free account')}</span>
+                                            <span>{localize('Open a free account')}</span>
                                         </a>
-                                        <p>{it.L('Already have an account?')}</p>
+                                        <p>{localize('Already have an account?')}</p>
                                         <a
                                             id='authorization_error_btn_login'
                                             className='btn btn--link'
                                         >
-                                            {it.L('Log in here')}
+                                            {localize('Log in here')}
                                         </a>
                                     </div>
                                 </div>
@@ -388,7 +389,7 @@ const Trading = () => (
                                                     data-balloon-length='xlarge'
                                                     value='purchase'
                                                 >
-                                                    {it.L('Purchase')}
+                                                    {localize('Purchase')}
                                                 </span>
                                             </div>
                                         </span>
@@ -422,7 +423,7 @@ const Trading = () => (
                                                     data-balloon-length='xlarge'
                                                     value='purchase'
                                                 >
-                                                    {it.L('Purchase')}
+                                                    {localize('Purchase')}
                                                 </span>
                                             </div>
                                         </span>
@@ -456,7 +457,7 @@ const Trading = () => (
                                                     data-balloon-length='xlarge'
                                                     value='purchase'
                                                 >
-                                                    {it.L('Purchase')}
+                                                    {localize('Purchase')}
                                                 </span>
                                             </div>
                                         </span>
