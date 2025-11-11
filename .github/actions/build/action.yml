@@ -5,6 +5,15 @@ inputs:
     description: "Target Environment"
     required: true
     default: staging
+  R2_PROJECT_NAME:
+    description: "R2 project name for translations CDN"
+    required: false
+  CROWDIN_URL:
+    description: "Crowdin CDN URL for translations"
+    required: false
+  CROWDIN_BRANCH_NAME:
+    description: "Crowdin branch name for translations"
+    required: false
   # RUDDERSTACK_KEY:
   #   description: "Rudderstack key for initializing analytics"
   #   required: false
@@ -21,6 +30,9 @@ runs:
       env:
         TARGET_ENV: ${{ inputs.target }}
         NODE_ENV: ${{ inputs.target }}
+        R2_PROJECT_NAME: ${{ inputs.R2_PROJECT_NAME }}
+        CROWDIN_URL: ${{ inputs.CROWDIN_URL }}
+        CROWDIN_BRANCH_NAME: ${{ inputs.CROWDIN_BRANCH_NAME }}
         # RUDDERSTACK_KEY: ${{ inputs.RUDDERSTACK_KEY }}
         # GROWTHBOOK_CLIENT_KEY: ${{ inputs.GROWTHBOOK_CLIENT_KEY }}
         # REMOTE_CONFIG_URL: ${{ inputs.REMOTE_CONFIG_URL }}
