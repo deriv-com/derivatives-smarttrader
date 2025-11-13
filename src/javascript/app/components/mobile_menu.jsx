@@ -3,22 +3,11 @@ import { localize } from '@deriv-com/translations';
 import Url from '../../_common/url';
 import Client from '../base/client';
 import Language from '../../_common/language';
-import { useHeader } from '../contexts/HeaderContext';
+import { useApp } from '../contexts/AppContext';
 import { getPlatformHostname } from '../../../templates/_common/brand.config';
 import { getAccountType } from '../../config';
 
 const BUILD_HASH = process.env.BUILD_HASH || '';
-
-/**
- * Get available languages from Language.getAll() - same as desktop implementation
- */
-const getAvailableLanguages = () => Object.entries(Language.getAll())
-    .filter(([code]) => !/ACH/.test(code))
-    .map(([code, name]) => ({
-        code,
-        name,
-        flag: code.toLowerCase(),
-    }));
 
 /**
  * MobileMenuHeader - Header section with close button and language selector
@@ -64,7 +53,7 @@ const MobileMenuHeader = ({ onClose, onLanguageClick }) => {
  * MobileMenuContent - Main menu content with trade, reports, and logout
  */
 const MobileMenuContent = ({ onReportsClick, onLogoutClick, isVisible }) => {
-    const { isLoggedIn } = useHeader();
+    const { isLoggedIn } = useApp();
 
     return (
         <div
@@ -234,11 +223,8 @@ const LanguageSubmenu = ({ onBack, onLanguageSelect, availableLanguages }) => (
  * MobileMenuComponent - Main mobile menu component with state management
  */
 const MobileMenuComponent = () => {
-    const { isMobileMenuOpen, closeMobileMenu } = useHeader();
+    const { isMobileMenuOpen, closeMobileMenu, availableLanguages, handleLanguageChange } = useApp();
     const [activeSubmenu, setActiveSubmenu] = useState(null); // null, 'reports', or 'language'
-    
-    // Get available languages using Language.getAll() like desktop
-    const availableLanguages = getAvailableLanguages();
 
     // Handle body scroll locking when menu opens/closes
     useEffect(() => {
@@ -279,21 +265,8 @@ const MobileMenuComponent = () => {
     };
 
     const handleLanguageSelect = async (langCode) => {
-        const currentLanguage = Language.get();
-        if (langCode === currentLanguage) return;
-
-        // Validate language before changing
-        const allLanguages = Object.keys(Language.getAll());
-        if (!allLanguages.includes(langCode.toUpperCase())) {
-            return;
-        }
-
-        try {
-            await Language.changeSelectedLanguage(langCode.toUpperCase());
-        } catch (error) {
-            // eslint-disable-next-line no-console
-            console.error('Failed to change language:', error);
-        }
+        // Use centralized language change from AppContext
+        await handleLanguageChange(langCode);
     };
 
     return (

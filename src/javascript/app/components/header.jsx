@@ -2,12 +2,13 @@ import React from 'react';
 import { Skeleton } from '@deriv-com/quill-ui';
 import { localize } from '@deriv-com/translations';
 import MobileMenuComponent from './mobile_menu';
+import LanguageMenuModal from '../../../templates/_common/components/language-menu-modal';
 import { renderReactComponent } from '../../_common/react_root_manager';
 import { getElementById } from '../../_common/common_functions';
 import Url from '../../_common/url';
 import Login from '../../_common/base/login';
 import Client from '../base/client';
-import { HeaderProvider, useHeader } from '../contexts/HeaderContext';
+import { AppProvider, useApp } from '../contexts/AppContext';
 import { getBrandHomeUrl, getPlatformHostname } from '../../../templates/_common/brand.config';
 import { getAccountType } from '../../config';
 
@@ -17,7 +18,7 @@ const BUILD_HASH = process.env.BUILD_HASH || '';
  * HeaderLeft - Left section of header with logo and reports link
  */
 const HeaderLeft = () => {
-    const { isLoggedIn, toggleMobileMenu } = useHeader();
+    const { isLoggedIn, toggleMobileMenu } = useApp();
     
     // Get URL parameters for Reports link
     const account_type = getAccountType();
@@ -70,7 +71,7 @@ const HeaderLeft = () => {
  * AccountInfo - Displays account icon, type, and balance
  */
 const AccountInfo = () => {
-    const { accountInfo, getFormattedBalance, getAccountTypeDisplay } = useHeader();
+    const { accountInfo, getFormattedBalance, getAccountTypeDisplay } = useApp();
 
     // Get account icon based on currency
     const getAccountIcon = () => {
@@ -121,7 +122,7 @@ const AccountInfo = () => {
  * LoginButtons - Login and signup buttons with skeleton loaders
  */
 const LoginButtons = () => {
-    const { isLoading } = useHeader();
+    const { isLoading } = useApp();
 
     const handleLogin = (e) => {
         e.preventDefault();
@@ -171,7 +172,7 @@ const LoginButtons = () => {
  * HeaderRight - Right section with account info or login buttons
  */
 const HeaderRight = () => {
-    const { isLoggedIn } = useHeader();
+    const { isLoggedIn } = useApp();
 
     const handleLogout = (e) => {
         e.preventDefault();
@@ -220,9 +221,12 @@ export const init = () => {
     const container = getElementById('header-container');
     if (container) {
         renderReactComponent(
-            <HeaderProvider>
-                <HeaderComponent />
-            </HeaderProvider>,
+            <AppProvider>
+                <>
+                    <HeaderComponent />
+                    <LanguageMenuModal />
+                </>
+            </AppProvider>,
             container
         );
     }

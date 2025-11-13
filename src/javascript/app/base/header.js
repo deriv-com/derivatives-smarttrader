@@ -3,7 +3,6 @@ const Client = require('./client');
 const BinarySocket = require('./socket');
 const Login = require('../../_common/base/login');
 const { getAccountType } = require('../../config');
-const SocketCache = require('../../_common/base/socket_cache');
 const getElementById = require('../../_common/common_functions').getElementById;
 const Url = require('../../_common/url');
 const applyToAllElements = require('../../_common/utility').applyToAllElements;
@@ -19,7 +18,6 @@ const header_icon_base_path = '/images/pages/header/';
 
 const Header = (() => {
     const notifications = [];
-    let is_language_popup_on = false;
     let is_full_screen = false;
     let is_header_ready = false;
 
@@ -334,88 +332,26 @@ const Header = (() => {
             await Chat.open();
         });
 
-        // Language Popup.
+        // Language selector
         const current_language = Language.get();
-        const available_languages = Object.entries(Language.getAll()).filter(
-            (language) => !/ACH/.test(language[0])
-        );
 
         const el_language_select_img = getElementById('language-select__logo');
-        el_language_select_img.src = Url.urlForStatic(
-            `images/languages/ic-flag-${current_language.toLowerCase()}.svg?${
-                process.env.BUILD_HASH
-            }`
-        );
+        if (el_language_select_img) {
+            el_language_select_img.src = Url.urlForStatic(
+                `images/languages/ic-flag-${current_language.toLowerCase()}.svg?${
+                    process.env.BUILD_HASH
+                }`
+            );
+        }
 
-        getElementById('language-select').addEventListener(
-            'click',
-            toggleLanguagePopup
-        );
-
-        const el_language_menu_modal = getElementById('language-menu-modal');
-        el_language_menu_modal.addEventListener('click', (e) => {
-            if ($(e.target).is(el_language_menu_modal)) {
-                toggleLanguagePopup();
-            }
-        });
-
-        available_languages.map((language) => {
-            const language_menu_item = createElement('div', {
-                class: `language-menu-item${
-                    current_language === language[0] ? ' language-menu-item__active' : ''
-                }`,
-                id: language[0],
+        const language_select = getElementById('language-select');
+        if (language_select) {
+            language_select.addEventListener('click', () => {
+                if (window.toggleLanguagePopup) {
+                    window.toggleLanguagePopup();
+                }
             });
-            language_menu_item.appendChild(
-                createElement('img', {
-                    src: Url.urlForStatic(
-                        `images/languages/ic-flag-${language[0].toLowerCase()}.svg?${
-                            process.env.BUILD_HASH
-                        }`
-                    ),
-                })
-            );
-            language_menu_item.appendChild(
-                createElement('span', { text: language[1] })
-            );
-            getElementById('language-menu-list').appendChild(language_menu_item);
-        });
-
-        applyToAllElements(
-            '.language-menu-item',
-            (el) => {
-                el.addEventListener('click', async () => {
-                    const item_language = el.getAttribute('id');
-                    if (item_language === current_language) return;
-                
-                    // Validate language before changing
-                    const allLanguages = Object.keys(Language.getAll());
-                    if (!allLanguages.includes(item_language.toUpperCase())) {
-                    // eslint-disable-next-line no-console
-                        console.warn('Invalid language selected:', item_language);
-                        return;
-                    }
-                
-                    SocketCache.clear();
-
-                    // Use new translation system to change language
-                    await Language.changeSelectedLanguage(item_language);
-                });
-            },
-            '',
-            getElementById('language-menu-list')
-        );
-
-        const el_language_menu_close_btn = getElementById(
-            'language-menu-close_btn'
-        );
-        el_language_menu_close_btn.addEventListener('click', toggleLanguagePopup);
-
-    };
-
-    const toggleLanguagePopup = () => {
-        is_language_popup_on = !is_language_popup_on;
-        getElementById('language-menu-modal').setVisibility(is_language_popup_on);
+        }
     };
 
     const toggleFullscreen = () => {

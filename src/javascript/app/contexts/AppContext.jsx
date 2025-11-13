@@ -3,21 +3,23 @@ import Client from '../base/client';
 import BinarySocket from '../../_common/base/socket_base';
 import { formatMoney } from '../../_common/base/currency_base';
 import { getAccountType } from '../../config';
+import Language from '../../_common/language';
 
 // Create the context
-const HeaderContext = createContext(null);
+const AppContext = createContext(null);
 
 /**
- * HeaderProvider - Manages all header-related state
+ * AppProvider - Manages application-wide state
  *
  * Provides:
  * - Authentication state (isLoggedIn)
  * - Account information (currency, balance, loginid, accountType)
+ * - Language configuration (currentLanguage, availableLanguages)
+ * - Mobile menu state (isMobileMenuOpen)
  * - Loading states
- * - Mobile menu state
- * - Formatted balance helper
+ * - Helper functions (getFormattedBalance, handleLanguageChange, etc.)
  */
-const HeaderProvider = ({ children }) => {
+const AppProvider = ({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(Client.isLoggedIn());
     const [isLoading, setIsLoading] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -26,6 +28,20 @@ const HeaderProvider = ({ children }) => {
         balance    : Client.get('balance') || 0,
         loginid    : Client.get('loginid') || '',
         accountType: getAccountType() || '',
+    });
+
+    // Centralized language configuration - used by both desktop and mobile
+    const [currentLanguage] = useState(() => Language.get());
+    const [availableLanguages] = useState(() => {
+        const allLanguages = Language.getAll();
+        const allowedLanguages = Language.getAllowedLanguages();
+        
+        // Map language codes to display format with flags
+        return allowedLanguages.map(code => ({
+            code,
+            name: allLanguages[code],
+            flag: code.toLowerCase(),
+        }));
     });
 
     // Update login state
@@ -138,33 +154,48 @@ const HeaderProvider = ({ children }) => {
         setIsMobileMenuOpen(false);
     };
 
+    // Handle language change
+    const handleLanguageChange = async (langCode) => {
+        try {
+            await Language.changeSelectedLanguage(langCode);
+            return true;
+        } catch (error) {
+            // eslint-disable-next-line no-console
+            console.error('Failed to change language:', error);
+            return false;
+        }
+    };
+
     const value = {
         isLoggedIn,
         isLoading,
         accountInfo,
         isMobileMenuOpen,
+        currentLanguage,
+        availableLanguages,
         getFormattedBalance,
         getAccountTypeDisplay,
         setIsLoading,
         toggleMobileMenu,
         closeMobileMenu,
+        handleLanguageChange,
     };
 
-    return React.createElement(HeaderContext.Provider, { value }, children);
+    return React.createElement(AppContext.Provider, { value }, children);
 };
 
 /**
- * useHeader - Custom hook to access header context
+ * useApp - Custom hook to access app context
  *
- * @returns {Object} Header context value
- * @throws {Error} If used outside HeaderProvider
+ * @returns {Object} App context value
+ * @throws {Error} If used outside AppProvider
  */
-const useHeader = () => {
-    const context = useContext(HeaderContext);
+const useApp = () => {
+    const context = useContext(AppContext);
     if (!context) {
-        throw new Error('useHeader must be used within a HeaderProvider');
+        throw new Error('useApp must be used within an AppProvider');
     }
     return context;
 };
 
-export { HeaderProvider, useHeader };
+export { AppProvider, useApp };

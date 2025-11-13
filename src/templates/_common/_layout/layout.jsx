@@ -2,7 +2,6 @@ import React from 'react';
 import Head from './head.jsx';
 // import Elevio from '../includes/elevio.jsx';
 import Gtm from '../includes/gtm.jsx';
-import LanguageMenuModal from '../components/language-menu-modal.jsx';
 
 const CONTENT_PLACEHOLDER = 'CONTENT_PLACEHOLDER';
 
@@ -73,7 +72,6 @@ const Layout = () => {
                     <Topbar />
                 </div>
                 {/* <Elevio /> */}
-                <LanguageMenuModal />
             </body>
         </html>
     );
