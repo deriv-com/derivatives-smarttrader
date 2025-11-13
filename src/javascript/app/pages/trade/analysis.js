@@ -55,7 +55,7 @@ const TradingAnalysis = (() => {
         trade_analysis_items.attr('hrefLang', getLanguage().toLowerCase());
         trade_analysis_items.on('click', (e) => {
             e.preventDefault();
-            const li = e.target.parentElement;
+            const li = e.currentTarget.parentElement;
             sessionStorage.setItem('currentAnalysisTab', li.id);
             if (!li.classList.contains('active')) {
                 loadAnalysisTab(li.id);
@@ -148,8 +148,8 @@ const TradingAnalysis = (() => {
      * function to toggle the active element for analysis menu
      */
     const toggleActiveAnalysisTabs = () => {
-        current_tab        = getActiveTab();
-
+        // current_tab is already set by the caller (loadAnalysisTab)
+        // Don't call getActiveTab() here as it can read stale sessionStorage values
         const analysis_container  = getElementById('analysis_content');
         const child_elements      = analysis_container.children;
         const current_tab_element = getElementById(`${current_tab}-content`);
