@@ -10,29 +10,24 @@ import { getAccountType } from '../../config';
 const BUILD_HASH = process.env.BUILD_HASH || '';
 
 /**
+ * Get available languages from Language.getAll() - same as desktop implementation
+ */
+const getAvailableLanguages = () => Object.entries(Language.getAll())
+    .filter(([code]) => !/ACH/.test(code))
+    .map(([code, name]) => ({
+        code,
+        name,
+        flag: code.toLowerCase(),
+    }));
+
+/**
  * MobileMenuHeader - Header section with close button and language selector
  */
-// Language configuration - shared across components
-const LANGUAGES = [
-    { code: 'EN', flag: 'uk', name: 'English' },
-    { code: 'DE', flag: 'de', name: 'Deutsch' },
-    { code: 'ES', flag: 'es', name: 'Español' },
-    { code: 'FR', flag: 'fr', name: 'Français' },
-    { code: 'IT', flag: 'it', name: 'Italiano' },
-    { code: 'PL', flag: 'pl', name: 'Polish' },
-    { code: 'PT', flag: 'pt', name: 'Português' },
-    { code: 'RU', flag: 'ru', name: 'Русский' },
-    { code: 'TH', flag: 'th', name: 'ไทย' },
-    { code: 'VI', flag: 'vi', name: 'Tiếng Việt' },
-    { code: 'ZH_CN', flag: 'zh_cn', name: '简体中文' },
-    { code: 'ZH_TW', flag: 'zh_tw', name: '繁體中文' },
-];
 
 const MobileMenuHeader = ({ onClose, onLanguageClick }) => {
     const currentLang = Language.get();
     const langCode = currentLang ? currentLang.toUpperCase() : 'EN';
-    const currentLanguage = LANGUAGES.find(lang => lang.code === langCode) || LANGUAGES[0];
-    const flagCode = currentLanguage.flag;
+    const flagCode = currentLang ? currentLang.toLowerCase() : 'en';
 
     return (
         <div className='mobile__menu-header'>
@@ -94,7 +89,6 @@ const MobileMenuContent = ({ onReportsClick, onLogoutClick, isVisible }) => {
                             id='mobile__platform-switcher-item-reports'
                             className='mobile__platform-switcher-item client_logged_in'
                             onClick={onReportsClick}
-                            style={{ cursor: 'pointer' }}
                         >
                             <img
                                 className='mobile__platform-switcher-icon reports-icon'
@@ -198,7 +192,7 @@ const ReportsSubmenu = ({ onBack }) => {
 /**
  * LanguageSubmenu - Submenu for language selection
  */
-const LanguageSubmenu = ({ onBack, onLanguageSelect }) => (
+const LanguageSubmenu = ({ onBack, onLanguageSelect, availableLanguages }) => (
     <div
         id='mobile__menu-content-submenu-language'
         className='mobile__menu-content-submenu mobile__menu-content-submenu--active mobile__menu-content-submenu-language mobile__menu-content'
@@ -217,7 +211,7 @@ const LanguageSubmenu = ({ onBack, onLanguageSelect }) => (
             <div className='mobile__menu-content-submenu-header-text'>{localize('Select language')}</div>
         </div>
         <div className='mobile__menu-content-submenu-lists mobile__language-grid'>
-            {LANGUAGES.map(lang => (
+            {availableLanguages.map(lang => (
                 <div
                     key={lang.code}
                     className='mobile__language-item'
@@ -242,6 +236,9 @@ const LanguageSubmenu = ({ onBack, onLanguageSelect }) => (
 const MobileMenuComponent = () => {
     const { isMobileMenuOpen, closeMobileMenu } = useHeader();
     const [activeSubmenu, setActiveSubmenu] = useState(null); // null, 'reports', or 'language'
+    
+    // Get available languages using Language.getAll() like desktop
+    const availableLanguages = getAvailableLanguages();
 
     // Handle body scroll locking when menu opens/closes
     useEffect(() => {
@@ -316,7 +313,11 @@ const MobileMenuComponent = () => {
                 {activeSubmenu === 'reports' && <ReportsSubmenu onBack={handleBack} />}
                 
                 {activeSubmenu === 'language' && (
-                    <LanguageSubmenu onBack={handleBack} onLanguageSelect={handleLanguageSelect} />
+                    <LanguageSubmenu
+                        onBack={handleBack}
+                        onLanguageSelect={handleLanguageSelect}
+                        availableLanguages={availableLanguages}
+                    />
                 )}
 
                 <div className='mobile__menu-footer topbar'>
