@@ -16,6 +16,9 @@ const initializeTranslations = async () => {
         // Get initial language
         const language = getInitialLanguage();
 
+        // Use changeLanguage to ensure translation resources are loaded
+        await i18nInstance.changeLanguage(language.toLowerCase());
+
         // Set document language attribute
         document.documentElement.lang = language.toLowerCase();
         

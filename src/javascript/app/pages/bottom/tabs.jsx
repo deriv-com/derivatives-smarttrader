@@ -26,10 +26,18 @@ const BottomTabs = () => {
     };
 
     const triggerOldTab = id => {
-        const tab_element = document.querySelectorAll('#trade_analysis li')?.[id];
-        const link_element = tab_element?.querySelector('a');
-        if (link_element) {
-            link_element.click();
+        // Map NEW tab indices to OLD tab IDs
+        const tab_map = ['tab_graph', 'tab_explanation', 'tab_last_digit'];
+        const tab_id = tab_map[id];
+        
+        if (tab_id) {
+            // Update sessionStorage so old system knows which tab is active
+            sessionStorage.setItem('currentAnalysisTab', tab_id);
+            
+            // If it's the chart tab, directly call showChart
+            if (tab_id === 'tab_graph') {
+                WebtraderChart.showChart();
+            }
         }
     };
 

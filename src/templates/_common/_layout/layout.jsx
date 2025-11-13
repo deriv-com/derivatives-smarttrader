@@ -1,10 +1,7 @@
 import React from 'react';
 import Head from './head.jsx';
-import Header from './header.jsx';
-// import MobileMenu from './mobile_menu.jsx';
 // import Elevio from '../includes/elevio.jsx';
 import Gtm from '../includes/gtm.jsx';
-import LanguageMenuModal from '../components/language-menu-modal.jsx';
 
 const CONTENT_PLACEHOLDER = 'CONTENT_PLACEHOLDER';
 
@@ -65,7 +62,7 @@ const Layout = () => {
                 <Gtm />
                 <div id='msg_notification' className='notice-msg center-text' />
                 <div id='page-wrapper'>
-                    <Header />
+                    <div id='header-container' />
                     <div id='sso_loader_container' />
                     <div id='content-holder'>
                         {/* <MobileMenu /> */}
@@ -75,7 +72,6 @@ const Layout = () => {
                     <Topbar />
                 </div>
                 {/* <Elevio /> */}
-                <LanguageMenuModal />
             </body>
         </html>
     );

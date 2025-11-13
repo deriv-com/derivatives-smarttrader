@@ -2,39 +2,26 @@ const { localize } = require('@deriv-com/translations');
 const Client = require('./client');
 const BinarySocket = require('./socket');
 const Login = require('../../_common/base/login');
-const { getBrandHomeUrl, getPlatformHostname } = require('../../../templates/_common/brand.config');
 const { getAccountType } = require('../../config');
-const SocketCache = require('../../_common/base/socket_cache');
 const getElementById = require('../../_common/common_functions').getElementById;
 const Url = require('../../_common/url');
 const applyToAllElements = require('../../_common/utility').applyToAllElements;
 const Language = require('../../_common/language');
 const createElement = require('../../_common/utility').createElement;
-
 const getTopLevelDomain = require('../../_common/utility').getTopLevelDomain;
-const getPlatformSettings =
-      require('../../../templates/_common/brand.config').getPlatformSettings;
-
-const formatMoney = require('../common/currency').formatMoney;
-const isEuCountry = require('../common/country_base').isEuCountry;
 const DerivLiveChat = require('../pages/livechat.jsx');
-const {
-    default: isHubEnabledCountry,
-} = require('../common/isHubEnabledCountry.js');
-const { SessionStore } = require('../../_common/storage');
 const Chat = require('../../_common/chat.js').default;
 const getRemoteConfig = require('../hooks/useRemoteConfig').getRemoteConfig;
+const { init: initHeaderComponent } = require('../components/header.jsx');
 
 const header_icon_base_path = '/images/pages/header/';
 
 const Header = (() => {
     const notifications = [];
-    let is_language_popup_on = false;
     let is_full_screen = false;
     let is_header_ready = false;
 
     const header_ready_callbacks = [];
-    const ext_platform_url = encodeURIComponent(window.location.href);
     const fullscreen_map = {
         event: [
             'fullscreenchange',
@@ -163,63 +150,21 @@ const Header = (() => {
         }, 100);
     };
 
-    // Modern account info setup for single-account mode (matching bot project)
-    const setupSingleAccountHeader = () => {
-        if (!Client.isLoggedIn()) return;
-        
-        BinarySocket.wait('authorize', 'balance').then(() => {
-            const currency = Client.get('currency');
-            const loginid = Client.get('loginid');
-            const balance = Client.get('balance') || 0;
-            const accountType = getAccountType();
-            
-            if (currency && loginid) {
-                // Set account icon
-                const getIcon = () => {
-                    if (accountType === 'real') return currency ? currency.toLowerCase() : 'unknown';
-                    return 'virtual';
-                };
-                
-                const icon = Url.urlForStatic(
-                    `${header_icon_base_path}ic-currency-${getIcon()}.svg?${process.env.BUILD_HASH}`
-                );
-                
-                // Set account icon
-                const iconElement = getElementById('header__acc-icon');
-                if (iconElement) {
-                    iconElement.src = icon;
-                }
-                
-                // Set account type (Real/Demo)
-                const accountTypeElement = getElementById('header__acc-type');
-                if (accountTypeElement) {
-                    accountTypeElement.textContent = accountType === 'demo' ? localize('Demo') : localize('Real');
-                }
-                
-                // Set balance if not already set by updateBalance
-                const balanceElement = getElementById('header__acc-balance');
-                if (balanceElement && (!balanceElement.innerHTML || balanceElement.innerHTML.trim() === '')) {
-                    const display_balance = formatMoney(currency, balance);
-                    balanceElement.innerHTML = display_balance;
-                }
-            }
-        });
-    };
-
     const onLoad = async () => {
         try {
-            bindSvg();
+            // Initialize React components
+            // Note: Both components need to share the same HeaderProvider instance
+            // This is handled in header.jsx which renders both components
+            const headerContainer = getElementById('header-container');
+            if (headerContainer) {
+                initHeaderComponent();
+            }
+            
             updateLoginButtonsDisplay();
             
-            // Set navigation URLs immediately - don't wait for WebSocket
-            setHeaderUrls();
-            
-            // Call topbar detection immediately - don't wait for WebSocket
+            // Call topbar detection for fullscreen button
             waitForTopbarElements();
             bindClick();
-            
-            // Set up header account info for single-account mode immediately
-            setupSingleAccountHeader();
             
             await BinarySocket.wait('authorize');
 
@@ -267,117 +212,6 @@ const Header = (() => {
             });
     };
 
-    const setHeaderUrls = () => {
-        const url_add_account_dynamic = document.getElementById(
-            'url-add-account-dynamic'
-        );
-
-        if (isEuCountry()) {
-            url_add_account_dynamic.classList.remove('url-add-account');
-            url_add_account_dynamic.classList.add('url-add-account-multiplier');
-        }
-
-        applyToAllElements('.url-wallet-apps', (el) => {
-            el.href = isHubEnabledCountry()
-                ? Url.urlForTradersHub(
-                    'tradershub/redirect',
-                    `action=redirect_to&redirect_to=cfds&account=${
-                        Url.param('account') || SessionStore.get('account').toUpperCase()
-                    }`
-                )
-                : Url.urlForDeriv('', `ext_platform_url=${ext_platform_url}`);
-        });
-        applyToAllElements('.url-appstore', (el) => {
-            el.href = isHubEnabledCountry()
-                ? Url.urlForTradersHub(
-                    'tradershub/redirect',
-                    `action=redirect_to&redirect_to=home&account=${
-                        Url.param('account') || SessionStore.get('account').toUpperCase()
-                    }`
-                )
-                : Url.urlForDeriv('', `ext_platform_url=${ext_platform_url}`);
-        });
-        applyToAllElements('.url-appstore-cfd', (el) => {
-            el.href = isHubEnabledCountry()
-                ? Url.urlForTradersHub(
-                    'tradershub/redirect',
-                    `action=redirect_to&redirect_to=cfds&account=${
-                        Url.param('account') || SessionStore.get('account').toUpperCase()
-                    }`
-                )
-                : Url.urlForDeriv('', `ext_platform_url=${ext_platform_url}`);
-        });
-        applyToAllElements('.url-reports-positions', (el) => {
-            const account_type = getAccountType();
-            const redirect_url = getPlatformHostname();
-            
-            el.href = Url.urlForReports(
-                'reports/positions',
-                redirect_url,
-                account_type
-            );
-        });
-        applyToAllElements('.url-reports-profit', (el) => {
-            el.href = Url.urlForDeriv(
-                'reports/profit',
-                `ext_platform_url=${ext_platform_url}`
-            );
-        });
-        applyToAllElements('.url-reports-statement', (el) => {
-            el.href = Url.urlForDeriv(
-                'reports/statement',
-                `ext_platform_url=${ext_platform_url}`
-            );
-        });
-
-        applyToAllElements('.url-add-account', (el) => {
-            el.href = Url.urlForDeriv(
-                'redirect',
-                `action=add_account&ext_platform_url=${ext_platform_url}`
-            );
-        });
-        applyToAllElements('.url-add-account-multiplier', (el) => {
-            el.href = Url.urlForDeriv(
-                'redirect',
-                `action=add_account_multiplier&ext_platform_url=${ext_platform_url}`
-            );
-        });
-        applyToAllElements('.url-manage-account', (el) => {
-            el.href = isHubEnabledCountry()
-                ? Url.urlForTradersHub(
-                    'tradershub/redirect',
-                    `action=redirect_to&redirect_to=wallet&account=${
-                        Url.param('account') || SessionStore.get('account').toUpperCase()
-                    }`
-                )
-                : Url.urlForDeriv(
-                    'redirect',
-                    `action=manage_account&ext_platform_url=${ext_platform_url}`
-                );
-        });
-        applyToAllElements('.url-wallets-deposit', (el) => {
-            el.href = isHubEnabledCountry()
-                ? Url.urlForTradersHub(
-                    'tradershub/redirect',
-                    `action=redirect_to&redirect_to=wallet&account=${
-                        Url.param('account') || SessionStore.get('account').toUpperCase()
-                    }`
-                )
-                : Url.urlForDeriv(
-                    'redirect',
-                    `action=payment_transfer&ext_platform_url=${ext_platform_url}`
-                );
-        });
-
-        // Set Deriv logo links to brand home URL
-        applyToAllElements('.url-deriv-com', (el) => {
-            el.href = getBrandHomeUrl();
-        });
-        applyToAllElements('.url-deriv-com-mobile', (el) => {
-            el.href = getBrandHomeUrl();
-        });
-    };
-
     const onUnload = () => {
         fullscreen_map.event.forEach((event) => {
             document.removeEventListener(event, onFullScreen);
@@ -388,152 +222,12 @@ const Header = (() => {
         is_full_screen = fullscreen_map.element.some((el) => document[el]);
     };
 
-    const bindSvg = () => {
-        applyToAllElements('#add-account-icon', (el) => {
-            el.src = Url.urlForStatic(
-                `${header_icon_base_path}ic-add-account.svg?${process.env.BUILD_HASH}`
-            );
-        });
-        
-        applyToAllElements('#appstore-icon', (el) => {
-            el.src = Url.urlForStatic(
-                `${header_icon_base_path}ic-appstore-home.svg?${process.env.BUILD_HASH}`
-            );
-        });
-
-        applyToAllElements('.header__expand', (el) => {
-            el.src = Url.urlForStatic(
-                `${header_icon_base_path}ic-chevron-down.svg?${process.env.BUILD_HASH}`
-            );
-        });
-        // TODO : Change to light arrow down icon
-        applyToAllElements('.header__expand-light', (el) => {
-            el.src = Url.urlForStatic(
-                `${header_icon_base_path}ic-chevron-down.svg?${process.env.BUILD_HASH}`
-            );
-        });
-
-        applyToAllElements('.header__logo', (el) => {
-            el.src = Url.urlForStatic(
-                `${header_icon_base_path}${getPlatformSettings('smarttrader').icon}?${
-                    process.env.BUILD_HASH
-                }`
-            );
-        });
-
-        applyToAllElements('.logout-icon', (el) => {
-            el.src = Url.urlForStatic(
-                `${header_icon_base_path}ic-logout.svg?${process.env.BUILD_HASH}`
-            );
-        });
-
-        applyToAllElements('.reports-icon', (el) => {
-            el.src = Url.urlForStatic(
-                `${header_icon_base_path}ic-reports.svg?${process.env.BUILD_HASH}`
-            );
-        });
-
-        applyToAllElements('.whatsapp-icon', (el) => {
-            el.src = Url.urlForStatic(
-                `${header_icon_base_path}ic-whatsapp.svg?${process.env.BUILD_HASH}`
-            );
-        });
-
-        applyToAllElements('.livechat-icon', (el) => {
-            el.src = Url.urlForStatic(
-                `${header_icon_base_path}ic-livechat.svg?${process.env.BUILD_HASH}`
-            );
-        });
-
-        applyToAllElements('.btn__close', (el) => {
-            el.src = Url.urlForStatic(
-                `${header_icon_base_path}ic-close.svg?${process.env.BUILD_HASH}`
-            );
-        });
-
-        applyToAllElements('#header__hamburger', (el) => {
-            el.src = Url.urlForStatic(
-                `${header_icon_base_path}ic-hamburger.svg?${process.env.BUILD_HASH}`
-            );
-        });
-
-        applyToAllElements('.deriv-com-logo', (el) => {
-            el.src = Url.urlForStatic(
-                `${header_icon_base_path}deriv-com-logo.svg?${process.env.BUILD_HASH}`
-            );
-        });
-
-        applyToAllElements('.deriv-com-logo-mobile', (el) => {
-            el.src = Url.urlForStatic(
-                `${header_icon_base_path}deriv-com-logo.svg?${process.env.BUILD_HASH}`
-            );
-        });
-
-        applyToAllElements('#mobile__platform-switcher-icon-trade', (el) => {
-            el.src = Url.urlForStatic(
-                `${header_icon_base_path}ic-trade.svg?${process.env.BUILD_HASH}`
-            );
-        });
-
-        applyToAllElements('#mobile__platform-switcher-icon-arrowright', (el) => {
-            el.src = Url.urlForStatic(
-                `${header_icon_base_path}ic-chevron-right.svg?${process.env.BUILD_HASH}`
-            );
-        });
-
-        applyToAllElements('#mobile__menu-content-submenu-icon-back', (el) => {
-            el.src = Url.urlForStatic(
-                `${header_icon_base_path}ic-chevron-left.svg?${process.env.BUILD_HASH}`
-            );
-        });
-
-        applyToAllElements(
-            '#mobile__menu-content-submenu-account-settings-icon-back',
-            (el) => {
-                el.src = Url.urlForStatic(
-                    `${header_icon_base_path}ic-chevron-left.svg?${process.env.BUILD_HASH}`
-                );
-            }
-        );
-
-        applyToAllElements(
-            '#mobile__menu-content-submenu-language-icon-back',
-            (el) => {
-                el.src = Url.urlForStatic(
-                    `${header_icon_base_path}ic-chevron-left.svg?${process.env.BUILD_HASH}`
-                );
-            }
-        );
-
-        applyToAllElements('#mobile__menu-content-submenu-icon-open', (el) => {
-            el.src = Url.urlForStatic(
-                `${header_icon_base_path}ic-portfolio.svg?${process.env.BUILD_HASH}`
-            );
-        });
-
-        applyToAllElements('#mobile__menu-content-submenu-icon-profit', (el) => {
-            el.src = Url.urlForStatic(
-                `${header_icon_base_path}ic-profit-table.svg?${process.env.BUILD_HASH}`
-            );
-        });
-
-        applyToAllElements('#mobile__menu-content-submenu-icon-statement', (el) => {
-            el.src = Url.urlForStatic(
-                `${header_icon_base_path}ic-statement.svg?${process.env.BUILD_HASH}`
-            );
-        });
-    };
-
     const updateLoginButtonsDisplay = () => {
         // Get login and signup buttons
         const btn_login = getElementById('btn__login');
         const btn_signup = getElementById('btn__signup');
         
         if (!btn_login || !btn_signup) return;
-
-        // Translate button text using localize() from @deriv-com/translations
-        btn_login.textContent = localize('Log in');
-        btn_signup.textContent = localize('Sign up');
 
         // Hide buttons initially
         btn_login.style.display = 'none';
@@ -620,396 +314,11 @@ const Header = (() => {
             btn_signup.onclick = Login.redirectToSignup;
         }
 
-        // Translate header buttons using localize() from @deriv-com/translations
-        const reports_text = getElementById('header__reports-text');
-        if (reports_text) {
-            reports_text.textContent = localize('Reports');
-        }
-        
-        const btn_logout = getElementById('btn__logout');
-        if (btn_logout) {
-            btn_logout.textContent = localize('Log out');
-        }
-        
-        // Translate mobile menu items
-        translateMobileMenuItems();
-
         applyToAllElements('.logout', (el) => {
             el.addEventListener('click', logoutOnClick);
         });
-        // Mobile menu
-        const mobile_menu_overlay = getElementById('mobile__container');
-        const mobile_menu = getElementById('mobile__menu');
-        const mobile_menu_close = getElementById('mobile__menu-close');
-        const hamburger_menu = getElementById('header__hamburger');
-        const mobile_menu_livechat = getElementById('mobile__menu-livechat');
-        const mobile_menu__livechat_logo = getElementById(
-            'mobile__menu-header-livechat__logo'
-        );
-        const mobile_menu_active = 'mobile__container--active';
-        const showMobileMenu = (shouldShow) => {
-            if (shouldShow) {
-                mobile_menu_overlay.classList.add(mobile_menu_active);
-                document.body.classList.add('stop-scrolling');
-            } else {
-                // Reset all submenu states before closing the sidebar
-                resetAllSubmenus();
-                mobile_menu_overlay.classList.remove(mobile_menu_active);
-                document.body.classList.remove('stop-scrolling');
-            }
-        };
 
-        if (hamburger_menu) {
-            hamburger_menu.addEventListener('click', () => showMobileMenu(true));
-        }
-        if (mobile_menu_close) {
-            mobile_menu_close.addEventListener('click', () => showMobileMenu(false));
-        }
-        if (mobile_menu_livechat) {
-            mobile_menu_livechat.addEventListener('click', async () => {
-                await Chat.open();
-            });
-        }
-
-        // Mobile Menu Livechat Icon
-        mobile_menu__livechat_logo.src = Url.urlForStatic(
-            `images/common/livechat.svg?${process.env.BUILD_HASH}`
-        );
-
-        // Dynamic link for trader's hub cta for mobile menu
-        const mobile_platform_appstore_link = getElementById('url-appstore');
-        // Get current account parameter from URL
-        const url_params = new URLSearchParams(window.location.search);
-        const account_param = url_params.get('account');
-        const traders_hub_link = isHubEnabledCountry()
-            ? Url.urlForTradersHub(
-                'tradershub/redirect',
-                `action=redirect_to&redirect_to=home&account=${
-                    Url.param('account') || SessionStore.get('account').toUpperCase()
-                }`
-            )
-            : Url.urlForDeriv(
-                '',
-                `ext_platform_url=${ext_platform_url}${
-                    account_param ? `&account=${account_param}` : ''
-                }`
-            );
-        mobile_platform_appstore_link.href = traders_hub_link;
-
-        // Note: wallet switcher functionality is disabled for single account mode
-
-        // Mobile reports menu
-        const appstore_menu = getElementById(
-            'mobile__platform-switcher-item-appstore'
-        );
-        const report_menu = getElementById(
-            'mobile__platform-switcher-item-reports'
-        );
-        const cashier_menu = getElementById(
-            'mobile__platform-switcher-item-cashier'
-        );
-        const account_settings_menu = getElementById(
-            'mobile__platform-switcher-item-account-settings'
-        );
-        const language_menu = getElementById(
-            'mobile__platform-switcher-item-language'
-        );
-        const menu = getElementById('mobile_menu-content');
-        const submenu = getElementById('mobile__menu-content-submenu');
-        const cashier_submenu = getElementById(
-            'mobile__menu-content-submenu-cashier'
-        );
-        const account_settings_submenu = getElementById(
-            'mobile__menu-content-submenu-account-settings'
-        );
-        const language_submenu = getElementById(
-            'mobile__menu-content-submenu-language'
-        );
-        const back = getElementById('mobile__menu-content-submenu-header');
-        const cashier_back = getElementById(
-            'mobile__menu-content-submenu-cashier-header'
-        );
-        const account_settings_back = getElementById(
-            'mobile__menu-content-submenu-account-settings-header'
-        );
-        const language_back = getElementById(
-            'mobile__menu-content-submenu-language-header'
-        );
-        const header_language_selector = getElementById(
-            'mobile__menu-language-selector'
-        );
-        const submenu_active = 'mobile__menu-content-submenu--active';
-        const account_settings_header = getElementById(
-            'mobile__menu-content-submenu-account-settings-header'
-        );
-        const profile_category_headers = document.querySelectorAll(
-            '#mobile__menu-content-submenu-account-settings .mobile__menu-content-submenu-category-header'
-        );
-        const menu_active = 'mobile__menu-content--active';
-        const showMobileSubmenu = (shouldShow) => {
-            if (shouldShow) {
-                submenu.classList.add(submenu_active);
-                menu.classList.remove(menu_active);
-            } else {
-                submenu.classList.remove(submenu_active);
-                menu.classList.add(menu_active);
-            }
-        };
-
-        const showMobileCashierSubmenu = (shouldShow) => {
-            if (shouldShow) {
-                cashier_submenu.classList.add(submenu_active);
-                menu.classList.remove(menu_active);
-            } else {
-                cashier_submenu.classList.remove(submenu_active);
-                menu.classList.add(menu_active);
-            }
-        };
-
-        const showMobileAccountSettingsSubmenu = (shouldShow) => {
-            if (shouldShow) {
-                account_settings_submenu.classList.add(submenu_active);
-                menu.classList.remove(menu_active);
-            } else {
-                account_settings_submenu.classList.remove(submenu_active);
-                menu.classList.add(menu_active);
-            }
-        };
-
-        const resetAllSubmenus = () => {
-            // Reset all submenu states to show main menu when sidebar is closed
-            try {
-                // Hide all submenus by removing active classes
-                submenu.classList.remove(submenu_active);
-                cashier_submenu.classList.remove(submenu_active);
-                account_settings_submenu.classList.remove(submenu_active);
-                language_submenu.classList.remove(submenu_active);
-                
-                // Show main menu by adding active class
-                menu.classList.add(menu_active);
-                
-                // Reset language submenu context
-                languageSubmenuContext = null;
-                
-                // Show the language selector if it was hidden
-                const languageSelector = getElementById(
-                    'mobile__menu-language-selector'
-                );
-                if (languageSelector) {
-                    languageSelector.classList.remove(
-                        'mobile__menu-language-selector--hidden'
-                    );
-                }
-                
-                // Restore account settings headers if they were hidden
-                restoreAccountSettingsHeaders();
-            } catch (error) {
-                // Silently handle any errors to prevent breaking the sidebar functionality
-                // eslint-disable-next-line no-console
-                console.warn('Error resetting mobile submenus:', error);
-            }
-        };
-
-        let languageSubmenuContext = null;
-        const LANGUAGE_CONTEXT = {
-            HEADER          : 'header',
-            MAIN_MENU       : 'main_menu',
-            ACCOUNT_SETTINGS: 'account_settings',
-        };
-
-        const hideAccountSettingsHeaders = () => {
-            try {
-                if (account_settings_header) {
-                    account_settings_header.style.display = 'none';
-                }
-                if (profile_category_headers && profile_category_headers.length > 0) {
-                    profile_category_headers.forEach((header) => {
-                        if (header) header.style.display = 'none';
-                    });
-                }
-            } catch (error) {
-                // Error handling - silently continue
-            }
-        };
-
-        const restoreAccountSettingsHeaders = () => {
-            try {
-                if (account_settings_header) {
-                    account_settings_header.style.display = '';
-                }
-                if (profile_category_headers && profile_category_headers.length > 0) {
-                    profile_category_headers.forEach((header) => {
-                        if (header) header.style.display = '';
-                    });
-                }
-            } catch (error) {
-                // Error handling - silently continue
-            }
-        };
-
-        const showMobileLanguageSubmenu = (shouldShow, context = null) => {
-            const languageSelector = getElementById('mobile__menu-language-selector');
-            
-            if (shouldShow) {
-                languageSubmenuContext = context;
-                
-                // Hide the language selector when submenu opens
-                if (languageSelector) {
-                    languageSelector.classList.add(
-                        'mobile__menu-language-selector--hidden'
-                    );
-                }
-                
-                language_submenu.classList.add(submenu_active);
-                menu.classList.remove(menu_active);
-                
-                if (context === LANGUAGE_CONTEXT.ACCOUNT_SETTINGS) {
-                    account_settings_submenu.classList.remove(submenu_active);
-                    
-                    hideAccountSettingsHeaders();
-                }
-            } else {
-                // Show the language selector when submenu closes
-                if (languageSelector) {
-                    languageSelector.classList.remove(
-                        'mobile__menu-language-selector--hidden'
-                    );
-                }
-                
-                language_submenu.classList.remove(submenu_active);
-                
-                if (languageSubmenuContext === LANGUAGE_CONTEXT.ACCOUNT_SETTINGS) {
-                    account_settings_submenu.classList.add(submenu_active);
-                    
-                    restoreAccountSettingsHeaders();
-                } else {
-                    menu.classList.add(menu_active);
-                }
-                
-                languageSubmenuContext = null;
-            }
-        };
-
-        // Some note here
-        appstore_menu.addEventListener('click', () => {
-            showMobileSubmenu(false);
-        });
-
-        report_menu.addEventListener('click', () => {
-            showMobileSubmenu(true);
-        });
-
-        back.addEventListener('click', () => {
-            showMobileSubmenu(false);
-        });
-
-        cashier_menu.addEventListener('click', () => {
-            showMobileCashierSubmenu(true);
-        });
-
-        cashier_back.addEventListener('click', () => {
-            showMobileCashierSubmenu(false);
-        });
-
-        account_settings_menu.addEventListener('click', () => {
-            showMobileAccountSettingsSubmenu(true);
-        });
-
-        account_settings_back.addEventListener('click', () => {
-            showMobileAccountSettingsSubmenu(false);
-        });
-
-        header_language_selector.addEventListener('click', () => {
-            showMobileLanguageSubmenu(true, LANGUAGE_CONTEXT.HEADER);
-        });
-
-        language_menu.addEventListener('click', () => {
-            showMobileLanguageSubmenu(true, LANGUAGE_CONTEXT.MAIN_MENU);
-        });
-
-        const account_settings_languages = getElementById(
-            'mobile__account-settings-languages'
-        );
-        if (account_settings_languages) {
-            account_settings_languages.addEventListener('click', () => {
-                showMobileLanguageSubmenu(true, LANGUAGE_CONTEXT.ACCOUNT_SETTINGS);
-            });
-        }
-
-        language_back.addEventListener('click', () => {
-            showMobileLanguageSubmenu(false);
-        });
-
-        applyToAllElements(
-            '.mobile__language-item',
-            (el) => {
-                el.addEventListener('click', async () => {
-                    const selectedLanguage = el.getAttribute('data-language');
-                    const currentLanguage = Language.get();
-                
-                    if (selectedLanguage === currentLanguage) return;
-
-                    const allLanguages = Object.keys(Language.getAll());
-                    if (!allLanguages.includes(selectedLanguage.toUpperCase())) {
-                    // eslint-disable-next-line no-console
-                        console.warn('Invalid language selected:', selectedLanguage);
-                        return;
-                    }
-                
-                    SocketCache.clear();
-                
-                    // Use new translation system to change language
-                    await Language.changeSelectedLanguage(selectedLanguage.toUpperCase());
-                });
-            },
-            '',
-            getElementById('mobile__menu-content-submenu-language')
-        );
-
-        const updateMobileLanguageDisplay = () => {
-            const currentLanguage = Language.get();
-            
-            const flagImg = getElementById('mobile__menu-language-flag');
-            const langText = getElementById('mobile__menu-language-text');
-            
-            if (flagImg && langText) {
-                flagImg.src = Url.urlForStatic(
-                    `images/languages/ic-flag-${currentLanguage.toLowerCase()}.svg?${
-                        process.env.BUILD_HASH
-                    }`
-                );
-                langText.textContent = currentLanguage.toUpperCase();
-            }
-            
-            applyToAllElements('.mobile__language-item', (el) => {
-                const itemLang = el.getAttribute('data-language');
-                if (itemLang === currentLanguage.toUpperCase()) {
-                    el.classList.add('mobile__language-item--active');
-                } else {
-                    el.classList.remove('mobile__language-item--active');
-                }
-            });
-        };
-
-        updateMobileLanguageDisplay();
-
-        // OnClickOutisde Event Handle
-        document.addEventListener('click', (event) => {
-            // Mobile Menu
-            if (
-                !mobile_menu.contains(event.target) &&
-        !hamburger_menu.contains(event.target) &&
-        mobile_menu_overlay.classList.contains(mobile_menu_active)
-            ) {
-                showMobileMenu(false);
-            }
-        });
-
-        // whatsapp mobile menu
-        const whatsapp_mobile_drawer = getElementById('whatsapp-mobile-drawer');
-        whatsapp_mobile_drawer.addEventListener('click', () =>
-            window.open('https://wa.me/35699578341', '_blank')
-        );
+        // Note: Mobile menu is now fully handled by React components
 
         // Livechat Logo
         const livechat_img = getElementById('livechat__logo');
@@ -1023,139 +332,26 @@ const Header = (() => {
             await Chat.open();
         });
 
-        // Language Popup.
+        // Language selector
         const current_language = Language.get();
-        const available_languages = Object.entries(Language.getAll()).filter(
-            (language) => !/ACH/.test(language[0])
-        );
 
         const el_language_select_img = getElementById('language-select__logo');
-        el_language_select_img.src = Url.urlForStatic(
-            `images/languages/ic-flag-${current_language.toLowerCase()}.svg?${
-                process.env.BUILD_HASH
-            }`
-        );
+        if (el_language_select_img) {
+            el_language_select_img.src = Url.urlForStatic(
+                `images/languages/ic-flag-${current_language.toLowerCase()}.svg?${
+                    process.env.BUILD_HASH
+                }`
+            );
+        }
 
-        getElementById('language-select').addEventListener(
-            'click',
-            toggleLanguagePopup
-        );
-
-        const el_language_menu_modal = getElementById('language-menu-modal');
-        el_language_menu_modal.addEventListener('click', (e) => {
-            if ($(e.target).is(el_language_menu_modal)) {
-                toggleLanguagePopup();
-            }
-        });
-
-        available_languages.map((language) => {
-            const language_menu_item = createElement('div', {
-                class: `language-menu-item${
-                    current_language === language[0] ? ' language-menu-item__active' : ''
-                }`,
-                id: language[0],
+        const language_select = getElementById('language-select');
+        if (language_select) {
+            language_select.addEventListener('click', () => {
+                if (window.toggleLanguagePopup) {
+                    window.toggleLanguagePopup();
+                }
             });
-            language_menu_item.appendChild(
-                createElement('img', {
-                    src: Url.urlForStatic(
-                        `images/languages/ic-flag-${language[0].toLowerCase()}.svg?${
-                            process.env.BUILD_HASH
-                        }`
-                    ),
-                })
-            );
-            language_menu_item.appendChild(
-                createElement('span', { text: language[1] })
-            );
-            getElementById('language-menu-list').appendChild(language_menu_item);
-        });
-
-        applyToAllElements(
-            '.language-menu-item',
-            (el) => {
-                el.addEventListener('click', async () => {
-                    const item_language = el.getAttribute('id');
-                    if (item_language === current_language) return;
-                
-                    // Validate language before changing
-                    const allLanguages = Object.keys(Language.getAll());
-                    if (!allLanguages.includes(item_language.toUpperCase())) {
-                    // eslint-disable-next-line no-console
-                        console.warn('Invalid language selected:', item_language);
-                        return;
-                    }
-                
-                    SocketCache.clear();
-
-                    // Use new translation system to change language
-                    await Language.changeSelectedLanguage(item_language);
-                });
-            },
-            '',
-            getElementById('language-menu-list')
-        );
-
-        const el_language_menu_close_btn = getElementById(
-            'language-menu-close_btn'
-        );
-        el_language_menu_close_btn.addEventListener('click', toggleLanguagePopup);
-
-    };
-
-    const translateMobileMenuItems = () => {
-        // Mobile menu header
-        const menu_header_text = getElementById('mobile__menu-header-text');
-        if (menu_header_text) {
-            menu_header_text.textContent = localize('Menu');
         }
-        
-        // Main menu items
-        const trade_text = getElementById('mobile__menu-trade-text');
-        if (trade_text) {
-            trade_text.textContent = localize('Trade');
-        }
-        
-        const mobile_reports_text = getElementById('mobile__menu-reports-text');
-        if (mobile_reports_text) {
-            mobile_reports_text.textContent = localize('Reports');
-        }
-        
-        const mobile_logout_text = getElementById('mobile__menu-logout-text');
-        if (mobile_logout_text) {
-            mobile_logout_text.textContent = localize('Log out');
-        }
-        
-        // Reports submenu
-        const submenu_reports_text = getElementById('mobile__menu-submenu-reports-text');
-        if (submenu_reports_text) {
-            submenu_reports_text.textContent = localize('Reports');
-        }
-        
-        const open_positions_text = getElementById('mobile__menu-open-positions-text');
-        if (open_positions_text) {
-            open_positions_text.textContent = localize('Open positions');
-        }
-        
-        const profit_table_text = getElementById('mobile__menu-profit-table-text');
-        if (profit_table_text) {
-            profit_table_text.textContent = localize('Profit table');
-        }
-        
-        const statements_text = getElementById('mobile__menu-statements-text');
-        if (statements_text) {
-            statements_text.textContent = localize('Statements');
-        }
-        
-        // Language submenu
-        const select_language_text = getElementById('mobile__menu-select-language-text');
-        if (select_language_text) {
-            select_language_text.textContent = localize('Select language');
-        }
-    };
-
-    const toggleLanguagePopup = () => {
-        is_language_popup_on = !is_language_popup_on;
-        getElementById('language-menu-modal').setVisibility(is_language_popup_on);
     };
 
     const toggleFullscreen = () => {
