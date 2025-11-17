@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { LabelPairedGlobeSmRegularIcon } from '@deriv/quill-icons';
 import { localize } from '@deriv-com/translations';
 import Url from '../../_common/url';
 import Client from '../base/client';
@@ -16,7 +17,6 @@ const BUILD_HASH = process.env.BUILD_HASH || '';
 const MobileMenuHeader = ({ onClose, onLanguageClick }) => {
     const currentLang = Language.get();
     const langCode = currentLang ? currentLang.toUpperCase() : 'EN';
-    const flagCode = currentLang ? currentLang.toLowerCase() : 'en';
 
     return (
         <div className='mobile__menu-header'>
@@ -34,12 +34,7 @@ const MobileMenuHeader = ({ onClose, onLanguageClick }) => {
                     className='mobile__menu-language-selector'
                     onClick={onLanguageClick}
                 >
-                    <img
-                        id='mobile__menu-language-flag'
-                        className='mobile__menu-language-flag'
-                        src={Url.urlForStatic(`images/languages/ic-flag-${flagCode}.svg?${BUILD_HASH}`)}
-                        alt={langCode}
-                    />
+                    <LabelPairedGlobeSmRegularIcon />
                     <span id='mobile__menu-language-text' className='mobile__menu-language-text'>
                         {langCode}
                     </span>
@@ -181,7 +176,7 @@ const ReportsSubmenu = ({ onBack }) => {
 /**
  * LanguageSubmenu - Submenu for language selection
  */
-const LanguageSubmenu = ({ onBack, onLanguageSelect, availableLanguages }) => (
+const LanguageSubmenu = ({ onBack, onLanguageSelect, availableLanguages, currentLanguage }) => (
     <div
         id='mobile__menu-content-submenu-language'
         className='mobile__menu-content-submenu mobile__menu-content-submenu--active mobile__menu-content-submenu-language mobile__menu-content'
@@ -203,15 +198,12 @@ const LanguageSubmenu = ({ onBack, onLanguageSelect, availableLanguages }) => (
             {availableLanguages.map(lang => (
                 <div
                     key={lang.code}
-                    className='mobile__language-item'
+                    className={`mobile__language-item${
+                        currentLanguage === lang.code ? ' mobile__language-item--active' : ''
+                    }`}
                     data-language={lang.code}
                     onClick={() => onLanguageSelect(lang.code)}
                 >
-                    <img
-                        className='mobile__language-flag'
-                        src={Url.urlForStatic(`images/languages/ic-flag-${lang.flag}.svg?${BUILD_HASH}`)}
-                        alt={lang.name}
-                    />
                     <div className='mobile__language-text'>{lang.name}</div>
                 </div>
             ))}
@@ -223,7 +215,7 @@ const LanguageSubmenu = ({ onBack, onLanguageSelect, availableLanguages }) => (
  * MobileMenuComponent - Main mobile menu component with state management
  */
 const MobileMenuComponent = () => {
-    const { isMobileMenuOpen, closeMobileMenu, availableLanguages, handleLanguageChange } = useApp();
+    const { isMobileMenuOpen, closeMobileMenu, availableLanguages, handleLanguageChange, currentLanguage } = useApp();
     const [activeSubmenu, setActiveSubmenu] = useState(null); // null, 'reports', or 'language'
 
     // Handle body scroll locking when menu opens/closes
@@ -290,6 +282,7 @@ const MobileMenuComponent = () => {
                         onBack={handleBack}
                         onLanguageSelect={handleLanguageSelect}
                         availableLanguages={availableLanguages}
+                        currentLanguage={currentLanguage}
                     />
                 )}
 

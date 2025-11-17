@@ -142,13 +142,15 @@ body .topbar {
     #language-select {
         cursor: pointer;
         height: inherit;
+        display: flex;
+        align-items: center;
+        padding: 0 0.8rem;
+        border-left: 1px solid var(--general-section-1);
+        border-right: 1px solid var(--general-section-1);
 
-        img {
-            padding: 0 0.8rem;
-            width: 24px;
-            height: 16px;
-            border-left: 1px solid var(--general-section-1);
-            border-right: 1px solid var(--general-section-1);
+        span {
+            margin-left: 4px;
+            font-weight: 700;
         }
         &:hover {
             background-color: var(--general-hover);
@@ -953,12 +955,14 @@ body .mobile {
         &-language-selector {
             display: flex;
             align-items: center;
-            gap: 4px;
             padding: 8px 12px;
             cursor: pointer;
             border-radius: 4px;
             transition: background-color 0.2s;
             
+            span {
+                margin-left: 4px;
+            }
             &:hover {
                 background: var(--state-hover);
             }
@@ -975,6 +979,7 @@ body .mobile {
         &-content {
             height: calc(100% - 77px);
             display: none;
+            overflow-y: auto;
 
             &--active {
                 display: block;
@@ -1349,7 +1354,7 @@ body #topbar {
         
         &:hover {
             background-color: rgba(255, 255, 255, 0.1) !important;
-        }     
+        }
         &--hidden {
             display: none !important;
             visibility: hidden !important;
@@ -1357,12 +1362,12 @@ body #topbar {
     }
 
     // Language flag styling (inline context)
-    &-flag {
-        width: 24px;
-        height: 18px;
-        margin-right: 0.5rem;
-        object-fit: cover;
-    }
+    // &-flag {
+    //     width: 24px;
+    //     height: 18px;
+    //     margin-right: 0.5rem;
+    //     object-fit: cover;
+    // }
 
     // Language text styling (inline context)
     &-text {
@@ -1382,7 +1387,7 @@ body #topbar {
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: space-between;
+        justify-content: center;
         height: 88px;
         padding: 10px 8px;
         border-radius: 8px;
@@ -1403,12 +1408,12 @@ body #topbar {
     }
 
     // Language flag styling (grid context)
-    &-flag {
-        width: 32px;
-        height: 24px;
-        margin-bottom: 0;
-        object-fit: cover;
-    }
+    // &-flag {
+    //     width: 32px;
+    //     height: 24px;
+    //     margin-bottom: 0;
+    //     object-fit: cover;
+    // }
 
     // Language text styling (grid context)
     &-text {

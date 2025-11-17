@@ -94,17 +94,17 @@ body {
         &-list {
             display: grid;
             grid-template-columns: repeat(5, 80px);
-            grid-template-rows: repeat(2, 84px);
+            grid-auto-rows: 84px;
             grid-gap: 40px;
             padding: 40px;
         }
         .language-menu-item {
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             border: 1px solid transparent;
             border-radius: 4px;
             padding: 16px 5px;
-            align-items: center;
             cursor: pointer;
 
             &:not(.language-menu-item__active):hover {
@@ -115,14 +115,9 @@ body {
                 border: 1px solid var(--border-active);
                 font-weight: 700;
             }
-            img {
-                width: 36px;
-                height: 24px;
-            }
             span {
                 font-size: 0.9rem;
                 color: var(--text-prominent);
-                margin-top: 10px;
             }
         }
     }

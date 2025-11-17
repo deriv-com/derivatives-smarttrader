@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { localize } from '@deriv-com/translations';
-import Url from '../../../javascript/_common/url';
 import { useApp } from '../../../javascript/app/contexts/AppContext';
-
-const BUILD_HASH = process.env.BUILD_HASH || '';
 
 const LanguageMenuModal = () => {
     const [isVisible, setIsVisible] = useState(false);
@@ -58,12 +55,6 @@ const LanguageMenuModal = () => {
                                 }`}
                                 onClick={() => handleLanguageSelect(lang.code)}
                             >
-                                <img
-                                    src={Url.urlForStatic(
-                                        `images/languages/ic-flag-${lang.flag}.svg?${BUILD_HASH}`
-                                    )}
-                                    alt={lang.name}
-                                />
                                 <span>{lang.name}</span>
                             </div>
                         ))}
