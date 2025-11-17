@@ -1,4 +1,5 @@
 import React from 'react';
+import { LabelPairedGlobeSmRegularIcon } from '@deriv/quill-icons';
 import Head from './head.jsx';
 // import Elevio from '../includes/elevio.jsx';
 import Gtm from '../includes/gtm.jsx';
@@ -34,7 +35,10 @@ const Topbar = () => (
             <div id='network_status_wrapper' className='no-underline' data-balloon-pos='up'>
                 <div className='network_status' />
             </div>
-            <div id='language-select'><img id='language-select__logo' /></div>
+            <div id='language-select'>
+                <LabelPairedGlobeSmRegularIcon />
+                <span id='language-select__text' />
+            </div>
             <span className='no-underline nowrap gmt-clock' data-balloon-pos='up' />
             {/* <div id='topbar-whatsapp'>
                 <img src={it.url_for('images/pages/footer/ic-whatsapp.svg')} />

@@ -159,7 +159,7 @@ export const Explanation = ({ explanation_only = false }) => {
                 <div id='explanation_explain' className='gr-child'>
                     <div id={`explain_${form_name}`}  >
                         <div className='explanation-heading'>
-                            <Text size='lg' bold >{contract_explanation_data.explain[form_name]?.title || 'Contract Explanation'}</Text>
+                            <Text size='lg' bold >{contract_explanation_data.explain[form_name]?.title || localize('Contract Explanation')}</Text>
                         </div>
                         <div className='explanation-content'>
                             {contract_explanation_data.explain[form_name]?.content?.map(

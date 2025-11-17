@@ -335,14 +335,19 @@ const Header = (() => {
         // Language selector
         const current_language = Language.get();
 
-        const el_language_select_img = getElementById('language-select__logo');
-        if (el_language_select_img) {
-            el_language_select_img.src = Url.urlForStatic(
-                `images/languages/ic-flag-${current_language.toLowerCase()}.svg?${
-                    process.env.BUILD_HASH
-                }`
-            );
+        const el_language_select_text = getElementById('language-select__text');
+        if (el_language_select_text) {
+            el_language_select_text.textContent = current_language ? current_language.toUpperCase() : 'EN';
         }
+
+        // const el_language_select_img = getElementById('language-select__logo');
+        // if (el_language_select_img) {
+        //     el_language_select_img.src = Url.urlForStatic(
+        //         `images/languages/ic-flag-${current_language.toLowerCase()}.svg?${
+        //             process.env.BUILD_HASH
+        //         }`
+        //     );
+        // }
 
         const language_select = getElementById('language-select');
         if (language_select) {
