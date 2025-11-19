@@ -63,7 +63,6 @@ const Purchase = (() => {
         const container           = CommonFunctions.getElementById('contract_confirmation_container');
         const message_container   = CommonFunctions.getElementById('confirmation_message');
         const heading             = CommonFunctions.getElementById('contract_purchase_heading');
-        const descr               = CommonFunctions.getElementById('contract_purchase_descr');
         const barrier_element     = CommonFunctions.getElementById('contract_purchase_barrier');
         const reference           = CommonFunctions.getElementById('contract_purchase_reference');
         const chart               = CommonFunctions.getElementById('trade_tick_chart');
@@ -186,14 +185,12 @@ const Purchase = (() => {
             });
 
             CommonFunctions.elementTextContent(heading, localize('Contract Confirmation'));
-            CommonFunctions.elementTextContent(descr, receipt.longcode);
             CommonFunctions.elementTextContent(barrier_element, '');
             CommonFunctions.elementTextContent(reference, `${localize('Your transaction reference is')} ${receipt.transaction_id}`);
 
             dataManager.setPurchase({
                 show_purchase_results: true,
                 pr_heading           : localize('Contract Confirmation'),
-                pr_description       : receipt.longcode,
                 pr_barrier           : '',
                 pr_reference         : `${localize('Your transaction reference is')} ${receipt.transaction_id}`,
             });

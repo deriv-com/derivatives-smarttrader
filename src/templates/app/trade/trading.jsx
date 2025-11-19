@@ -322,7 +322,6 @@ const Trading = () => (
                             <div id='confirmation_message_container'>
                                 <div id='confirmation_message'>
                                     <h3 id='contract_purchase_heading' />
-                                    <div id='contract_purchase_descr' />
                                     <div className='row' id='contract_purchase_profit_list'>
                                         <div className='col' id='contract_purchase_payout' />
                                         <div className='col' id='contract_purchase_cost' />
@@ -462,7 +461,6 @@ const Trading = () => (
                                             </div>
                                         </span>
                                     </div>
-                                    <div className='contract_longcode' />
                                 </div>
                                 <div className='col price_comment' />
                                 <div className='col contract_error' />

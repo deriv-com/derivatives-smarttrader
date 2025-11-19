@@ -66,7 +66,6 @@ const ViewPopup = (() => {
 
         dataManager.setPurchase({
             show_contract_details_popup: true,
-            cd_description             : null,
         });
     };
 
@@ -753,9 +752,7 @@ const ViewPopup = (() => {
     const makeTemplate = () => {
         $container = $('<div/>').append($('<div/>', { id: wrapper_id }));
 
-        const longcode = contract.longcode;
-
-        $container.prepend($('<div/>', { id: 'sell_bet_desc', class: 'popup_bet_desc drag-handle', text: longcode }));
+        $container.prepend($('<div/>', { id: 'sell_bet_desc', class: 'popup_bet_desc drag-handle' }));
         const $sections  = $('<div/>').append($('<div class="gr-row container"><div id="sell_details_chart_wrapper" class="gr-8 gr-12-p gr-12-m"></div><div id="sell_details_table" class="gr-4 gr-12-p gr-12-m"></div></div>'));
         let barrier_text = localize('Barrier');
         const low_barrier_text = localize('Low barrier');
@@ -811,7 +808,6 @@ const ViewPopup = (() => {
         // Pass all contract details to new quill contract detail popup
         // cd_ prefix is Contract Details
         dataManager.setPurchase({
-            cd_description       : longcode,
             cd_show_entry_spot   : should_show_entry_spot,
             cd_show_barrier      : should_show_barrier,
             cd_show_barrier_reset: Reset.isReset(contract.contract_type),
