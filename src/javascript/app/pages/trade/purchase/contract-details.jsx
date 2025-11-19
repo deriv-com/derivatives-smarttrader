@@ -73,9 +73,6 @@ const AuditSection = ({ data }) => {
             <div className='popup-scroller'>
                 <div className='body-box'>
                     <div className='purchase-details-box'>
-                        <div className='details-title'>
-                            <Text centered size='md'>{data?.cd_description}</Text>
-                        </div>
                         <div className='details-column'>
                             <div className='contract-info-wrapper full'>
                                 {Object.keys(audit_data).map(audit_data_key =>{
@@ -163,9 +160,6 @@ const DetailsSection = ({ data }) => (
         <div className='popup-scroller'>
             <div className='body-box'>
                 <div className='purchase-details-box'>
-                    <div className='details-title'>
-                        <Text centered size='md'>{data?.cd_description}</Text>
-                    </div>
                     <div className='details-column'>
                         <div className='chart-wrapper' id={data?.cd_chart_id} />
                         <ContractTable data={data} />
@@ -218,7 +212,7 @@ const ContractDetails = () => {
     return (
         <Portal>
             <div className='quill-purchase-popup'>
-                {!data?.cd_description ? (
+                {!data?.cd_contract_type ? (
                     <div className='body-box'>
                         <div className='loader-box'>
                             <Skeleton.Square fullWidth height={24} rounded />

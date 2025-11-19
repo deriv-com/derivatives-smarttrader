@@ -12,7 +12,6 @@ const Portfolio = (() => {
             contract_id      : c.contract_id,
             payout           : parseFloat(c.payout),
             expiry_time      : c.expiry_time,
-            longcode         : c.longcode,
             shortcode        : c.shortcode,
             currency         : c.currency,
             buy_price        : c.buy_price,

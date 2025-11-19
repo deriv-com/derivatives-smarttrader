@@ -164,7 +164,6 @@ const Price = (() => {
         const payout        = container.getElementsByClassName('payout')[0];
         const purchase            = container.getElementsByClassName('purchase_button')[0];
         const description         = container.getElementsByClassName('contract_description')[0];
-        const longcode            = container.getElementsByClassName('contract_longcode')[0];
         const comment             = container.getElementsByClassName('price_comment')[0];
         const error               = container.getElementsByClassName('contract_error')[0];
         const currency            = CommonFunctions.getVisibleElement('currency');
@@ -210,21 +209,10 @@ const Price = (() => {
                 currency                     : getCurrencyDisplayCode(currentCurrency),
             });
 
-            if (data.longcode && window.innerWidth > 500) {
-                dataManager.setPurchase({
-                    [`${position}_description`]: data.longcode,
-                });
-
-                if (description) description.setAttribute('data-balloon', data.longcode);
-                if (longcode) CommonFunctions.elementTextContent(longcode, data.longcode);
-            } else {
-                dataManager.setPurchase({
-                    [`${position}_description`]: '',
-                });
-
-                if (description) description.removeAttribute('data-balloon');
-                if (longcode) CommonFunctions.elementTextContent(longcode, '');
-            }
+            if (description) description.removeAttribute('data-balloon');
+            dataManager.setPurchase({
+                [`${position}_description`]: '',
+            });
         };
 
         const setPurchaseStatus = (enable) => {

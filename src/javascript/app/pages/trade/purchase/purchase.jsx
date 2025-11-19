@@ -376,9 +376,6 @@ const Purchase = () => {
                 </div>
               
                 <div className='body-box'>
-                    <div className='description-box'>
-                        <Text size='sm'>{data?.pr_description}</Text>
-                    </div>
                     <div className='table-box'>
                         {data?.pr_table_payout_value && (
                             <div className='table-item'>

@@ -5,7 +5,6 @@ const portfolio_mock_data = {
     symbol        : 'frxAUDJPY',
     shortcode     : 'CALL_FRXAUDJPY_10_1467352741_1467388741_S0P_0',
     contract_id   : '9299986648',
-    longcode      : 'Win payout if AUD/JPY is strictly higher than entry spot at 10 hours after contract start time.',
     expiry_time   : 1467388741,
     currency      : 'USD',
     transaction_id: '18513214188',
@@ -53,8 +52,6 @@ describe('Portfolio', () => {
             .and.to.be.a('string');
         expect(portfolio_data).to.have.property('payout')
             .and.to.be.a('number');
-        expect(portfolio_data).to.have.property('longcode')
-            .and.to.be.a('string');
         expect(portfolio_data).to.have.property('currency')
             .and.to.be.a('string');
         expect(portfolio_data).to.have.property('buy_price')
