@@ -132,7 +132,7 @@ export const contract_explanation_data = {
                 return [
                     localize('If you select "Reset-Call", you win the payout if the exit spot is strictly higher than either the entry spot or the spot at reset time.'),
                     localize('If you select "Reset-Put", you win the payout if the exit spot is strictly lower than either the entry spot or the spot at reset time.'),
-                    localize('If the <strong>exit spot</strong> is equal to the <strong>barrier</strong> or the <stronm g>new barrier (if a reset occurs)</stronmg>, you don\'t win the payout.'),
+                    localize('If the <strong>exit spot</strong> is equal to the <strong>barrier</strong> or the <strong>new barrier (if a reset occurs)</strong>, you don\'t win the payout.'),
                 ];
             },
         },
