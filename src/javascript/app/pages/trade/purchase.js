@@ -17,6 +17,7 @@ const Url                      = require('../../../_common/url');
 const dataManager              = require('../../common/data_manager').default;
 const createElement            = require('../../../_common/utility').createElement;
 const getPropertyValue         = require('../../../_common/utility').getPropertyValue;
+const { getAccountType }       = require('../../../config');
 
 /*
  * Purchase object that handles all the functions related to
@@ -156,9 +157,10 @@ const Purchase = (() => {
 
                             message = `${error.message}. ${additional_message}`;
                         } else if (/ClientUnwelcome/.test(error.code) && /gb/.test(Client.get('residence'))) {
-                            if (!Client.hasAccountType('real') && Client.get('is_virtual')) {
+                            const account_type = getAccountType();
+                            if (account_type === 'demo') {
                                 message = localize('Please complete the [_1]Real Account form[_2] to verify your age as required by the [_3]UK Gambling[_4] Commission (UKGC).', [`<a href='${Url.urlFor('new_account/realws')}'>`, '</a>', '<strong>', '</strong>']);
-                            } else if (Client.hasAccountType('real') && /^virtual|iom$/i.test(Client.get('landing_company_shortcode'))) {
+                            } else if (account_type === 'real' && /^virtual|iom$/i.test(Client.get('landing_company_shortcode'))) {
                                 message = localize('Account access is temporarily limited. Please check your inbox for more details.');
                             } else {
                                 message = error.message;
