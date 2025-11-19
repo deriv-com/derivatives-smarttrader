@@ -331,11 +331,10 @@ const ViewPopup = (() => {
                 cd_info_msg: contract.validation_error && !is_unsupported_contract ? contract.validation_error : null,
             });
             if (is_unsupported_contract) {
-                const redirect = `<a href="https://home.deriv.${Utility.getTopLevelDomain()}" target="_blank" rel="noopener noreferrer">`;
-                const redirect_close = '</a>';
+                const redirect_url = `https://home.deriv.${Utility.getTopLevelDomain()}`;
                 const message = Callputspread.isCallputspread(contract.contract_type) ?
-                    localize('This contract is only available on [_1]DTrader[_2].', [redirect, redirect_close]) :
-                    localize('This contract is only available on DTrader.[_1][_2]Go to Dtrader[_3] to close or cancel this contract.', ['<br/>', redirect, redirect_close]);
+                    localize('This contract is only available on <a href="{{url}}" target="_blank" rel="noopener noreferrer">DTrader</a>.', { url: redirect_url }) :
+                    localize('This contract is only available on DTrader.<br/><a href="{{url}}" target="_blank" rel="noopener noreferrer">Go to Dtrader</a> to close or cancel this contract.', { url: redirect_url });
                 containerSetText('trade_details_bottom', message);
             }
         }
@@ -983,13 +982,13 @@ const ViewPopup = (() => {
         if (is_sell_clicked) {
             const formatted_sell_price = formatMoney(contract.currency, response.sell.sold_for, true);
             containerSetText('contract_sell_message',
-                `${localize('You have sold this contract at [_1] [_2]', [formatted_sell_price, getCurrencyDisplayCode(contract.currency)])}
+                `${localize('You have sold this contract at {{price}} {{currency}}', { price: formatted_sell_price, currency: getCurrencyDisplayCode(contract.currency) })}
                 <br />
-                ${localize('Your transaction reference number is [_1]', response.sell.transaction_id)}`);
+                ${localize('Your transaction reference number is {{transaction_id}}', { transaction_id: response.sell.transaction_id })}`);
             dataManager.setPurchase({
-                cd_sell_msg: `${localize('You have sold this contract at [_1] [_2]', [formatted_sell_price, getCurrencyDisplayCode(contract.currency)])}
+                cd_sell_msg: `${localize('You have sold this contract at {{price}} {{currency}}', { price: formatted_sell_price, currency: getCurrencyDisplayCode(contract.currency) })}
                     <br />
-                    ${localize('Your transaction reference number is [_1]', response.sell.transaction_id)}`,
+                    ${localize('Your transaction reference number is {{transaction_id}}', { transaction_id: response.sell.transaction_id })}`,
             });
         }
         getContract('no-subscribe');

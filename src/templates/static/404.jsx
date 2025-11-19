@@ -10,7 +10,7 @@ const Page404 = () => (
                 </div>
                 <div className='gr-8 gr-12-m gr-12-p gr-6-t'>
                     <p>{localize('The page you requested could not be found. Either it no longer exists or the address is wrong. Please check for any typos.')}</p>
-                    <p dangerouslySetInnerHTML={{ __html: localize('<a href="[_1]">Return to trading page</a>', it.url_for('trading')) }} />
+                    <p dangerouslySetInnerHTML={{ __html: localize('<a href="{{url}}">Return to trading page</a>', { url: it.url_for('trading') }) }} />
                 </div>
                 <div className='gr-4 gr-12-m gr-12-p gr-6-t'>
                     <div className='big-error-code'>404</div>

@@ -5,12 +5,10 @@ const getDecimalPlaces         = require('./currency').getDecimalPlaces;
 const Client                   = require('../base/client');
 const Password                 = require('../../_common/check_password');
 
-const localizeKeepPlaceholders = localize;
 const compareBigUnsignedInt    = require('../../_common/string_util').compareBigUnsignedInt;
 const getHashValue             = require('../../_common/url').getHashValue;
 const cloneObject              = require('../../_common/utility').cloneObject;
 const isEmptyObject            = require('../../_common/utility').isEmptyObject;
-const template                 = require('../../_common/utility').template;
 const urlFor                   = require('../../_common/url').urlForStatic;
 
 const Validation = (() => {
@@ -213,19 +211,19 @@ const Validation = (() => {
         } else if (options.type === 'float' && options.decimals &&
             !(new RegExp(`^\\d+(\\.\\d{0,${options.decimals}})?$`).test(value))) {
             is_ok   = false;
-            message = localize('Up to [_1] decimal places are allowed.', options.decimals);
+            message = localize('Up to {{decimals}} decimal places are allowed.', { decimals: options.decimals });
         } else if ('min' in options && 'max' in options && +options.min === +options.max && +value !== +options.min) {
             is_ok   = false;
-            message = localize('Should be [_1]', addComma(options.min, options.format_money ? getDecimalPlaces(Client.get('currency')) : undefined));
+            message = localize('Should be {{value}}', { value: addComma(options.min, options.format_money ? getDecimalPlaces(Client.get('currency')) : undefined) });
         } else if ('min' in options && 'max' in options && (+value < +options.min || isMoreThanMax(value, options))) {
             is_ok   = false;
-            message = localize('Should be between [_1] and [_2]', [addComma(options.min, options.format_money ? getDecimalPlaces(Client.get('currency')) : undefined), addComma(options.max, options.format_money ? getDecimalPlaces(Client.get('currency')) : undefined)]);
+            message = localize('Should be between {{min}} and {{max}}', { min: addComma(options.min, options.format_money ? getDecimalPlaces(Client.get('currency')) : undefined), max: addComma(options.max, options.format_money ? getDecimalPlaces(Client.get('currency')) : undefined) });
         } else if ('min' in options && +value < +options.min) {
             is_ok   = false;
-            message = localize('Should be more than [_1]', addComma(options.min, options.format_money ? getDecimalPlaces(Client.get('currency')) : undefined));
+            message = localize('Should be more than {{min}}', { min: addComma(options.min, options.format_money ? getDecimalPlaces(Client.get('currency')) : undefined) });
         } else if ('max' in options && isMoreThanMax(value, options)) {
             is_ok   = false;
-            message = localize('Should be less than [_1]', addComma(options.max, options.format_money ? getDecimalPlaces(Client.get('currency')) : undefined));
+            message = localize('Should be less than {{max}}', { max: addComma(options.max, options.format_money ? getDecimalPlaces(Client.get('currency')) : undefined) });
         }
 
         ValidatorsMap.get().number.message = message;
@@ -267,14 +265,14 @@ const Validation = (() => {
             email           : { func: validEmail,        message: localize('Invalid email address.') },
             password        : { func: validPassword,     message: localize('Password should have lower and uppercase English letters with numbers.') },
             general         : { func: validGeneral,      message: localize('Only letters, numbers, space, hyphen, period, and apostrophe are allowed.') },
-            address         : { func: validAddress,      message: localize('Only letters, numbers, space, and these special characters are allowed: [_1]', '- . \' # ; : ( ) , @ /') },
+            address         : { func: validAddress,      message: localize('Only letters, numbers, space, and these special characters are allowed: {{characters}}', { characters: '- . \' # ; : ( ) , @ /' }) },
             letter_symbol   : { func: validLetterSymbol, message: localize('Only letters, space, hyphen, period, and apostrophe are allowed.') },
             postcode        : { func: validPostCode,     message: localize('Only letters, numbers, space, and hyphen are allowed.') },
             phone           : { func: validPhone,        message: localize('Please enter a valid phone number (e.g. +15417541234).') },
             compare         : { func: validCompare,      message: localize('The two passwords that you entered do not match.') },
-            not_equal       : { func: validNotEqual,     message: localizeKeepPlaceholders('[_1] and [_2] cannot be the same.') },
-            min             : { func: validMin,          message: localizeKeepPlaceholders('Minimum of [_1] characters required.') },
-            length          : { func: validLength,       message: localizeKeepPlaceholders('You should enter [_1] characters.') },
+            not_equal       : { func: validNotEqual,     message: '' },
+            min             : { func: validMin,          message: '' },
+            length          : { func: validLength,       message: '' },
             number          : { func: validNumber,       message: '' },
             regular         : { func: validRegular,      message: '' },
             tax_id          : { func: validTaxID,        message: localize('Should start with letter or number, and may contain hyphen and underscore.') },
@@ -336,11 +334,12 @@ const Validation = (() => {
             if (!field.is_ok) {
                 message = options.message || ValidatorsMap.get(type).message;
                 if (type === 'length') {
-                    message = template(message, [options.min === options.max ? options.min : `${options.min}-${options.max}`]);
+                    const length_value = options.min === options.max ? options.min : `${options.min}-${options.max}`;
+                    message = localize('You should enter {{length}} characters.', { length: length_value });
                 } else if (type === 'min') {
-                    message = template(message, [options.min]);
+                    message = localize('Minimum of {{min}} characters required.', { min: options.min });
                 } else if (type === 'not_equal') {
-                    message = template(message, [options.name1, options.name2]);
+                    message = localize('{{name1}} and {{name2}} cannot be the same.', { name1: options.name1, name2: options.name2 });
                 }
                 all_is_ok = false;
                 return true; // break on the first error found

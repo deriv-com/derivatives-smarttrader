@@ -136,7 +136,7 @@ const Purchase = (() => {
                             if (has_professional_requested) {
                                 message = localize('Your application to be treated as a professional client is being processed.');
                             } else if (has_professional_rejected) {
-                                const message_text = `${localize('Your professional client request is [_1]not approved[_2].', ['<strong>', '</strong>'])}<br />${localize('Please reapply once the required criteria has been fulfilled.')}<br /><br />${localize('More information can be found in an email sent to you.')}`;
+                                const message_text = `${localize('Your professional client request is <strong>not approved</strong>.')}<br />${localize('Please reapply once the required criteria has been fulfilled.')}<br /><br />${localize('More information can be found in an email sent to you.')}`;
                                 const button_text  = localize('I want to reapply');
 
                                 message = prepareConfirmationErrorCta(message_text, button_text, true);
@@ -149,7 +149,7 @@ const Purchase = (() => {
                         } else if (/RestrictedCountry/.test(error.code)) {
                             let additional_message = '';
                             if (/FinancialBinaries/.test(error.code)) {
-                                additional_message = localize('Try our [_1]Synthetic Indices[_2].', [`<a href="${Url.urlFor('get-started/binary-options', 'anchor=synthetic-indices#range-of-markets')}" >`, '</a>']);
+                                additional_message = localize('Try our <a href="{{url}}">Synthetic Indices</a>.', { url: Url.urlFor('get-started/binary-options', 'anchor=synthetic-indices#range-of-markets') });
                             } else if (/Random/.test(error.code)) {
                                 additional_message = localize('Try our other markets.');
                             }
@@ -158,7 +158,7 @@ const Purchase = (() => {
                         } else if (/ClientUnwelcome/.test(error.code) && /gb/.test(Client.get('residence'))) {
                             const account_type = getAccountType();
                             if (account_type === 'demo') {
-                                message = localize('Please complete the [_1]Real Account form[_2] to verify your age as required by the [_3]UK Gambling[_4] Commission (UKGC).', [`<a href='${Url.urlFor('new_account/realws')}'>`, '</a>', '<strong>', '</strong>']);
+                                message = localize('Please complete the <a href="{{url}}">Real Account form</a> to verify your age as required by the <strong>UK Gambling</strong> Commission (UKGC).', { url: Url.urlFor('new_account/realws') });
                             } else if (account_type === 'real' && /^virtual|iom$/i.test(Client.get('landing_company_shortcode'))) {
                                 message = localize('Account access is temporarily limited. Please check your inbox for more details.');
                             } else {

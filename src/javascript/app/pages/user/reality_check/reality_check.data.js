@@ -22,17 +22,17 @@ const RealityCheckData = (() => {
         const current_time = moment.utc();
 
         const session_duration = moment.duration(current_time.diff(start_time));
-        const duration_string  = localize('[_1] days [_2] hours [_3] minutes', [
-            session_duration.get('days'),
-            session_duration.get('hours'),
-            session_duration.get('minutes'),
-        ]);
+        const duration_string  = localize('{{days}} days {{hours}} hours {{minutes}} minutes', {
+            days   : session_duration.get('days'),
+            hours  : session_duration.get('hours'),
+            minutes: session_duration.get('minutes'),
+        });
 
         const turnover    = +(data.buy_amount) + (+(data.sell_amount));
         const profit_loss = +(data.sell_amount) - (+(data.buy_amount));
 
         return {
-            start_time_string: localize('Your trading statistics since [_1].', `${start_time.format('YYYY-MM-DD HH:mm:ss')} GMT`),
+            start_time_string: localize('Your trading statistics since {{time}}.', { time: `${start_time.format('YYYY-MM-DD HH:mm:ss')} GMT` }),
             login_time       : `${start_time.format('YYYY-MM-DD HH:mm:ss')} GMT`,
             current_time     : `${current_time.format('YYYY-MM-DD HH:mm:ss')} GMT`,
             session_duration : duration_string,
