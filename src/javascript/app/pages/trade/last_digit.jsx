@@ -30,7 +30,7 @@ const LastDigit = () => (
         <div id='last_digit_histo' className='gr-8 gr-12-m gr-centered' />
         <div id='last_digit_title' className='gr-hide'>
             <span id='digit_domain' />
-            - {parse(localize('Last digit stats for the latest [_1] ticks on [_2]', ['<span id="digit_info_count">100</span>', '<span id="digit_info_underlying" />']))}
+            - {parse(localize('Last digit stats for the latest {{count}} ticks on {{underlying}}', { count: '<span id="digit_info_count">100</span>', underlying: '<span id="digit_info_underlying" />' }))}
         </div>
     </div>
 );

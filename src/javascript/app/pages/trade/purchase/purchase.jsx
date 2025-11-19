@@ -332,7 +332,7 @@ const Purchase = () => {
                                             <Text size='sm'>{data?.error?.message}</Text>
                                             <Text size='sm'>{
                                                 parse(
-                                                    localize('Do you want to top up for another [_1]? If not, you can do this later on the [_2]Cashier page[_3], too.', ['$10,000.00', '<a id=\'top_up_cashier_redirect\' href=\'\'>', '</a>'])
+                                                    localize('Do you want to top up for another {{amount}}? If not, you can do this later on the <a id="top_up_cashier_redirect" href="">Cashier page</a>, too.', { amount: '$10,000.00' })
                                                 )}
                                             </Text>
                                             <Button

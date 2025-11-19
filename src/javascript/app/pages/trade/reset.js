@@ -34,10 +34,10 @@ const Reset = (() => {
         }
 
         CommonFunctions.getElementById('reset_time')
-            .html(localize('The reset time is [_1]', reset_time_str))
+            .html(localize('The reset time is {{reset_time}}', { reset_time: reset_time_str }))
             .setAttribute('style', '');
         dataManager.setTrade({
-            reset_message: localize('The reset time is [_1]', reset_time_str),
+            reset_message: localize('The reset time is {{reset_time}}', { reset_time: reset_time_str }),
         });
     };
 

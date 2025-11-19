@@ -239,7 +239,7 @@ const Page = (() => {
         if (server && server.length > 0) {
             const message = `${(isProduction() ? '' :
                 `${localize('This is a staging server - For testing purposes only')} - `)}
-                ${localize('The server <a href="[_1]">endpoint</a> is: [_2]', [Url.urlFor('endpoint'), server])}`;
+                ${localize('The server <a href="{{endpoint_url}}">endpoint</a> is: {{server}}', { endpoint_url: Url.urlFor('endpoint'), server })}`;
 
             const end_note = getElementById('end-note');
             elementInnerHtml(end_note, message);
@@ -256,8 +256,8 @@ const Page = (() => {
             l      : Language.get().toLowerCase(),
             url    : 'https://browsehappy.com/',
             noclose: true, // Do not show the 'ignore' button to close the notification
-            text   : localize('Your web browser ([_1]) is out of date and may affect your trading experience. Proceed at your own risk. [_2]Update browser[_3]',
-                ['{brow_name}', '<a href="https://browsehappy.com/" target="_blank">', '</a>']),
+            text   : localize('Your web browser ({{browser_name}}) is out of date and may affect your trading experience. Proceed at your own risk. <a href="{{url}}" target="_blank">Update browser</a>',
+                { browser_name: '{brow_name}', url: 'https://browsehappy.com/' }),
             reminder: 0, // show all the time
         };
         if (document.body) {

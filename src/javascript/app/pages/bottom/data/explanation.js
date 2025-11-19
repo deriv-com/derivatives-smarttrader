@@ -140,8 +140,8 @@ export const contract_explanation_data = {
             
             get content() {
                 return [
-                    localize('If you select [_1]"High Tick"[_2], you win the payout if the selected tick is the [_1]highest among the next five ticks[_2].', ['<strong>', '</strong>']),
-                    localize('If you select [_1]"Low Tick"[_2], you win the payout if the selected tick is the [_1]lowest among the next five ticks[_2].', ['<strong>', '</strong>']),
+                    localize('If you select <strong>"High Tick"</strong>, you win the payout if the selected tick is the <strong>highest among the next five ticks</strong>.'),
+                    localize('If you select <strong>"Low Tick"</strong>, you win the payout if the selected tick is the <strong>lowest among the next five ticks</strong>.'),
                 ];
             },
         },
@@ -149,8 +149,8 @@ export const contract_explanation_data = {
             
             get content() {
                 return [
-                    localize('If you select [_1]"Only Ups"[_2], you win the payout if consecutive ticks rise successively after the [_1]entry spot[_2].[_3]No payout if any tick falls or is equal to any of the previous ticks.', ['<strong>', '</strong>', '<br />']),
-                    localize('If you select [_1]"Only Downs"[_2], you win the payout if consecutive ticks fall successively after the [_1]entry spot[_2].[_3]No payout if any tick rises or is equal to any of the previous ticks.', ['<strong>', '</strong>', '<br />']),
+                    localize('If you select <strong>"Only Ups"</strong>, you win the payout if consecutive ticks rise successively after the <strong>entry spot</strong>.<br />No payout if any tick falls or is equal to any of the previous ticks.'),
+                    localize('If you select <strong>"Only Downs"</strong>, you win the payout if consecutive ticks fall successively after the <strong>entry spot</strong>.<br />No payout if any tick rises or is equal to any of the previous ticks.'),
                 ];
             },
         },
@@ -282,13 +282,13 @@ export const contract_explanation_data = {
             title: localize('Entry spot') ,
             get content() {
                 return [
-                    localize('The [_1]start time[_2] is when the contract has been processed by our servers and the [_1]entry spot[_2] is the [_1]next tick[_2] thereafter.', ['<strong>', '</strong>']),
+                    localize('The <strong>start time</strong> is when the contract has been processed by our servers and the <strong>entry spot</strong> is the <strong>next tick</strong> thereafter.'),
                 ];
             },
             get title_secondary() { return localize('Exit Spot'); },
             get content_secondary() {
                 return [
-                    localize('The [_1]exit spot[_2] is the last tick when the contract ends. Contract ends when all ticks rise or fall successively, or when a single tick breaks the predicted pattern.', ['<strong>', '</strong>']),
+                    localize('The <strong>exit spot</strong> is the last tick when the contract ends. Contract ends when all ticks rise or fall successively, or when a single tick breaks the predicted pattern.'),
                 ];
             },
         },
