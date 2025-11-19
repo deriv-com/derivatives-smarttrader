@@ -141,7 +141,8 @@ const AppProvider = ({ children }) => {
     // Helper function to get account type display name
     const getAccountTypeDisplay = () => {
         if (!isLoggedIn) return '';
-        return Client.getAccountTitle(accountInfo.loginid);
+        const accountType = getAccountType();
+        return accountType.charAt(0).toUpperCase() + accountType.slice(1);
     };
 
     // Toggle mobile menu

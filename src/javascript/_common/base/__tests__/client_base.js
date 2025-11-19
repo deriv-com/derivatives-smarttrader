@@ -44,49 +44,6 @@ describe('ClientBase', () => {
     });
 
 
-    describe('.getAccountType()', () => {
-        it('works as expected', () => {
-            expect(Client.getAccountType(loginid_virtual)).to.eq('virtual');
-            expect(Client.getAccountType(loginid_real)).to.eq(undefined);
-            expect(Client.getAccountType(loginid_gaming)).to.eq('gaming');
-            expect(Client.getAccountType(loginid_financial)).to.eq('financial');
-        });
-    });
-
-    describe('.isAccountOfType()', () => {
-        it('works as expected', () => {
-            expect(Client.isAccountOfType('virtual', loginid_virtual)).to.eq(true);
-            expect(Client.isAccountOfType('real', loginid_real)).to.eq(true);
-        });
-    });
-
-    describe('.getAccountOfType()', () => {
-        it('works as expected', () => {
-            // In single-account system, we work with current account only
-            Client.set('loginid', loginid_virtual);
-            expect(Client.getAccountOfType('virtual')).to.not.eq(undefined);
-            Client.set('loginid', loginid_real);
-            expect(Client.getAccountOfType('real')).to.not.eq(undefined);
-            Client.set('loginid', loginid_financial);
-            expect(Client.getAccountOfType('financial')).to.not.eq(undefined);
-        });
-        it('doesn\'t return disabled account if enabled_only flag is set', () => {
-            Client.set('is_disabled', 1);
-            expect(Client.getAccountOfType('financial', 1)).to.deep.eq({});
-        });
-    });
-
-    describe('.hasAccountType()', () => {
-        it('works as expected', () => {
-            Client.set('loginid', loginid_financial);
-            expect(Client.hasAccountType('financial')).to.eq(true);
-        });
-        it('doesn\'t return disabled account if enabled_only flag is set', () => {
-            Client.set('is_disabled', 1);
-            expect(Client.hasAccountType('financial', 1)).to.eq(false);
-        });
-    });
-
     describe('.hasCurrencyType()', () => {
         it('works as expected', () => {
             Client.clearAllAccounts();
@@ -142,13 +99,6 @@ describe('ClientBase', () => {
             expect(upgrade_info.can_upgrade_to).to.deep.equal(['maltainvest']);
             expect(upgrade_info.type).to.deep.equal(['financial']);
             expect(upgrade_info.can_open_multi).to.eq(false);
-        });
-    });
-
-    describe('.getLandingCompanyValue()', () => {
-        it('works as expected', () => {
-            expect(Client.getLandingCompanyValue(loginid_financial, landing_company.landing_company, 'name')).to.eq(landing_company.landing_company.financial_company.name);
-            expect(Client.getLandingCompanyValue(loginid_gaming, landing_company.landing_company, 'name')).to.eq(landing_company.landing_company.gaming_company.name);
         });
     });
 

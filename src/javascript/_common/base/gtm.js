@@ -9,7 +9,7 @@ const getLanguage      = require('../language').get;
 const State            = require('../storage').State;
 const getPropertyValue = require('../utility').getPropertyValue;
 const isLoginPages     = require('../utility').isLoginPages;
-const getAppId         = require('../../config').getAppId;
+const { getAppId, getAccountType } = require('../../config');
 
 const GTM = (() => {
     const isGtmApplicable = () => (/^(1|1098|14473|15284|16303|15265|16929)$/.test(getAppId()));
@@ -61,7 +61,7 @@ const GTM = (() => {
         const moment_now = window.time || moment().utc();
         const data = {
             visitorId         : ClientBase.get('loginid'),
-            bom_account_type  : ClientBase.getAccountType(),
+            bom_account_type  : getAccountType(),
             bom_currency      : ClientBase.get('currency'),
             bom_country       : get_settings.country,
             bom_country_abbrev: get_settings.country_code,
@@ -151,10 +151,6 @@ const GTM = (() => {
 
         gtm_data[`mt5_${acc_type}_id`] = response.mt5_new_account.login;
 
-        if (/demo/.test(acc_type) && !ClientBase.get('is_virtual')) {
-            gtm_data.visitorId = ClientBase.getAccountOfType('virtual').loginid;
-        }
-
         pushDataLayer(gtm_data);
     };
 
@@ -179,7 +175,7 @@ const GTM = (() => {
         if (!transactions_arr.includes(response.transaction.transaction_id)) {
             const data = {
                 event           : 'transaction',
-                bom_account_type: ClientBase.getAccountType(),
+                bom_account_type: getAccountType(),
                 bom_today       : moment_now.unix(),
                 transaction     : {
                     id     : response.transaction.transaction_id,

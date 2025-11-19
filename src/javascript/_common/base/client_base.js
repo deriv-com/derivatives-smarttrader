@@ -6,8 +6,6 @@ const SocketCache                  = require('./socket_cache');
 const LocalStore                   = require('../storage').LocalStore;
 const SessionStore                 = require('../storage').SessionStore;
 const State                        = require('../storage').State;
-const getPropertyValue             = require('../utility').getPropertyValue;
-const isEmptyObject                = require('../utility').isEmptyObject;
 
 const ClientBase = (() => {
     const storage_key = 'current_account';
@@ -89,31 +87,6 @@ const ClientBase = (() => {
 
     const getCurrentAccount = () => LocalStore.getObject(storage_key) || {};
 
-    const getAccountType = (loginid = current_loginid) => {
-        let account_type;
-        if (/^VR/.test(loginid))          account_type = 'virtual';
-        else if (/^MF/.test(loginid))     account_type = 'financial';
-        else if (/^MLT|MX/.test(loginid)) account_type = 'gaming';
-        return account_type;
-    };
-
-    const isAccountOfType = (type, loginid = current_loginid, only_enabled = false) => {
-        const this_type   = getAccountType(loginid);
-        return ((
-            (type === 'virtual' && this_type === 'virtual') ||
-            (type === 'real'    && this_type !== 'virtual') ||
-            type === this_type) &&
-            (only_enabled ? !get('is_disabled') : true));
-    };
-
-    const getAccountOfType = (type, only_enabled) => {
-        const loginid = current_account.loginid;
-        return (loginid && isAccountOfType(type, loginid, only_enabled)) ?
-            Object.assign({ loginid }, current_account) : {};
-    };
-
-    const hasAccountType = (type, only_enabled) => !isEmptyObject(getAccountOfType(type, only_enabled));
-
     // only considers currency of real money accounts
     // @param {String} type = crypto|fiat
     const hasCurrencyType = (type) => {
@@ -138,31 +111,6 @@ const ClientBase = (() => {
         }
 
         return get('currency') && !isCryptocurrency(get('currency'));
-    };
-
-    const TypesMapConfig = (() => {
-        let types_map_config;
-
-        const initTypesMap = () => ({
-            default  : localize('Real'),
-            financial: localize('Investment'),
-            gaming   : localize('Gaming'),
-            virtual  : localize('Virtual'),
-        });
-
-        return {
-            get: () => {
-                if (!types_map_config) {
-                    types_map_config = initTypesMap();
-                }
-                return types_map_config;
-            },
-        };
-    })();
-
-    const getAccountTitle = loginid => {
-        const types_map = TypesMapConfig.get();
-        return (types_map[getAccountType(loginid)] || types_map.default);
     };
 
     /**
@@ -298,20 +246,11 @@ const ClientBase = (() => {
 
     const getBasicUpgradeInfo = () => {
         const upgradeable_landing_companies = State.getResponse('authorize.upgradeable_landing_companies');
-        const landing_company_obj = State.getResponse('landing_company');
 
-        let can_open_multi = false;
         let can_upgrade_to = [];
         let type;
         if ((upgradeable_landing_companies || []).length) {
             const current_landing_company = get('landing_company_shortcode');
-            let allowed_currencies = [];
-            if (current_loginid) {
-                allowed_currencies = getLandingCompanyValue(current_loginid, landing_company_obj, 'legal_allowed_currencies');
-            }
-            // create multiple accounts only available for landing companies with legal_allowed_currencies
-            can_open_multi = !!(upgradeable_landing_companies.indexOf(current_landing_company) !== -1 &&
-            (allowed_currencies && allowed_currencies.length));
 
             // only show upgrade message to landing companies other than current
             const canUpgrade = (...landing_companies) => {
@@ -333,35 +272,10 @@ const ClientBase = (() => {
 
         return {
             type,
-            can_upgrade: !!can_upgrade_to.length,
+            can_upgrade   : !!can_upgrade_to.length,
             can_upgrade_to,
-            can_open_multi,
+            can_open_multi: false,
         };
-    };
-
-    const getLandingCompanyValue = (loginid, landing_company, key) => {
-        let landing_company_object;
-        if (loginid.financial || isAccountOfType('financial', loginid)) {
-            landing_company_object = getPropertyValue(landing_company, 'financial_company');
-        } else if (loginid.real || isAccountOfType('real', loginid)) {
-            landing_company_object = getPropertyValue(landing_company, 'gaming_company');
-
-            // handle accounts that don't have gaming company
-            if (!landing_company_object) {
-                landing_company_object = getPropertyValue(landing_company, 'financial_company');
-            }
-        } else {
-            const financial_company = (getPropertyValue(landing_company, 'financial_company') || {})[key] || [];
-            const gaming_company    = (getPropertyValue(landing_company, 'gaming_company') || {})[key] || [];
-
-            landing_company_object = Array.isArray(financial_company) ?
-                financial_company.concat(gaming_company)
-                :
-                $.extend({}, financial_company, gaming_company);
-
-            return landing_company_object;
-        }
-        return (landing_company_object || {})[key];
     };
 
     // API_V3: send a list of accounts the client can transfer to
@@ -469,17 +383,12 @@ const ClientBase = (() => {
         get,
         setTotalBalance,
         getTotalBalance,
-        getAccountType,
-        isAccountOfType,
         isHighRisk,
         isLowRisk,
         isOptionsBlocked,
         isOfferingBlocked,
-        getAccountOfType,
-        hasAccountType,
         hasCurrencyType,
         hasOnlyCurrencyType,
-        getAccountTitle,
         responseAuthorizeSessionToken,
         clearAllAccounts,
         setNewAccount,
@@ -487,7 +396,6 @@ const ClientBase = (() => {
         getCurrentAccount,
         getMT5AccountDisplays,
         getBasicUpgradeInfo,
-        getLandingCompanyValue,
         canTransferFunds,
         hasSvgAccount,
         canChangeCurrency,
