@@ -132,7 +132,7 @@ export const contract_explanation_data = {
                 return [
                     localize('If you select "Reset-Call", you win the payout if the exit spot is strictly higher than either the entry spot or the spot at reset time.'),
                     localize('If you select "Reset-Put", you win the payout if the exit spot is strictly lower than either the entry spot or the spot at reset time.'),
-                    localize('If the <strong>exit spot</strong> is equal to the <strong>barrier</strong> or the <stronm g>new barrier (if a reset occurs)</stronmg>, you don\'t win the payout.'),
+                    localize('If the <strong>exit spot</strong> is equal to the <strong>barrier</strong> or the <strong>new barrier (if a reset occurs)</strong>, you don\'t win the payout.'),
                 ];
             },
         },
@@ -163,13 +163,13 @@ export const contract_explanation_data = {
     },
     explain: {
         asian: {
-            title: localize('Entry Spot') ,
+            get title() { return localize('Entry Spot'); },
             get content() {
                 return [
                     localize('The entry spot is the first tick after the contract is processed by our servers.'),
                 ];
             },
-            title_secondary: localize('The Average') ,
+            get title_secondary() { return localize('The Average'); },
             get content_secondary() {
                 return [
                     localize('The average is the average of the ticks, including the entry spot and the last tick.'),
@@ -177,7 +177,7 @@ export const contract_explanation_data = {
             },
         },
         digits: {
-            title: localize('Entry Spot') ,
+            get title() { return localize('Entry Spot'); },
             get content() {
                 return [
                     localize('The entry spot is the first tick after the contract is processed by our servers.'),
@@ -185,7 +185,7 @@ export const contract_explanation_data = {
             },
         },
         endsinout: {
-            title: localize('Exit spot') ,
+            get title() { return localize('Exit spot'); },
             get content() {
                 return [
                     localize('The <strong>exit spot</strong> is the latest tick at or before the <strong>end time</strong>.'),
@@ -195,7 +195,7 @@ export const contract_explanation_data = {
             },
         },
         evenodd: {
-            title: localize('Entry Spot') ,
+            get title() { return localize('Entry Spot'); },
             get content() {
                 return [
                     localize('The entry spot is the first tick after the contract is processed by our servers.'),
@@ -203,7 +203,7 @@ export const contract_explanation_data = {
             },
         },
         higherlower: {
-            title: localize('Exit spot') ,
+            get title() { return localize('Exit spot'); },
             get content() {
                 return [
                     localize('The <strong>exit spot</strong> is the latest tick at or before the <strong>end time</strong>.'),
@@ -213,7 +213,7 @@ export const contract_explanation_data = {
             },
         },
         overunder: {
-            title: localize('Entry Spot') ,
+            get title() { return localize('Entry Spot'); },
             get content() {
                 return [
                     localize('The entry spot is the first tick after the contract is processed by our servers.'),
@@ -221,14 +221,14 @@ export const contract_explanation_data = {
             },
         },
         risefall: {
-            title: localize('Entry spot') ,
+            get title() { return localize('Entry spot'); },
             get content() {
                 return [
                     localize('The <strong>start time</strong> is when the contract is processed by our servers and the <strong>entry spot</strong> is the <strong>next tick</strong> thereafter.'),
                     localize('If you select a <strong>start time</strong> in the future, the <strong>start time</strong> is that which is selected and the <strong>entry spot</strong> is the price in effect at that time.'),
                 ];
             },
-            title_secondary: localize('Exit spot') ,
+            get title_secondary() { return localize('Exit spot'); },
             get content_secondary() {
                 return [
                     localize('The <strong>exit spot</strong> is the latest tick at or before the <strong>end time</strong>.'),
@@ -239,7 +239,7 @@ export const contract_explanation_data = {
         },
 
         staysinout: {
-            title: localize('Contract period') ,
+            get title() { return localize('Contract period'); },
             get content() {
                 return [
                     localize('The <strong>contract period</strong> is the period between the <strong>next tick</strong> after the <strong>start time</strong> and the <strong>end time</strong>.'),
@@ -249,7 +249,7 @@ export const contract_explanation_data = {
             },
         },
         touchnotouch: {
-            title: localize('Contract period') ,
+            get title() { return localize('Contract period'); },
             get content() {
                 return [
                     localize('The <strong>contract period</strong> is the period between the <strong>next tick</strong> after the <strong>start time</strong> and the <strong>end time</strong>.'),
@@ -259,7 +259,7 @@ export const contract_explanation_data = {
             },
         },
         reset: {
-            title: localize('Reset Time') ,
+            get title() { return localize('Reset Time'); },
             get content() {
                 return [
                     localize('At reset time, if the spot is in the opposite direction of your prediction, the barrier is reset to that spot.'),
@@ -271,7 +271,7 @@ export const contract_explanation_data = {
             },
         },
         highlowticks: {
-            title: localize('Entry Spot') ,
+            get title() { return localize('Entry Spot'); },
             get content() {
                 return [
                     localize('The entry spot is the first tick after the contract is processed by our servers.'),
@@ -279,7 +279,7 @@ export const contract_explanation_data = {
             },
         },
         runs: {
-            title: localize('Entry spot') ,
+            get title() { return localize('Entry spot'); },
             get content() {
                 return [
                     localize('The <strong>start time</strong> is when the contract has been processed by our servers and the <strong>entry spot</strong> is the <strong>next tick</strong> thereafter.'),
