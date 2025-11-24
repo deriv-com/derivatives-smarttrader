@@ -5,20 +5,6 @@ import { localize } from '@deriv-com/translations';
 import { StandaloneCircleInfoRegularIcon } from '@deriv/quill-icons/Standalone';
 import { parseData, TimeTooltipWrapper, triggerClick } from '../../../common/helpers';
 
-// Helper to re-translate messages that may contain localize() calls
-const translateMessage = (message) => {
-    if (!message) return message;
-    
-    // Check if message contains untranslated localize patterns
-    const localizePattern = /localize\(['"]([^'"]+)['"]\)/g;
-    if (localizePattern.test(message)) {
-        // Re-translate by replacing localize() calls with actual translations
-        return message.replace(/localize\(['"]([^'"]+)['"]\)/g, (match, key) => localize(key));
-    }
-    
-    return message;
-};
-
 const ContractTable = ({ data }) => (
     <div className='contract-info-wrapper'>
         <div className='table-box'>
@@ -218,7 +204,7 @@ const ContractTable = ({ data }) => (
                             className='info-msg'
                             size='sm'
                             status='info'
-                            message={parseData(translateMessage(data.cd_sell_msg))}
+                            message={parseData(data.cd_sell_msg)}
                         />
                     </div>
                 )}
@@ -230,7 +216,7 @@ const ContractTable = ({ data }) => (
                         className='info-msg'
                         size='sm'
                         status='info'
-                        message={parseData(translateMessage(data.cd_info_msg))}
+                        message={parseData(data.cd_info_msg)}
                     />
                 </div>
             )
@@ -250,7 +236,7 @@ const ContractTable = ({ data }) => (
                         className='info-msg'
                         size='sm'
                         status='warning'
-                        message={parseData(translateMessage(data.cd_error_msg))}
+                        message={parseData(data.cd_error_msg)}
                     />
                 )}
                 {data?.cd_sell_info && (
@@ -258,7 +244,7 @@ const ContractTable = ({ data }) => (
                         className='info-msg'
                         size='sm'
                         status='info'
-                        message={parseData(translateMessage(data.cd_sell_info))}
+                        message={parseData(data.cd_sell_info)}
                         icon={<StandaloneCircleInfoRegularIcon iconSize='sm' />}
                     />
                 )}

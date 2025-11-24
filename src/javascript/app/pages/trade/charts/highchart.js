@@ -10,6 +10,7 @@ const ViewPopupUI          = require('../../user/view_popup/view_popup.ui');
 const BinarySocket         = require('../../../base/socket');
 const addComma             = require('../../../common/currency').addComma;
 const State                = require('../../../../_common/storage').State;
+const { mapErrorMessage }  = require('../../../../_common/error_mapper');
 const getPropertyValue     = require('../../../../_common/utility').getPropertyValue;
 const isEmptyObject        = require('../../../../_common/utility').isEmptyObject;
 const generateSymbolDisplayName = require('../../../common/active_symbols').generateSymbolDisplayName;
@@ -299,7 +300,7 @@ const Highchart = (() => {
                 }
             }
         } else if (type === 'ticks_history' && error) {
-            HighchartUI.showError('', error.message);
+            HighchartUI.showError('', mapErrorMessage(error));
         }
     };
 

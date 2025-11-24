@@ -7,6 +7,7 @@ const addComma             = require('../../../_common/base/currency_base').addC
 const elementTextContent   = require('../../../_common/common_functions').elementTextContent;
 const getElementById       = require('../../../_common/common_functions').getElementById;
 const isVisible            = require('../../../_common/common_functions').isVisible;
+const { mapErrorMessage }  = require('../../../_common/error_mapper');
 
 /*
  * Tick object handles all the process/display related to tick streaming
@@ -37,7 +38,7 @@ const Tick = (() => {
 
         if (data) {
             if (data.error) {
-                error_message = data.error.message;
+                error_message = mapErrorMessage(data.error);
             } else {
                 const all_underlyings = underlyings();
                 Object.keys(all_underlyings).forEach(key => {

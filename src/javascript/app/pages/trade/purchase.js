@@ -7,6 +7,7 @@ const TickDisplay              = require('./tick_trade');
 const updateValues             = require('./update_values');
 const Client                   = require('../../base/client');
 const Login                    = require('../../../_common/base/login');
+const { mapErrorMessage }      = require('../../../_common/error_mapper');
 const { getBrandSignupUrl }    = require('../../../../templates/_common/brand.config');
 const BinarySocket             = require('../../base/socket');
 const formatMoney              = require('../../common/currency').formatMoney;
@@ -93,7 +94,7 @@ const Purchase = (() => {
 
                 message_container.hide();
                 confirmation_error.setVisibility(1);
-                CommonFunctions.elementInnerHtml(confirmation_error, error.message);
+                CommonFunctions.elementInnerHtml(confirmation_error, mapErrorMessage(error));
                 
                 dataManager.setPurchase({
                     error: { ...error },
@@ -127,7 +128,7 @@ const Purchase = (() => {
                 } else {
                     BinarySocket.wait('get_account_status').then(response => {
                         confirmation_error.setVisibility(1);
-                        let message = error.message;
+                        let message = mapErrorMessage(error);
                       
                         if (/NoMFProfessionalClient/.test(error.code)) {
                             const account_status = getPropertyValue(response, ['get_account_status', 'status']) || [];
@@ -136,7 +137,7 @@ const Purchase = (() => {
                             if (has_professional_requested) {
                                 message = localize('Your application to be treated as a professional client is being processed.');
                             } else if (has_professional_rejected) {
-                                const message_text = `${localize('Your professional client request is <strong>not approved</strong>.')}<br />${localize('Please reapply once the required criteria has been fulfilled.')}<br /><br />${localize('More information can be found in an email sent to you.')}`;
+                                const message_text = localize('Your professional client request is <strong>not approved</strong>.<br />Please reapply once the required criteria has been fulfilled.<br /><br />More information can be found in an email sent to you.');
                                 const button_text  = localize('I want to reapply');
 
                                 message = prepareConfirmationErrorCta(message_text, button_text, true);
@@ -154,7 +155,7 @@ const Purchase = (() => {
                                 additional_message = localize('Try our other markets.');
                             }
 
-                            message = `${error.message}. ${additional_message}`;
+                            message = `${mapErrorMessage(error)}. ${additional_message}`;
                         } else if (/ClientUnwelcome/.test(error.code) && /gb/.test(Client.get('residence'))) {
                             const account_type = getAccountType();
                             if (account_type === 'demo') {
@@ -162,7 +163,7 @@ const Purchase = (() => {
                             } else if (account_type === 'real' && /^virtual|iom$/i.test(Client.get('landing_company_shortcode'))) {
                                 message = localize('Account access is temporarily limited. Please check your inbox for more details.');
                             } else {
-                                message = error.message;
+                                message = mapErrorMessage(error);
                             }
                         }
 
