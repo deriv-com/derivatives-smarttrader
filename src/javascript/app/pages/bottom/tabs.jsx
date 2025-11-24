@@ -34,10 +34,11 @@ const BottomTabs = () => {
             // Update sessionStorage so old system knows which tab is active
             sessionStorage.setItem('currentAnalysisTab', tab_id);
             
-            // If it's the chart tab, directly call showChart
-            if (tab_id === 'tab_graph') {
-                WebtraderChart.showChart();
-            }
+            // Lazy load to avoid circular dependency
+            // Use the existing loadAnalysisTab function which handles all tab logic
+            import('../trade/analysis').then(({ default: TradingAnalysis }) => {
+                TradingAnalysis.loadAnalysisTab(tab_id);
+            });
         }
     };
 
@@ -69,10 +70,6 @@ const BottomTabs = () => {
     }, [has_last_digit]);
 
     useEffect(() => {
-        const opposite_tab = (selected_tab + 1) > 2 ? 0 : (selected_tab + 1);
-      
-        triggerOldTab(opposite_tab);
-
         trigger_old_tab_timer.current = setTimeout(() => {
             triggerOldTab(selected_tab);
         }, 100);
