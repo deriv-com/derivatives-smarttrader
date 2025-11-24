@@ -5,7 +5,6 @@ const Header                 = require('./header');
 const BinarySocket           = require('./socket');
 const updateBalance          = require('../pages/user/update_balance');
 const GTM                    = require('../../_common/base/gtm');
-const { mapErrorMessage }    = require('../../_common/error_mapper');
 const SubscriptionManager    = require('../../_common/base/subscription_manager').default;
 const LocalStore             = require('../../_common/storage').LocalStore;
 const State                  = require('../../_common/storage').State;
@@ -27,7 +26,7 @@ const BinarySocketGeneral = (() => {
             case 'authorize':
                 if (response.error) {
                     const is_active_tab = sessionStorage.getItem('active_tab') === '1';
-                    showNoticeMessage(mapErrorMessage(response.error));
+                    showNoticeMessage(response.error.message);
                     localStorage.removeItem('session_token');
                     
                     if (is_active_tab) {
@@ -68,7 +67,7 @@ const BinarySocketGeneral = (() => {
             case 'WrongResponse':
             case 'InternalServerError':
             case 'OutputValidationFailed': {
-                showNoticeMessage(mapErrorMessage(response.error));
+                showNoticeMessage(response.error.message);
                 break;
             }
             case 'RateLimit':
@@ -76,10 +75,10 @@ const BinarySocketGeneral = (() => {
                 break;
             case 'InvalidAppID':
                 //  Header.displayNotification(response.error.message, true, 'INVALID_APP_ID');
-                Header.displayNotification({ key: 'invalid_app_id', title: localize('Invalid app id'), message: mapErrorMessage(response.error), type: 'danger' });
+                Header.displayNotification({ key: 'invalid_app_id', title: localize('Invalid app id'), message: response.error.message, type: 'danger' });
                 break;
             case 'DisabledClient':
-                showNoticeMessage(mapErrorMessage(response.error));
+                showNoticeMessage(response.error.message);
                 break;
             // no default
         }

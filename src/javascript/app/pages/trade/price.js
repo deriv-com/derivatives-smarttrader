@@ -8,7 +8,6 @@ const Defaults             = require('./defaults');
 const BinarySocket         = require('../../base/socket');
 const formatMoney          = require('../../common/currency').formatMoney;
 const CommonFunctions      = require('../../../_common/common_functions');
-const { mapErrorMessage }  = require('../../../_common/error_mapper');
 const { getCurrencyDisplayCode } = require('../../../_common/base/currency_base');
 const  dataManager     = require('../../common/data_manager').default;
 const getPropertyValue     = require('../../../_common/utility').getPropertyValue;
@@ -228,10 +227,9 @@ const Price = (() => {
             comment.hide();
             setData();
             error.show();
-            const mapped_error = mapErrorMessage(details.error);
-            CommonFunctions.elementTextContent(error, mapped_error);
+            CommonFunctions.elementTextContent(error, details.error.message);
             dataManager.setPurchase({
-                [`${position}_comment`]: mapped_error,
+                [`${position}_comment`]: details.error.message,
             });
         } else {
             setData(proposal);

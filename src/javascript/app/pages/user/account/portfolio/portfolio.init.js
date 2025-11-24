@@ -1,4 +1,4 @@
-const { localize }        = require('@deriv-com/translations');
+const { localize } = require('@deriv-com/translations');
 const Portfolio           = require('./portfolio').Portfolio;
 const ViewPopup           = require('../../view_popup/view_popup');
 const Client              = require('../../../../base/client');
@@ -9,7 +9,6 @@ const SubscriptionManager = require('../../../../../_common/base/subscription_ma
 const urlParam            = require('../../../../../_common/url').param;
 const getPropertyValue    = require('../../../../../_common/utility').getPropertyValue;
 const showLoadingImage    = require('../../../../../_common/utility').showLoadingImage;
-const { mapErrorMessage } = require('../../../../../_common/error_mapper');
 
 const PortfolioInit = (() => {
     let values,
@@ -77,7 +76,7 @@ const PortfolioInit = (() => {
 
     const updatePortfolio = (data) => {
         if (getPropertyValue(data, 'error')) {
-            errorMessage(mapErrorMessage(data.error));
+            errorMessage(data.error.message);
             return;
         }
 
@@ -121,7 +120,7 @@ const PortfolioInit = (() => {
 
     const transactionResponseHandler = (response) => {
         if (getPropertyValue(response, 'error')) {
-            errorMessage(mapErrorMessage(response.error));
+            errorMessage(response.error.message);
         } else if (response.transaction.action === 'buy') {
             BinarySocket.send({ portfolio: 1 }).then((res) => {
                 updatePortfolio(res);
