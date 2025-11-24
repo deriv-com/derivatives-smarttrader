@@ -75,7 +75,7 @@ const mapErrorMessage = (error) => {
             );
         case 'CompanyWideLimitExceeded':
             return localize(
-                'No further trading is allowed on this contract type for the current trading session For more info, refer to our terms and conditions.'
+                'No further trading is allowed on this contract type for the current trading session. For more info, refer to our terms and conditions.'
             );
         case 'ContractAlreadySold':
             return localize('This contract has been sold.');
@@ -94,7 +94,7 @@ const mapErrorMessage = (error) => {
             return localize('Invalid contract update parameters.');
         case 'ContractUpdateNotAllowed':
             return localize(
-                'This contract cannot be updated once you\'ve made your purchase.This feature is not available for this contract type.'
+                'This contract cannot be updated once you\'ve made your purchase. This feature is not available for this contract type.'
             );
         case 'ContractUpdateTooFrequent':
             return localize('Only one update per second is allowed.');
@@ -370,7 +370,7 @@ const mapErrorMessage = (error) => {
             return localize('Trading is suspended due to missing market (old) data.');
         case 'OpenPositionLimit':
             return localize(
-                'Sorry, you cannot hold more than {{param_1}} contracts at a given time.Please wait until some contracts have closed and try again.',
+                'Sorry, you cannot hold more than {{param_1}} contracts at a given time. Please wait until some contracts have closed and try again.',
                 {
                     param_1: params[0],
                 }
@@ -507,7 +507,7 @@ const mapErrorMessage = (error) => {
             );
         case 'Suspendedlogin':
             return localize(
-                'We can\'t take you to your account right now due to system maintenance.Please try again later.'
+                'We can\'t take you to your account right now due to system maintenance. Please try again later.'
             );
         case 'SymbolMissingInBetMarketTable':
             return localize('Trading is suspended for this instrument.');
