@@ -248,6 +248,7 @@ const TradingAnalysis = (() => {
 
     return {
         bindAnalysisTabEvent,
+        loadAnalysisTab,
         onUnload,
         request: requestTradeAnalysis,
     };
