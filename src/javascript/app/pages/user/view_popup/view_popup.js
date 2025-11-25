@@ -327,11 +327,12 @@ const ViewPopup = (() => {
                     cd_entry_spot: is_sold_before_start ? '-' : contract.entry_spot,
                 });
             }
+
             const validation_msg = contract.validation_error && !is_unsupported_contract ?
-                mapErrorMessage({ message: contract.validation_error }) : '&nbsp;';
+                mapErrorMessage({ code: contract.validation_error_code }) : '&nbsp;';
             containerSetText('trade_details_message', validation_msg);
             const info_msg = contract.validation_error && !is_unsupported_contract ?
-                mapErrorMessage({ message: contract.validation_error }) : null;
+                mapErrorMessage({ code: contract.validation_error_code }) : null;
             dataManager.setPurchase({
                 cd_info_msg: info_msg,
             });
