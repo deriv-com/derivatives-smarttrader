@@ -327,11 +327,16 @@ const ViewPopup = (() => {
                     cd_entry_spot: is_sold_before_start ? '-' : contract.entry_spot,
                 });
             }
+            let validation_error_code = contract.validation_error_code;
+            if (!validation_error_code && contract.validation_error === 'Resale of this contract is not offered.') {
+                validation_error_code = 'ResaleNotOffered';
+            }
+
             const validation_msg = contract.validation_error && !is_unsupported_contract ?
-                mapErrorMessage({ code: contract.validation_error_code, message: contract.validation_error }) : '&nbsp;';
+                mapErrorMessage({ code: validation_error_code }) : '&nbsp;';
             containerSetText('trade_details_message', validation_msg);
             const info_msg = contract.validation_error && !is_unsupported_contract ?
-                mapErrorMessage({ code: contract.validation_error_code, message: contract.validation_error }) : null;
+                mapErrorMessage({ code: validation_error_code }) : null;
             dataManager.setPurchase({
                 cd_info_msg: info_msg,
             });
