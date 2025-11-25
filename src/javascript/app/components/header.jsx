@@ -75,6 +75,9 @@ const AccountInfo = () => {
 
     // Get account icon based on currency
     const getAccountIcon = () => {
+        if (accountInfo.accountType === 'demo') {
+            return Url.urlForStatic(`images/pages/header/ic-currency-virtual.svg?${BUILD_HASH}`);
+        }
         // Show default USD icon until actual currency is available
         const currency = accountInfo.currency ? accountInfo.currency.toLowerCase() : 'usd';
         return Url.urlForStatic(`images/pages/header/ic-currency-${currency}.svg?${BUILD_HASH}`);
