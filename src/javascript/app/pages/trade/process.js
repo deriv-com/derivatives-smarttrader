@@ -13,6 +13,7 @@ const Symbols           = require('./symbols');
 const Tick              = require('./tick');
 const NotAvailable      = require('./not-available.jsx');
 const BinarySocket       = require('../../base/socket');
+const { mapErrorMessage } = require('../../../_common/error_mapper');
 const { triggerMarketChange } = require('../../hooks/events');
 const dataManager       = require('../../common/data_manager.js').default;
 const isCryptocurrency  = require('../../common/currency').isCryptocurrency;
@@ -56,7 +57,7 @@ const Process = (() => {
                 console.error('Active symbols API error:', apiResponse.error);
                 NotAvailable.init({
                     title: localize('API Error'),
-                    body : localize(`Error loading market data: ${  apiResponse.error.message || 'Unknown error'}`),
+                    body : localize(`Error loading market data: ${mapErrorMessage(apiResponse.error) || 'Unknown error'}`),
                 });
                 return;
             }
@@ -284,7 +285,7 @@ const Process = (() => {
             const confirmation_error = getElementById('confirmation_error');
             confirmation_error.setVisibility(1);
             handleNotOfferedSymbol();
-            elementInnerHtml(confirmation_error, `${contracts.error.message} <a onclick="sessionStorage.removeItem('underlying'); window.location.reload();">${localize('Please reload the page')}</a>`);
+            elementInnerHtml(confirmation_error, `${mapErrorMessage(contracts.error)} <a onclick="sessionStorage.removeItem('underlying'); window.location.reload();">${localize('Please reload the page')}</a>`);
             hideLoading();
 
             return;
