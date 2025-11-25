@@ -1,6 +1,7 @@
 const { localize }             = require('@deriv-com/translations');
 const moment                   = require('moment');
 const ViewPopupUI              = require('./view_popup.ui');
+const { mapErrorMessage }      = require('../../../../_common/error_mapper');
 const Highchart                = require('../../trade/charts/highchart');
 const Callputspread            = require('../../trade/callputspread');
 const Defaults                 = require('../../trade/defaults');
@@ -77,7 +78,7 @@ const ViewPopup = (() => {
         // In case of error such as legacy shortcode, this call is returning the error message
         // but no error field. To specify those cases, we check for other fields existence
         if (!Utility.getPropertyValue(response, ['proposal_open_contract', 'shortcode'])) {
-            showErrorPopup(response, response.proposal_open_contract.validation_error);
+            showErrorPopup(response, mapErrorMessage(response.proposal_open_contract));
             return;
         }
 
@@ -326,9 +327,13 @@ const ViewPopup = (() => {
                     cd_entry_spot: is_sold_before_start ? '-' : contract.entry_spot,
                 });
             }
-            containerSetText('trade_details_message', contract.validation_error && !is_unsupported_contract ? contract.validation_error : '&nbsp;');
+            const validation_msg = contract.validation_error && !is_unsupported_contract ?
+                mapErrorMessage({ message: contract.validation_error }) : '&nbsp;';
+            containerSetText('trade_details_message', validation_msg);
+            const info_msg = contract.validation_error && !is_unsupported_contract ?
+                mapErrorMessage({ message: contract.validation_error }) : null;
             dataManager.setPurchase({
-                cd_info_msg: contract.validation_error && !is_unsupported_contract ? contract.validation_error : null,
+                cd_info_msg: info_msg,
             });
             if (is_unsupported_contract) {
                 const redirect_url = `https://home.deriv.${Utility.getTopLevelDomain()}`;
@@ -876,7 +881,8 @@ const ViewPopup = (() => {
     };
 
     const showErrorPopup = (response, localized_text) => {
-        showMessagePopup(localized_text || localize('Sorry, an error occurred while processing your request.'), localize('There was an error'), 'notice-msg');
+        const error_message = localized_text || mapErrorMessage(response.error) || localize('Sorry, an error occurred while processing your request.');
+        showMessagePopup(error_message, localize('There was an error'), 'notice-msg');
         // eslint-disable-next-line no-console
         console.log(response);
     };
@@ -942,7 +948,7 @@ const ViewPopup = (() => {
             .append($('<span/>', { text: localize('Contract will be sold at the prevailing market price when the request is received by our servers. This price may differ from the indicated price.') })));
 
         dataManager.setPurchase({
-            cd_sell_info: `<strong>${localize('Note')}</strong>: ${localize('Contract will be sold at the prevailing market price when the request is received by our servers. This price may differ from the indicated price.')}`,
+            cd_sell_info: localize('<strong>Note</strong>: Contract will be sold at the prevailing market price when the request is received by our servers. This price may differ from the indicated price.'),
             cd_show_sell: true,
         });
     };
@@ -967,9 +973,10 @@ const ViewPopup = (() => {
             if (response.error.code === 'NoOpenPosition') {
                 getContract();
             } else {
-                $container.find('#errMsg').text(response.error.message).setVisibility(1);
+                const error_message = mapErrorMessage(response.error);
+                $container.find('#errMsg').text(error_message).setVisibility(1);
                 dataManager.setPurchase({
-                    cd_error_msg: response.error.message,
+                    cd_error_msg: error_message,
                 });
             }
             sellSetVisibility(true);
@@ -997,7 +1004,7 @@ const ViewPopup = (() => {
     const responseProposal = (response) => {
         if (response.error) {
             if (response.error.code !== 'AlreadySubscribed' && +response.echo_req.contract_id === contract_id) {
-                showErrorPopup(response, response.error.message);
+                showErrorPopup(response, mapErrorMessage(response.error));
             }
             return;
         }
