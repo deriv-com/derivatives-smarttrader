@@ -1,5 +1,3 @@
-const { localize } = require('@deriv-com/translations');
-
 /**
  * Maps error subcodes to localized error messages
  * Parameters from code_args are passed directly to localize() as object literals
@@ -8,6 +6,10 @@ const { localize } = require('@deriv-com/translations');
  * @returns {string} Localized error message with parameters substituted
  */
 const mapErrorMessage = (error) => {
+    // Get localize function at runtime to ensure it's initialized
+    // eslint-disable-next-line global-require
+    const { localize } = require('@deriv-com/translations');
+    
     // If error object is null/undefined, return generic localized message
     if (!error) {
         return localize('An error occurred. Please try again later.');
