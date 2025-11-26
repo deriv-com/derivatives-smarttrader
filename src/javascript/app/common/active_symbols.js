@@ -1,3 +1,4 @@
+const { localize }  = require('@deriv-com/translations');
 const isEmptyObject = require('../../_common/utility').isEmptyObject;
 
 const submarket_order = {
@@ -47,27 +48,27 @@ const ActiveSymbols = (() => {
     const getDisplayName = (key) => {
         const displayNames = {
             'forex'           : 'Forex',
-            'indices'         : 'Stock Indices',
-            'cryptocurrency'  : 'Cryptocurrencies',
-            'commodities'     : 'Commodities',
+            'indices'         : localize('Stock Indices'),
+            'cryptocurrency'  : localize('Cryptocurrencies'),
+            'commodities'     : localize('Commodities'),
             'synthetic_index' : 'Derived',
             'synthetics'      : 'Synthetics',
             'baskets'         : 'Baskets',
-            'random_index'    : 'Continuous Indices',
-            'random_daily'    : 'Daily Reset Indices',
-            'crash_index'     : 'Crash/Boom Indices',
-            'jump_index'      : 'Jump Indices',
-            'step_index'      : 'Step Indices',
+            'random_index'    : localize('Continuous Indices'),
+            'random_daily'    : localize('Daily Reset Indices'),
+            'crash_index'     : localize('Crash/Boom Indices'),
+            'jump_index'      : localize('Jump Indices'),
+            'step_index'      : localize('Step Indices'),
             'forex_basket'    : 'Forex Basket',
             'commodity_basket': 'Commodities Basket',
-            'major_pairs'     : 'Major Pairs',
-            'minor_pairs'     : 'Minor Pairs',
-            'europe_OTC'      : 'European indices',
-            'asia_oceania_OTC': 'Asian indices',
-            'americas_OTC'    : 'American indices',
-            'metals'          : 'Metals',
-            'energy'          : 'Energy',
-            'non_stable_coin' : 'Cryptocurrencies',
+            'major_pairs'     : localize('Major Pairs'),
+            'minor_pairs'     : localize('Minor Pairs'),
+            'europe_OTC'      : localize('European indices'),
+            'asia_oceania_OTC': localize('Asian indices'),
+            'americas_OTC'    : localize('American indices'),
+            'metals'          : localize('Metals'),
+            'energy'          : localize('Energy'),
+            'non_stable_coin' : localize('Cryptocurrencies'),
         };
         return displayNames[key] || key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ');
     };
