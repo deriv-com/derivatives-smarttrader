@@ -1,4 +1,3 @@
-const { localize }  = require('@deriv-com/translations');
 const isEmptyObject = require('../../_common/utility').isEmptyObject;
 
 const submarket_order = {
@@ -28,6 +27,8 @@ const marketOrder = [
 const derived = ['baskets', 'synthetics'];
 
 const ActiveSymbols = (() => {
+    let localize;
+
     const groupBy = (xs, key) => (
         xs.reduce((rv, x) => {
             (rv[x[key]] = rv[x[key]] || []).push(x);
@@ -46,6 +47,11 @@ const ActiveSymbols = (() => {
     const clone = obj => extend({}, obj);
 
     const getDisplayName = (key) => {
+        if (!localize) {
+            // eslint-disable-next-line global-require
+            localize = require('@deriv-com/translations').localize;
+        }
+
         const displayNames = {
             'forex'           : 'Forex',
             'indices'         : localize('Stock Indices'),
