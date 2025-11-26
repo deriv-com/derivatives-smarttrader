@@ -74,12 +74,14 @@ const HeaderLeft = () => {
 const AccountInfo = () => {
     const { accountInfo, getFormattedBalance, getAccountTypeDisplay } = useApp();
 
+    // Show loading skeleton for entire account info until we have data from authorize
+    const isLoading = typeof accountInfo.balance === 'undefined' || !accountInfo.loginid;
+
     // Get account icon based on currency
     const getAccountIcon = () => {
         if (accountInfo.accountType === 'demo') {
             return Url.urlForStatic(`images/pages/header/ic-currency-virtual.svg?${BUILD_HASH}`);
         }
-        // Show default USD icon until actual currency is available
         const currency = accountInfo.currency ? accountInfo.currency.toLowerCase() : 'usd';
         return Url.urlForStatic(`images/pages/header/ic-currency-${currency}.svg?${BUILD_HASH}`);
     };
@@ -88,27 +90,41 @@ const AccountInfo = () => {
         <div className='acc-info__wrapper'>
             <div className='acc-info__separator mobile-hide' />
             <div className='account-info-wrapper'>
-                <div data-testid='dt_acc_info' id='dt_core_account-info_acc-info' className='acc-info'>
-                    <span className='acc-info__id'>
-                        <span className='acc-info__id-icon'>
-                            <img
-                                id='header__acc-icon'
-                                className='header__acc-icon'
-                                src={getAccountIcon()}
-                                alt={accountInfo.currency || 'USD'}
-                            />
+                {isLoading ? (
+                    <div data-testid='dt_acc_info' id='dt_core_account-info_acc-info' className='acc-info'>
+                        <span className='acc-info__id'>
+                            <span className='acc-info__id-icon'>
+                                <Skeleton.Square width={32} height={32} rounded />
+                            </span>
                         </span>
-                    </span>
-                    <div className='acc-info__content'>
-                        <div className='acc-info__account-type-header'>
-                            <p id='header__acc-type' className='acc-info__account-type'>
-                                {getAccountTypeDisplay()}
-                            </p>
-                        </div>
-                        <div className='acc-info__balance-section'>
-                            {typeof accountInfo.balance === 'undefined' ? (
+                        <div className='acc-info__content'>
+                            <div className='acc-info__account-type-header'>
+                                <Skeleton.Square width={60} height={16} />
+                            </div>
+                            <div className='acc-info__balance-section'>
                                 <Skeleton.Square width={100} height={20} />
-                            ) : (
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <div data-testid='dt_acc_info' id='dt_core_account-info_acc-info' className='acc-info'>
+                        <span className='acc-info__id'>
+                            <span className='acc-info__id-icon'>
+                                <img
+                                    id='header__acc-icon'
+                                    className='header__acc-icon'
+                                    src={getAccountIcon()}
+                                    alt={accountInfo.currency || 'USD'}
+                                />
+                            </span>
+                        </span>
+                        <div className='acc-info__content'>
+                            <div className='acc-info__account-type-header'>
+                                <p id='header__acc-type' className='acc-info__account-type'>
+                                    {getAccountTypeDisplay()}
+                                </p>
+                            </div>
+                            <div className='acc-info__balance-section'>
                                 <p
                                     data-testid='dt_balance'
                                     id='header__acc-balance'
@@ -117,10 +133,10 @@ const AccountInfo = () => {
                                     {getFormattedBalance()}
                                     <span className='symbols'> {accountInfo.currency || 'USD'}</span>
                                 </p>
-                            )}
+                            </div>
                         </div>
                     </div>
-                </div>
+                )}
             </div>
         </div>
     );
