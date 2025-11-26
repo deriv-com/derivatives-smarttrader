@@ -25,7 +25,7 @@ const AppProvider = ({ children }) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [accountInfo, setAccountInfo] = useState({
         currency   : Client.get('currency') || '',
-        balance    : Client.get('balance') || 0,
+        balance    : Client.get('balance'),
         loginid    : Client.get('loginid') || '',
         accountType: getAccountType() || '',
     });
@@ -53,7 +53,7 @@ const AppProvider = ({ children }) => {
             if (loggedIn) {
                 setAccountInfo({
                     currency   : Client.get('currency') || '',
-                    balance    : Client.get('balance') || 0,
+                    balance    : Client.get('balance'),
                     loginid    : Client.get('loginid') || '',
                     accountType: getAccountType() || '',
                 });

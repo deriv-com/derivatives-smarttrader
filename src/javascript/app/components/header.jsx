@@ -106,14 +106,18 @@ const AccountInfo = () => {
                             </p>
                         </div>
                         <div className='acc-info__balance-section'>
-                            <p
-                                data-testid='dt_balance'
-                                id='header__acc-balance'
-                                className='acc-info__balance'
-                            >
-                                {getFormattedBalance()}
-                                <span className='symbols'> {accountInfo.currency || 'USD'}</span>
-                            </p>
+                            {typeof accountInfo.balance === 'undefined' ? (
+                                <Skeleton.Square width={100} height={20} />
+                            ) : (
+                                <p
+                                    data-testid='dt_balance'
+                                    id='header__acc-balance'
+                                    className='acc-info__balance'
+                                >
+                                    {getFormattedBalance()}
+                                    <span className='symbols'> {accountInfo.currency || 'USD'}</span>
+                                </p>
+                            )}
                         </div>
                     </div>
                 </div>
