@@ -24,10 +24,10 @@ const AppProvider = ({ children }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [accountInfo, setAccountInfo] = useState({
-        currency   : Client.get('currency') || '',
-        balance    : Client.get('balance'),
-        loginid    : Client.get('loginid') || '',
-        accountType: getAccountType() || '',
+        currency   : '',
+        balance    : undefined,
+        loginid    : '',
+        accountType: '',
     });
 
     // Centralized language configuration - used by both desktop and mobile
@@ -43,33 +43,6 @@ const AppProvider = ({ children }) => {
             flag: code.toLowerCase(),
         }));
     });
-
-    // Update login state
-    useEffect(() => {
-        const checkAuthState = () => {
-            const loggedIn = Client.isLoggedIn();
-            setIsLoggedIn(loggedIn);
-            
-            if (loggedIn) {
-                setAccountInfo({
-                    currency   : Client.get('currency') || '',
-                    balance    : Client.get('balance'),
-                    loginid    : Client.get('loginid') || '',
-                    accountType: getAccountType() || '',
-                });
-            } else {
-                setAccountInfo({
-                    currency   : '',
-                    balance    : 0,
-                    loginid    : '',
-                    accountType: '',
-                });
-            }
-        };
-
-        // Check on mount
-        checkAuthState();
-    }, []);
 
     // Subscribe to balance updates via WebSocket
     useEffect(() => {
@@ -108,7 +81,7 @@ const AppProvider = ({ children }) => {
             if (!response || response.msg_type !== 'authorize' || !response.authorize) {
                 return;
             }
-            
+
             if (response.authorize) {
                 const auth = response.authorize;
                 setIsLoggedIn(true);
@@ -119,7 +92,7 @@ const AppProvider = ({ children }) => {
                     accountType: getAccountType() || '',
                 });
                 setIsLoading(false);
-                
+            
                 // Clear token exchange flag if it exists
                 if (window.tokenExchangeInProgress) {
                     window.tokenExchangeInProgress = false;
@@ -129,10 +102,6 @@ const AppProvider = ({ children }) => {
 
         // Listen for authorize responses
         BinarySocket.wait('authorize').then(handleAuthorize);
-
-        return () => {
-            // Cleanup handled by BinarySocket
-        };
     }, []);
 
     // Helper function to format balance
