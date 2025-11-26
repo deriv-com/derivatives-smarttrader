@@ -2,18 +2,24 @@
 // SmartTrader now uses token-based authentication (oneTimeToken -> sessionToken -> authorize)
 
 const { getBrandLoginUrl, getBrandSignupUrl, getPlatformHostname } = require('../../../templates/_common/brand.config');
+const Language = require('../language');
 
 const Login = (() => {
     const redirectToLogin = () => {
         const baseLoginUrl = getBrandLoginUrl();
         const platformHostname = getPlatformHostname();
-        const loginUrlWithRedirect = `${baseLoginUrl}?redirect=${encodeURIComponent(platformHostname)}`;
+        const lang = Language.get();
+        const loginUrlWithRedirect = `${baseLoginUrl}?redirect=${encodeURIComponent(platformHostname)}&lang=${lang}`;
         
         window.location.href = loginUrlWithRedirect;
     };
 
     const redirectToSignup = () => {
-        window.location.href = getBrandSignupUrl();
+        const baseSignupUrl = getBrandSignupUrl();
+        const lang = Language.get();
+        const signupUrlWithLang = `${baseSignupUrl}?lang=${lang}`;
+
+        window.location.href = signupUrlWithLang;
     };
 
     const initOneAll = () => {

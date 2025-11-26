@@ -135,7 +135,8 @@ const Url = (() => {
         }
         
         const encoded_redirect = encodeURIComponent(redirect_url);
-        return `${dtrader_domain}/${path}?redirect=${encoded_redirect}&account_type=${account_type}`;
+        const lang = Language.get();
+        return `${dtrader_domain}/${path}?redirect=${encoded_redirect}&account_type=${account_type}&lang=${lang}`;
     };
 
     const urlForTradersHub = (path, pars) => {
