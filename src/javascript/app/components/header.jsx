@@ -8,6 +8,7 @@ import { getElementById } from '../../_common/common_functions';
 import Url from '../../_common/url';
 import Login from '../../_common/base/login';
 import Client from '../base/client';
+import Language from '../../_common/language';
 import { AppProvider, useApp } from '../contexts/AppContext';
 import { getBrandHomeUrl, getPlatformHostname } from '../../../templates/_common/brand.config';
 import { getAccountType } from '../../config';
@@ -37,7 +38,7 @@ const HeaderLeft = () => {
                 />
             </span>
             <div className='header-menu-item header-menu-links'>
-                <a className='url-deriv-com' href={getBrandHomeUrl()}>
+                <a className='url-deriv-com' href={`${getBrandHomeUrl()}?lang=${Language.get()}`}>
                     <img
                         className='deriv-com-logo'
                         src={Url.urlForStatic(`images/pages/header/deriv-com-logo.svg?${BUILD_HASH}`)}
