@@ -1,3 +1,4 @@
+const { localize }       = require('@deriv-com/translations');
 // const { init }           = require('@livechat/customer-sdk');
 const BinarySocket       = require('./socket');
 const Defaults           = require('../pages/trade/defaults');
@@ -11,12 +12,11 @@ const removeCookies      = require('../../_common/storage').removeCookies;
 const urlFor             = require('../../_common/url').urlFor;
 const applyToAllElements = require('../../_common/utility').applyToAllElements;
 
-// Import logout modal
-let LogoutModalModule;
+// Import logout modal - store promise to avoid race condition
+let logoutModalPromise;
 if (typeof window !== 'undefined') {
-    import('../../../templates/_common/components/logout-modal.jsx').then(module => {
-        LogoutModalModule = module.default;
-    });
+    logoutModalPromise = import('../../../templates/_common/components/logout-modal.jsx')
+        .then(module => module.default);
 }
 
 // const licenseID          = require('../../_common/utility').lc_licenseID;
@@ -222,14 +222,6 @@ const Client = (() => {
 
     // });
 
-    // Logout modal constants
-    const LOGOUT_MODAL_CONFIG = {
-        STORAGE_KEY: 'show_logout_modal',
-        TITLE      : 'Log out successful',
-        MESSAGE    : 'To sign out everywhere, log out from Home and your other active platforms.',
-        BUTTON_TEXT: 'Got it',
-    };
-
     const doLogout = (response) => {
         if (response.logout !== 1) return;
         
@@ -255,27 +247,34 @@ const Client = (() => {
         RealityCheckData.clear();
         
         // Set flag to show logout modal after page reload
-        sessionStorage.setItem(LOGOUT_MODAL_CONFIG.STORAGE_KEY, '1');
+        sessionStorage.setItem('show_logout_modal', '1');
         
         // Reload the page
         window.location.reload();
     };
     
-    const checkAndShowLogoutModal = () => {
+    const checkAndShowLogoutModal = async () => {
         // Check if we should show the logout modal after page reload
-        const shouldShowModal = sessionStorage.getItem(LOGOUT_MODAL_CONFIG.STORAGE_KEY) === '1';
+        const shouldShowModal = sessionStorage.getItem('show_logout_modal') === '1';
         
         if (!shouldShowModal) return;
         
-        sessionStorage.removeItem(LOGOUT_MODAL_CONFIG.STORAGE_KEY);
+        sessionStorage.removeItem('show_logout_modal');
         
-        if (LogoutModalModule) {
-            LogoutModalModule.init({
-                title     : LOGOUT_MODAL_CONFIG.TITLE,
-                message   : LOGOUT_MODAL_CONFIG.MESSAGE,
-                buttonText: LOGOUT_MODAL_CONFIG.BUTTON_TEXT,
-                onClose   : () => LogoutModalModule.remove(),
-            });
+        // Wait for the module to load to avoid race condition
+        if (logoutModalPromise) {
+            try {
+                const LogoutModalModule = await logoutModalPromise;
+                LogoutModalModule.init({
+                    title     : localize('Log out successful'),
+                    message   : localize('To sign out everywhere, log out from Home and your other active platforms.'),
+                    buttonText: localize('Got it'),
+                    onClose   : () => LogoutModalModule.remove(),
+                });
+            } catch (error) {
+                // eslint-disable-next-line no-console
+                console.error('Failed to load logout modal:', error);
+            }
         }
     };
 
