@@ -1,3 +1,4 @@
+const { localize }       = require('@deriv-com/translations');
 // const { init }           = require('@livechat/customer-sdk');
 const BinarySocket       = require('./socket');
 const Defaults           = require('../pages/trade/defaults');
@@ -10,7 +11,13 @@ const getElementById     = require('../../_common/common_functions').getElementB
 const removeCookies      = require('../../_common/storage').removeCookies;
 const urlFor             = require('../../_common/url').urlFor;
 const applyToAllElements = require('../../_common/utility').applyToAllElements;
-const getPropertyValue   = require('../../_common/utility').getPropertyValue;
+
+// Import logout modal - store promise to avoid race condition
+let logoutModalPromise;
+if (typeof window !== 'undefined') {
+    logoutModalPromise = import('../../../templates/_common/components/logout-modal.jsx')
+        .then(module => module.default);
+}
 
 // const licenseID          = require('../../_common/utility').lc_licenseID;
 // const clientID           = require('../../_common/utility').lc_clientID;
@@ -187,15 +194,6 @@ const Client = (() => {
         }
     };
 
-    const redirection = (response) => {
-        const redirect_to = getPropertyValue(response, ['echo_req', 'passthrough', 'redirect_to']);
-        if (redirect_to) {
-            window.location.href = redirect_to;
-        } else {
-            window.location.reload();
-        }
-    };
-
     // Called when logging out to end ongoing chats if there is any
     // Temporarily commented out LiveChat
     // const endLiveChat = () => new Promise ((resolve) => {
@@ -225,23 +223,59 @@ const Client = (() => {
     // });
 
     const doLogout = (response) => {
-
         if (response.logout !== 1) return;
-        removeCookies('login', 'loginid', 'loginid_list', 'email', 'residence', 'settings'); // backward compatibility
-        removeCookies('reality_check', 'affiliate_token', 'affiliate_tracking', 'onfido_token','utm_data', 'gclid');
-        // clear elev.io session storage
+        
+        // Remove cookies
+        removeCookies('login', 'loginid', 'loginid_list', 'email', 'residence', 'settings');
+        removeCookies('reality_check', 'affiliate_token', 'affiliate_tracking', 'onfido_token', 'utm_data', 'gclid');
+        
+        // Clear elev.io session storage
         sessionStorage.removeItem('_elevaddon-6app');
         sessionStorage.removeItem('_elevaddon-6create');
-        // clear trading session
+        
+        // Clear trading session
         const { MARKET, UNDERLYING } = Defaults.PARAM_NAMES;
         Defaults.remove(MARKET, UNDERLYING);
+        
+        // Clear client data
         ClientBase.clearAllAccounts();
         ClientBase.set('loginid', '');
-        // Clear session token for pure session token authentication
         localStorage.removeItem('session_token');
+        
+        // Clear caches
         SocketCache.clear();
         RealityCheckData.clear();
-        redirection(response);
+        
+        // Set flag to show logout modal after page reload
+        sessionStorage.setItem('show_logout_modal', '1');
+        
+        // Reload the page
+        window.location.reload();
+    };
+    
+    const checkAndShowLogoutModal = async () => {
+        // Check if we should show the logout modal after page reload
+        const shouldShowModal = sessionStorage.getItem('show_logout_modal') === '1';
+        
+        if (!shouldShowModal) return;
+        
+        sessionStorage.removeItem('show_logout_modal');
+        
+        // Wait for the module to load to avoid race condition
+        if (logoutModalPromise) {
+            try {
+                const LogoutModalModule = await logoutModalPromise;
+                LogoutModalModule.init({
+                    title     : localize('Log out successful'),
+                    message   : localize('To sign out everywhere, log out from Home and your other active platforms.'),
+                    buttonText: localize('Got it'),
+                    onClose   : () => LogoutModalModule.remove(),
+                });
+            } catch (error) {
+                // eslint-disable-next-line no-console
+                console.error('Failed to load logout modal:', error);
+            }
+        }
     };
 
     const getUpgradeInfo = () => {
@@ -287,6 +321,7 @@ const Client = (() => {
         activateByClientType,
         sendLogoutRequest,
         doLogout,
+        checkAndShowLogoutModal,
         getUpgradeInfo,
         defaultRedirectUrl,
     }, ClientBase);
