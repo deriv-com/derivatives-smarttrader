@@ -222,6 +222,13 @@ const Client = (() => {
 
     // });
 
+    const LOGOUT_MODAL_CONFIG = {
+        STORAGE_KEY: 'show_logout_modal',
+        get TITLE() { return localize('Log out successful'); },
+        get MESSAGE() { return localize('To sign out everywhere, log out from Home and your other active platforms.'); },
+        get BUTTON_TEXT() { return localize('Got it'); },
+    };
+
     const doLogout = (response) => {
         if (response.logout !== 1) return;
         
@@ -247,7 +254,7 @@ const Client = (() => {
         RealityCheckData.clear();
         
         // Set flag to show logout modal after page reload
-        sessionStorage.setItem('show_logout_modal', '1');
+        sessionStorage.setItem(LOGOUT_MODAL_CONFIG.STORAGE_KEY, '1');
         
         // Reload the page
         window.location.reload();
@@ -255,20 +262,20 @@ const Client = (() => {
     
     const checkAndShowLogoutModal = async () => {
         // Check if we should show the logout modal after page reload
-        const shouldShowModal = sessionStorage.getItem('show_logout_modal') === '1';
+        const shouldShowModal = sessionStorage.getItem(LOGOUT_MODAL_CONFIG.STORAGE_KEY) === '1';
         
         if (!shouldShowModal) return;
         
-        sessionStorage.removeItem('show_logout_modal');
+        sessionStorage.removeItem(LOGOUT_MODAL_CONFIG.STORAGE_KEY);
         
         // Wait for the module to load to avoid race condition
         if (logoutModalPromise) {
             try {
                 const LogoutModalModule = await logoutModalPromise;
                 LogoutModalModule.init({
-                    title     : localize('Log out successful'),
-                    message   : localize('To sign out everywhere, log out from Home and your other active platforms.'),
-                    buttonText: localize('Got it'),
+                    title     : LOGOUT_MODAL_CONFIG.TITLE,
+                    message   : LOGOUT_MODAL_CONFIG.MESSAGE,
+                    buttonText: LOGOUT_MODAL_CONFIG.BUTTON_TEXT,
                     onClose   : () => LogoutModalModule.remove(),
                 });
             } catch (error) {
