@@ -1,6 +1,6 @@
 import React from 'react';
 import { localize } from '@deriv-com/translations';
-import Title from '../components/title.jsx';
+import { getBrandName } from '../brand.config';
 import Favicons from '../includes/favicons.jsx';
 import AntiClickjack from '../includes/anti_clickjack.jsx';
 
@@ -24,7 +24,7 @@ const Head = () => (
         <meta name='google' content='notranslate' />
         <meta name='referrer' content='origin' />
 
-        <Title />
+        <title>{`SmartTrader | Online trading platform | ${getBrandName()}`}</title>
 
         <link rel='manifest' href={`${it.root_url}manifest.json`} />
 
