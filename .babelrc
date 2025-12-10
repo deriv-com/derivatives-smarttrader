@@ -3,18 +3,6 @@
     "plugins": [
         ["@babel/plugin-proposal-decorators", { "legacy": true }],
         "@babel/plugin-transform-class-properties",
-        "@babel/plugin-syntax-dynamic-import",
-        [
-            "module-resolver",
-            {
-                "root": [
-                    "./src/javascript"
-                ],
-                "alias": {
-                    "_common"  : "./src/javascript/_common",
-                    "Images"   : "./src/images/"
-                }
-            }
-        ]
+        "@babel/plugin-syntax-dynamic-import"
     ]
 }
