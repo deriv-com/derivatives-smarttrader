@@ -7,10 +7,12 @@
         [
             "module-resolver",
             {
-                "root": ["./src"],
+                "root": [
+                    "./src/javascript"
+                ],
                 "alias": {
-                    "_common": "./src/javascript/_common",
-                    "Images": "./src/images"
+                    "_common"  : "./src/javascript/_common",
+                    "Images"   : "./src/images/"
                 }
             }
         ]
