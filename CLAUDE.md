@@ -1,9 +1,11 @@
-# Deriv SmartTrader - Claude Development Guide
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
-SmartTrader is a web-based trading application for binary options and derivatives trading. Built with React 16.14.0, jQuery 3.5.1, and a custom WebSocket architecture for real-time market data.
+SmartTrader is a web-based trading application for binary options and derivatives trading. Built with React 18.3.1, jQuery 3.5.1, and a custom WebSocket architecture for real-time market data.
 
-**Key Architecture**: Single-page application using IIFE module pattern, WebSocket-based real-time data, dual chart system (Highchart + WebtraderChart), and comprehensive caching layer.
+**Key Architecture**: Single-page application using IIFE module pattern, WebSocket-based real-time data, dual chart system (Highstock + WebtraderChart), and comprehensive caching layer.
 
 ## Common Commands
 
@@ -21,42 +23,72 @@ SmartTrader is a web-based trading application for binary options and derivative
 - `grunt eslint` - Linting
 - `grunt sass` - Compile SCSS
 - `grunt webpack` - Bundle JavaScript
+- `grunt dev` - Deploy to gh-pages (js/css and templates)
+- `grunt deploy` - Deploy only js/css changes
+- `grunt shell:compile_dev` - Recompile templates
+
+### Translations
+- `./scripts/update_translations.sh` - Update translations from Crowdin
+- `scripts/extract_js_texts.js` - Extract translatable strings from JavaScript
+- Strings must use `localize('text')` function
+- Use `/* localize-ignore */` comment to skip extraction for specific strings
 
 ### Git & Deployment
-- `git tag production_vYYYYMMDD_X -m 'Release message'` - Create release tag
-- `gh pr create` - Create pull request (requires gh CLI)
-- `gh issue view <number>` - View GitHub issue details
+- **Main branch**: `master` (not main)
+- Release tags: `production_vYYYYMMDD_X` or `staging_vYYYYMMDD_X`
+- Example: `git tag production_v20250112_0 -m 'Release message'`
+- PRs: Create from feature branch to master, GitHub Actions auto-deploy test links
+- Test deployment on Vercel: Push/create PR → get test link → register app at api.deriv.com/dashboard
 
 ## Core Files & Architecture
 
 ### Essential References
-- `guide-ai/smarttrader-architecture.md` - Complete architecture documentation with implementation details
-- `guide-ai/live-market-data-architecture.md` - WebSocket and real-time data flow patterns
-- `src/javascript/app/base/binary_loader.js` - Application lifecycle orchestrator
-- `src/javascript/_common/base/socket_base.js` - WebSocket connection management
-- `src/javascript/app/pages/trade/get_ticks.js` - Market data request handler
+- [src/javascript/app/base/binary_loader.js](src/javascript/app/base/binary_loader.js) - Application lifecycle orchestrator, page initialization, SPA navigation
+- [src/javascript/_common/base/socket_base.js](src/javascript/_common/base/socket_base.js) - WebSocket connection management with auto-reconnection, request buffering
+- [src/javascript/app/base/socket.js](src/javascript/app/base/socket.js) - Application-specific WebSocket wrapper (BinarySocket)
+- [src/javascript/_common/base/socket_cache.js](src/javascript/_common/base/socket_cache.js) - API response caching layer
+- [src/javascript/app/pages/trade/get_ticks.js](src/javascript/app/pages/trade/get_ticks.js) - Market data request handler for real-time ticks
+- [src/javascript/app/base/binary_pages.js](src/javascript/app/base/binary_pages.js) - SPA routing configuration
 
-### Key Modules
-- **BinaryLoader**: App initialization, page lifecycle, SPA navigation
-- **BinarySocketBase**: WebSocket with auto-reconnection, request buffering, caching
+### Key Modules (IIFE Pattern)
+- **BinaryLoader**: App initialization, page lifecycle, handles SPA navigation
+- **BinarySocket**: WebSocket wrapper with auto-reconnection, request buffering, promise-based API
+- **SocketCache**: Response caching with configurable expiry (10min for symbols, 60min for exchange rates)
 - **GetTicks**: Real-time tick data processing and chart updates
-- **Highchart**: Contract analysis charts with barriers and zones
+- **Highchart** (Highstock): Contract analysis charts with barriers and zones
 - **WebtraderChart**: Independent trading charts via @deriv-com/webtrader-charts
+
+### Directory Structure
+```
+src/
+├── javascript/
+│   ├── _common/          # Shared utilities, base classes
+│   │   └── base/         # Socket, cache, client, currency base classes
+│   ├── app/
+│   │   ├── base/         # Core app infrastructure (loader, pages, socket)
+│   │   └── pages/        # Page-specific modules (trade, user, etc.)
+│   ├── config.js         # API endpoints, app configuration
+│   └── index.js          # Application entry point
+├── sass/                 # SCSS stylesheets
+├── templates/            # JSX templates
+└── root_files/          # Static assets for root
+```
 
 ## Code Style Guidelines
 
 ### JavaScript Patterns
-- **IIFE Module Pattern**: All components use `const ComponentName = (() => { /* private vars/methods */ return { /* public API */ }; })();`
+- **IIFE Module Pattern**: All modules use `const ModuleName = (() => { /* private vars/methods */ return { /* public API */ }; })();`
 - **ES Modules**: Use `import/export` syntax, not CommonJS `require()`
 - **Destructuring**: Destructure imports when possible: `import { foo } from 'bar'`
-- **jQuery Integration**: jQuery available globally as `$` for legacy compatibility
+- **jQuery Integration**: jQuery available globally as `$` for legacy compatibility (jQuery 3.5.1)
 - **Promise-based**: Use promises for async operations, avoid callbacks where possible
 
 ### React Components
-- **React 16.14.0**: Class components and functional components with hooks
+- **React 18.3.1**: Functional components with hooks preferred, class components for legacy
 - **JSX Files**: Use `.jsx` extension for React components
 - **Props Validation**: Use PropTypes for component props
 - **HTML Parsing**: Use `html-react-parser` for HTML to React conversion
+- **4-space indentation** for JSX (enforced by ESLint)
 
 ### WebSocket Patterns
 - **Request Deduplication**: Automatic for `authorize`, `get_settings`, `residence_list`, etc.
@@ -64,41 +96,58 @@ SmartTrader is a web-based trading application for binary options and derivative
 - **Error Handling**: Implement reconnection logic and request buffering
 - **Caching**: Use SocketCache for API responses with appropriate expiry times
 
-## Testing Instructions
+### ESLint Configuration
+- Extends `airbnb-base` and `binary` configs
+- React plugin enabled
+- Key rules: semicolons required, 1tbs brace style, no-console error
+- Single quotes for JSX attributes (jsx-quotes: prefer-single)
+- Auto-fix: `npm run eslint`
+
+## Testing
 
 ### Running Tests
 - `npm test` - Run full test suite
 - Tests use **Mocha + Chai + Enzyme + Sinon + JSDOM**
 - Test files: `__tests__/*.js` or `*.test.js`
 - Mock utilities available via `mock-require`
+- Browser globals (localStorage, sessionStorage) mocked via `mock-local-storage` and `jsdom-global`
 
 ### What to Verify
 - WebSocket connection and reconnection
 - Chart rendering and real-time updates
 - Authentication flows
 - Localization and language switching
-- Cross-browser compatibility (last 2 versions, iOS Safari)
+- Cross-browser compatibility (last 2 versions, iOS Safari, last 3 Safari versions)
 
 ## Development Workflow
 
 ### Environment Setup
-- **Node.js 18.x EXACTLY** (critical requirement)
+- **Node.js 18.x or higher** (recommended: 18.16.0)
+- Ruby and Sass (`gem install sass`)
+- Grunt CLI (`npm install -g grunt-cli`)
 - Browser storage must be enabled (localStorage + sessionStorage)
 - Install dependencies: `npm ci` (not `npm install`)
 
+### Pre-commit Hooks (Husky)
+The repository uses Husky for git hooks. Hooks automatically run before commits to enforce code quality.
+
+### GitHub Actions Workflows
+- `.github/workflows/release_production.yml` - Production releases
+- `.github/workflows/release_staging.yml` - Staging releases
+- `.github/workflows/test.yml` - Test on PR/push
+- `.github/workflows/sync-translations.yml` - Crowdin sync
+- `.github/workflows/claude.yml` - Claude Code integration
+
 ### Development Process
-1. Create feature branch from main
+1. Create feature branch from **master** (not main)
 2. Make changes and test locally with `npm run start`
 3. Run linting: `npm run eslint`
 4. Run tests: `npm test`
-5. Create PR with descriptive commit messages
+5. Commit (pre-commit hooks will run automatically)
+6. Push and create PR to master
+7. GitHub Actions will auto-deploy test link on Vercel
 
-### Branch Strategy
-- `main` - Production branch
-- Feature branches: `feature/description`
-- Release tags: `production_vYYYYMMDD_X`
-
-## WebSocket & Real-time Data Patterns
+## WebSocket & Real-time Data
 
 ### Connection Management
 ```javascript
@@ -125,28 +174,30 @@ BinarySocket.send({
 - Handle both `tick` and `history` message types
 - Implement proper cleanup in component `onUnload` methods
 
-### Caching Strategy
+### Caching Strategy (SocketCache)
 - **10min cache**: `active_symbols`, `contracts_for`, `payout_currencies`
 - **60min cache**: `exchange_rates`
-- **State-only**: `authorize`, `website_status`
+- **State-only** (no expiry): `authorize`, `website_status`
 - Cache keys include language, product_type, currency for specificity
 
 ## Chart Components
 
-### Highchart (Contract Analysis)
+### Highstock/Highchart (Contract Analysis)
 - **Purpose**: Contract-specific visualization with entry/exit points
 - **Data Source**: GetTicks → BinarySocket (main connection)
 - **Features**: Barriers, zones, contract markers, granularity calculation
 - **Usage**: Contract lifecycle visualization, tick-by-tick analysis
+- **Library**: highstock-release 5.0.14
 
 ### WebtraderChart (Trading Interface)
 - **Purpose**: General market analysis and trading
 - **Data Source**: @deriv-com/webtrader-charts (independent WebSocket)
 - **Features**: Multiple timeframes, chart types, indicators
 - **Usage**: Market analysis, technical indicators, drawing tools
+- **Library**: @deriv-com/webtrader-charts ^0.6.5
 
 ### Chart Selection Logic
-- Use **Highchart** for contract-specific analysis
+- Use **Highchart/Highstock** for contract-specific analysis
 - Use **WebtraderChart** for general trading and market analysis
 - Both can run simultaneously with separate WebSocket connections
 
@@ -154,7 +205,7 @@ BinarySocket.send({
 
 ### Adding a New Page
 1. Create module in `src/javascript/app/pages/[page-name]/`
-2. Add route in `src/javascript/app/base/binary_pages.js`
+2. Add route in [src/javascript/app/base/binary_pages.js](src/javascript/app/base/binary_pages.js)
 3. Create template in `src/templates/app/[page-name].jsx`
 4. Add styles in `src/sass/app/[page-name].scss`
 5. Test navigation and functionality
@@ -162,9 +213,12 @@ BinarySocket.send({
 ### Adding Translations
 1. Use `localize('Your text here')` in code
 2. Run `scripts/extract_js_texts.js` to extract strings
-3. Update `.po` files in `src/translations/`
-4. Compile with `grunt shell:compile_dev`
-5. Test language switching
+3. Run `./scripts/update_translations.sh` to push to Crowdin
+4. Download translations from Crowdin (part of script)
+5. Compile with `grunt shell:compile_dev`
+6. Test language switching
+
+**Important**: Refactor code so `localize()` receives string literals, not variables. If string literal not possible, add to `scripts/js_texts/static_strings_app.js`.
 
 ### WebSocket Integration
 1. Use `BinarySocket.send()` for API calls
@@ -178,16 +232,22 @@ BinarySocket.send({
 3. Handle chart cleanup: `chart.destroy()` in component unmount
 4. Implement responsive chart resizing
 
+### Template Changes
+- To recompile all templates: `grunt shell:compile_dev`
+- To recompile specific template: `grunt shell:compile_dev --path=about-us`
+- Templates are JSX files in `src/templates/`
+
 ## Important Warnings & Requirements
 
 ### Critical Requirements
-- **Node.js 18.x EXACTLY** - Other versions will cause build failures
-- **Browser Storage Required** - App checks localStorage/sessionStorage support
+- **Node.js 18.x or higher** - Specified in package.json engines
+- **Browser Storage Required** - App checks localStorage/sessionStorage support at startup
 - **HTTPS Only** - Development server runs on https://localhost
 - **jQuery Global** - Available as `$` globally, don't import separately
+- **Master branch** - Main branch is "master", not "main"
 
 ### Performance Considerations
-- **Request Deduplication**: Automatic for common API calls
+- **Request Deduplication**: Automatic for common API calls via SocketCache
 - **Lazy Loading**: WebtraderChart uses `require.ensure()` for code splitting
 - **Memory Management**: Always cleanup charts, subscriptions, and event listeners
 - **Cache Strategy**: Leverage SocketCache for frequently accessed data
@@ -198,6 +258,8 @@ BinarySocket.send({
 - **Storage Validation**: App disables login if storage unavailable
 - **Chart Granularity**: Automatically calculated based on contract duration
 - **Subscription Cleanup**: Must `forget_all` before new subscriptions
+- **React Version**: Now on React 18.3.1, not 16.14.0
+- **Branch Name**: Use "master", not "main"
 
 ### Error Handling Patterns
 - **WebSocket Errors**: Implement auto-reconnection with request buffering
@@ -205,28 +267,15 @@ BinarySocket.send({
 - **Authentication Errors**: Redirect to login or show appropriate messages
 - **Chart Errors**: Graceful fallback and error display
 
-## Development Tips
-
-### Debugging
-- Use browser DevTools for client-side debugging
-- Monitor WebSocket messages in Network tab
-- Check console for real-time data flow
-- Use React DevTools for component inspection
-
-### Performance Optimization
-- Use `BinarySocket.wait()` to avoid duplicate API calls
-- Implement proper component lifecycle cleanup
-- Leverage caching for frequently accessed data
-- Use lazy loading for heavy components
-
-### Testing Strategy
-- Test WebSocket connection and reconnection scenarios
-- Verify chart rendering with different data sets
-- Test authentication flows and error states
-- Validate localization and language switching
+## Key Dependencies
+- React 18.3.1 (upgraded from 16.x)
+- jQuery 3.5.1
+- Grunt (build system)
+- @deriv-com/webtrader-charts ^0.6.5
+- highstock-release 5.0.14
+- Mocha + Chai + Enzyme + Sinon (testing)
+- @deriv-com/analytics, @deriv-com/auth-client, @deriv-com/translations
 
 ---
-
-**Architecture Reference**: See `guide-ai/smarttrader-architecture.md` for complete technical details, implementation patterns, and API reference.
 
 **Last Updated**: January 2025
