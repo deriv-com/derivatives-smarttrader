@@ -1,6 +1,31 @@
 #!/usr/bin/env node
 
-/* eslint-disable no-console */
+/* eslint-disable no-console, no-underscore-dangle */
+
+/**
+ * Mock @deriv-com/translations for Server-Side Rendering
+ *
+ * This mock is required because @deriv-com/translations is an ES Module
+ * ("type": "module" in package.json) which cannot be loaded via CommonJS require()
+ * during the template compilation process.
+ *
+ * This mock only affects server-side template rendering (build time).
+ * The browser runtime uses the real @deriv-com/translations package bundled by webpack,
+ * so all translation features and language switching work normally in the browser.
+ */
+require('module').Module._cache[require.resolve('@deriv-com/translations')] = {
+    id      : require.resolve('@deriv-com/translations'),
+    filename: require.resolve('@deriv-com/translations'),
+    loaded  : true,
+    exports : {
+        localize              : (text) => text, // Simple pass-through for server-side rendering
+        getAllowedLanguages   : () => ({}),
+        getLanguage           : () => 'EN',
+        getInitialLanguage    : () => 'EN',
+        getURL                : () => '',
+        initializeTranslations: () => {},
+    },
+};
 require('@babel/register')({
     plugins: [
         '@babel/plugin-transform-modules-commonjs',
