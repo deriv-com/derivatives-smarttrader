@@ -169,16 +169,6 @@ const ClientBase = (() => {
             domain: currentDomain,
             path  : '/',
         });
-        
-        // Save session token as cookie under same domain as client_information for dtrader access
-        if (sessionToken) {
-            Cookies.set('session_token', sessionToken, {
-                domain  : currentDomain,
-                path    : '/',
-                secure  : window.location.protocol === 'https:',
-                sameSite: 'Lax',
-            });
-        }
     };
 
     const clearAllAccounts = () => {
