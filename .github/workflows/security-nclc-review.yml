@@ -5,9 +5,14 @@ permissions:
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 jobs:
   security:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: github.event.pull_request.draft == false
     env:
       SLACK_WEBHOOK_URL: ${{ secrets.SAST_SECURITY_SLACK_WEBHOOK }}
       SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
