@@ -180,7 +180,7 @@ jobs:
           claude-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
           run-every-commit: true
           custom-security-scan-instructions: custom_instruction.md
-          claude-model: claude-opus-4-5-20251101
+          claude-model: ${{ vars.CLAUDE_MODEL || 'claude-opus-4-5-20251101' }}
       - name: Send Failure Notification to Slack
         if: failure()
         uses: slackapi/slack-github-action@6c661ce58804a1a20f6dc5fbee7f0381b469e001
@@ -205,3 +205,4 @@ jobs:
                 }
               ]
             }
+
