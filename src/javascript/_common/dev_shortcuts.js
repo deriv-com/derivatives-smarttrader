@@ -102,6 +102,18 @@ Reloading in 1.5 seconds...`,
     };
 
     /**
+     * Get background color for notification type
+     */
+    const getNotificationColor = (type) => {
+        const colors = {
+            error  : '#ff4757',
+            success: '#2ed573',
+            info   : '#3742fa',
+        };
+        return colors[type] || colors.info;
+    };
+
+    /**
      * Create a notification element
      */
     const createNotification = (message, type = 'info') => {
@@ -110,7 +122,7 @@ Reloading in 1.5 seconds...`,
             position: fixed;
             top: 20px;
             right: 20px;
-            background: ${type === 'error' ? '#ff4757' : type === 'success' ? '#2ed573' : '#3742fa'};
+            background: ${getNotificationColor(type)};
             color: white;
             padding: 16px 20px;
             border-radius: 8px;
