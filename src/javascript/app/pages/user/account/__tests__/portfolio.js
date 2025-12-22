@@ -22,17 +22,20 @@ describe('Portfolio', () => {
     before(function (done) {
         this.timeout(10000);
         // this is a read token, even if other people take it, won't be able to do any harm
-        api.authorize(getApiToken()).then(() => {
-          api
-            .send({
-              balance: 1,
-              subscribe: 1,
-            })
+        api.authorize(getApiToken())
+            .then(() => api.send({
+                balance   : 1,
+                subscribe : 1,
+            }))
             .then((response) => {
-              balance = response;
-              done();
+                balance = response;
+                done();
+            })
+            .catch((error) => {
+                // eslint-disable-next-line no-console
+                console.error('Portfolio test setup failed:', error);
+                done(error);
             });
-        });
     });
     it('Should have all functions that are being tested', () => {
         expect(portfolio).to.have.any.keys('getBalance', 'getPortfolioData', 'getProposalOpenContract', 'getIndicativeSum', 'getSumPurchase');
