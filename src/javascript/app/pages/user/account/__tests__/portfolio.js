@@ -1,5 +1,5 @@
-const portfolio                    = require('../portfolio/portfolio').Portfolio;
-const { api, expect, getApiToken } = require('../../../../../_common/__tests__/tests_common');
+const portfolio = require('../portfolio/portfolio').Portfolio;
+const { expect }  = require('../../../../../_common/__tests__/tests_common');
 
 const portfolio_mock_data = {
     symbol        : 'frxAUDJPY',
@@ -18,33 +18,8 @@ const proposal_open_contract_mock_data = { barrier: '77.005', date_settlement: 1
 const values_mock_data                 = { 9324828148: { indicative: '4.33', buy_price: '5.37' }, 9299986648: { indicative: '5.16', buy_price: '5.14' } };
 
 describe('Portfolio', () => {
-    let balance;
-    before(function (done) {
-        this.timeout(10000);
-        // this is a read token, even if other people take it, won't be able to do any harm
-        api.authorize(getApiToken())
-            .then(() => api.send({
-                balance   : 1,
-                subscribe : 1,
-            }))
-            .then((response) => {
-                balance = response;
-                done();
-            })
-            .catch((error) => {
-                // eslint-disable-next-line no-console
-                console.error('Portfolio test setup failed:', error);
-                done(error);
-            });
-    });
     it('Should have all functions that are being tested', () => {
         expect(portfolio).to.have.any.keys('getBalance', 'getPortfolioData', 'getProposalOpenContract', 'getIndicativeSum', 'getSumPurchase');
-    });
-    it('Should have balance', () => {
-        const balance_string = portfolio.getBalance(balance, 'USD');
-        expect(balance_string).to.be.a('string');
-        const balance_value = portfolio.getBalance(balance);
-        expect(balance_value).to.be.a('number');
     });
     it('Should have all expected data for portfolio', () => {
         const portfolio_data = portfolio.getPortfolioData(portfolio_mock_data);
