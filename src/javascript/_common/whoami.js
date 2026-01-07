@@ -14,7 +14,7 @@ const getWhoAmIURL = (isProduction) => {
     if (isProduction) {
         return 'https://auth.deriv.com/sessions/whoami';
     }
-    return 'https://localhost/sessions/whoami';
+    return 'https://staging-auth.deriv.com/sessions/whoami';
 };
 
 /**

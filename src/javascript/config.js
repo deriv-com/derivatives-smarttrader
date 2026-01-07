@@ -138,7 +138,7 @@ const getSocketURL = () => {
             server_url = 'core.api.deriv.com/options/v1/ws';
         } else {
             // Staging environment
-            server_url = 'localhost/options/v1/ws';
+            server_url = 'staging-core.api.deriv.com/options/v1/ws';
         }
     }
     
@@ -170,7 +170,7 @@ const getChartSocketURL = () => {
             server_url = 'core.api.deriv.com/options/v1/ws';
         } else {
             // Staging environment
-            server_url = 'localhost/options/v1/ws';
+            server_url = 'staging-core.api.deriv.com/options/v1/ws';
         }
     }
     

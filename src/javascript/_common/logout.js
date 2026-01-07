@@ -14,7 +14,7 @@ const getLogoutURL = (isProduction) => {
     if (isProduction) {
         return 'https://auth.deriv.com/self-service/logout/browser';
     }
-    return 'https://localhost/self-service/logout/browser';
+    return 'https://staging-auth.deriv.com/self-service/logout/browser';
 };
 
 /**
