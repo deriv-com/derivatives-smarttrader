@@ -1,4 +1,5 @@
 // const Cookies = require('js-cookie');
+const { getWebSocketUrl } = require('../templates/_common/brand.config');
 
 /*
  * Configuration values needed in js codes
@@ -130,16 +131,8 @@ const getSocketURL = () => {
     let server_url = window.localStorage.getItem('config.server_url');
     
     if (!server_url) {
-        // Environment-based server selection
-        const isProductionEnv = process.env.NODE_ENV === 'production';
-        
-        if (isProductionEnv) {
-            // Production environment
-            server_url = 'core.api.deriv.com/options/v1/ws';
-        } else {
-            // Staging environment
-            server_url = 'staging-core.api.deriv.com/options/v1/ws';
-        }
+        // Use centralized brand config for environment-based server selection
+        server_url = getWebSocketUrl();
     }
     
     // Determine endpoint based on account_type and account_id
@@ -162,16 +155,8 @@ const getChartSocketURL = () => {
     let server_url = window.localStorage.getItem('config.server_url');
     
     if (!server_url) {
-        // Environment-based server selection
-        const isProductionEnv = process.env.NODE_ENV === 'production';
-        
-        if (isProductionEnv) {
-            // Production environment
-            server_url = 'core.api.deriv.com/options/v1/ws';
-        } else {
-            // Staging environment
-            server_url = 'staging-core.api.deriv.com/options/v1/ws';
-        }
+        // Use centralized brand config for environment-based server selection
+        server_url = getWebSocketUrl();
     }
     
     // Always use public endpoint for charts (market data doesn't require authentication)

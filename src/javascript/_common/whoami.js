@@ -5,17 +5,7 @@
  * Used to verify authentication status without WebSocket
  */
 
-/**
- * Get the whoami URL based on environment
- * @param {boolean} isProduction - Whether running in production
- * @returns {string} The whoami endpoint URL
- */
-const getWhoAmIURL = (isProduction) => {
-    if (isProduction) {
-        return 'https://auth.deriv.com/sessions/whoami';
-    }
-    return 'https://staging-auth.deriv.com/sessions/whoami';
-};
+const { getWhoAmIURL } = require('../../templates/_common/brand.config');
 
 /**
  * Check session validity via REST API whoami endpoint
@@ -23,8 +13,7 @@ const getWhoAmIURL = (isProduction) => {
  */
 const checkWhoAmI = async () => {
     try {
-        const isProduction = process.env.NODE_ENV === 'production';
-        const whoamiUrl = getWhoAmIURL(isProduction);
+        const whoamiUrl = getWhoAmIURL();
 
         const response = await fetch(whoamiUrl, {
             method     : 'GET',
@@ -53,5 +42,4 @@ const checkWhoAmI = async () => {
 
 module.exports = {
     checkWhoAmI,
-    getWhoAmIURL,
 };

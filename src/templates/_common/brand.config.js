@@ -15,6 +15,18 @@ const brand_config_data = {
             staging   : 'staging-dsmarttrader.deriv.com',
             production: 'dsmarttrader.deriv.com',
         },
+        websocket: {
+            staging   : 'staging-api-core.deriv.com/options/v1/ws',
+            production: 'api-core.deriv.com/options/v1/ws',
+        },
+        whoami_endpoint: {
+            staging   : 'https://staging-auth.deriv.com/sessions/whoami',
+            production: 'https://auth.deriv.com/sessions/whoami',
+        },
+        logout_endpoint: {
+            staging   : 'https://staging-auth.deriv.com/self-service/logout/browser',
+            production: 'https://auth.deriv.com/self-service/logout/browser',
+        },
     },
 };
 
@@ -40,6 +52,18 @@ const getPlatformHostname = () => isProduction
     ? brand_config_data.platform.hostname.production
     : brand_config_data.platform.hostname.staging;
 
+const getWebSocketUrl = () => isProduction
+    ? brand_config_data.platform.websocket.production
+    : brand_config_data.platform.websocket.staging;
+
+const getWhoAmIURL = () => isProduction
+    ? brand_config_data.platform.whoami_endpoint.production
+    : brand_config_data.platform.whoami_endpoint.staging;
+
+const getLogoutURL = () => isProduction
+    ? brand_config_data.platform.logout_endpoint.production
+    : brand_config_data.platform.logout_endpoint.staging;
+
 // Legacy compatibility function - now returns smarttrader platform info
 const getPlatformSettings = (platform_key) => {
     if (platform_key === 'smarttrader') {
@@ -63,4 +87,7 @@ module.exports = {
     getPlatformLogo,
     getPlatformHostname,
     getPlatformSettings, // Legacy compatibility
+    getWebSocketUrl,
+    getWhoAmIURL,
+    getLogoutURL,
 };

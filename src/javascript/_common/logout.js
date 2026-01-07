@@ -5,17 +5,7 @@
  * Used to terminate authentication sessions without WebSocket
  */
 
-/**
- * Get the logout URL based on environment
- * @param {boolean} isProduction - Whether running in production
- * @returns {string} The logout endpoint URL
- */
-const getLogoutURL = (isProduction) => {
-    if (isProduction) {
-        return 'https://auth.deriv.com/self-service/logout/browser';
-    }
-    return 'https://staging-auth.deriv.com/self-service/logout/browser';
-};
+const { getLogoutURL } = require('../../templates/_common/brand.config');
 
 /**
  * Request logout via REST API endpoint
@@ -23,8 +13,7 @@ const getLogoutURL = (isProduction) => {
  */
 const requestRestLogout = async () => {
     try {
-        const isProduction = process.env.NODE_ENV === 'production';
-        const logoutUrl = getLogoutURL(isProduction);
+        const logoutUrl = getLogoutURL();
 
         // Step 1: Get logout URL and token
         const response = await fetch(logoutUrl, {
@@ -61,5 +50,4 @@ const requestRestLogout = async () => {
 
 module.exports = {
     requestRestLogout,
-    getLogoutURL,
 };
