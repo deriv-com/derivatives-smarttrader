@@ -76,6 +76,29 @@ const getAppId = () => {
 
 const isBinaryApp = () => +getAppId() === binary_desktop_app_id;
 
+const getAccountId = () => {
+    // Check URL parameter first
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlAccountId = urlParams.get('account_id');
+    if (urlAccountId) {
+        // Store and clean up URL
+        window.localStorage.setItem('account_id', urlAccountId);
+        const url = new URL(window.location);
+        url.searchParams.delete('account_id');
+        window.history.replaceState({}, '', url);
+        return urlAccountId;
+    }
+    
+    // Check localStorage
+    const storedAccountId = window.localStorage.getItem('account_id');
+    if (storedAccountId) {
+        return storedAccountId;
+    }
+    
+    // No account_id available
+    return null;
+};
+
 const getAccountType = () => {
     // Check URL parameter first
     const urlParams = new URLSearchParams(window.location.search);
@@ -107,21 +130,52 @@ const getSocketURL = () => {
     let server_url = window.localStorage.getItem('config.server_url');
     
     if (!server_url) {
-        // Get account type
-        const accountType = getAccountType();
         // Environment-based server selection
         const isProductionEnv = process.env.NODE_ENV === 'production';
         
         if (isProductionEnv) {
-            // Production environment - use v2 servers
-            server_url = accountType === 'real' ? 'realv2.derivws.com' : 'demov2.derivws.com';
+            // Production environment
+            server_url = 'core.api.deriv.com/options/v1/ws';
         } else {
-            // Staging environment - use QA servers
-            server_url = accountType === 'real' ? 'qa197.deriv.dev' : 'qa194.deriv.dev';
+            // Staging environment
+            server_url = 'localhost/options/v1/ws';
         }
     }
     
-    return `wss://${server_url}/websockets/v3`;
+    // Determine endpoint based on account_type and account_id
+    const accountType = getAccountType();
+    const accountId = getAccountId();
+    
+    let endpoint = '/public'; // Default to public
+    let queryParams = '';
+    
+    if (accountId && accountType) {
+        endpoint = accountType === 'real' ? '/real' : '/demo';
+        queryParams = `?account_id=${accountId}`;
+    }
+    
+    return `wss://${server_url}${endpoint}${queryParams}`;
+};
+
+// Get public WebSocket URL for chart library (no authentication needed for market data)
+const getChartSocketURL = () => {
+    let server_url = window.localStorage.getItem('config.server_url');
+    
+    if (!server_url) {
+        // Environment-based server selection
+        const isProductionEnv = process.env.NODE_ENV === 'production';
+        
+        if (isProductionEnv) {
+            // Production environment
+            server_url = 'core.api.deriv.com/options/v1/ws';
+        } else {
+            // Staging environment
+            server_url = 'localhost/options/v1/ws';
+        }
+    }
+    
+    // Always use public endpoint for charts (market data doesn't require authentication)
+    return `wss://${server_url}/public`;
 };
 
 module.exports = {
@@ -130,5 +184,7 @@ module.exports = {
     getAppId,
     isBinaryApp,
     getAccountType,
+    getAccountId,
     getSocketURL,
+    getChartSocketURL,
 };

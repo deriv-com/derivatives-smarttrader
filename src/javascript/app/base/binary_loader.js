@@ -89,7 +89,7 @@ const BinaryLoader = (() => {
 
         // Make sure content is properly loaded or visible before scrolling to anchor.
         ContentVisibility.init().then(() => {
-            BinarySocket.wait('authorize').then(() => {
+            BinarySocket.wait('balance').then(() => {
                 GTM.pushDataLayer({ event: 'page_load' });
 
                 // reroute LiveChat group
@@ -131,7 +131,7 @@ const BinaryLoader = (() => {
             if (!Client.isLoggedIn()) {
                 displayMessage(error_messages.login());
             } else {
-                BinarySocket.wait('authorize')
+                BinarySocket.wait('balance')
                     .then((response) => {
                         if (response.error) {
                             displayMessage(error_messages.login());
@@ -154,7 +154,7 @@ const BinaryLoader = (() => {
             loadActiveScript();
         }
         
-        BinarySocket.wait('authorize').then(() => {
+        BinarySocket.wait('balance').then(() => {
             // Removed account type and regional restrictions - allow all account types
             // Original restrictions removed: isOptionsBlocked(), isOfferingBlocked(), isAccountOfType('financial')
         });

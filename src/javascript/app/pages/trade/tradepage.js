@@ -22,7 +22,7 @@ const TradePage = (() => {
     LoaderElement.init();
 
     const onLoad = () => {
-        BinarySocket.wait('authorize').then(() => {
+        BinarySocket.wait('balance').then(() => {
             init();
         });
     };
@@ -47,7 +47,7 @@ const TradePage = (() => {
         ViewPopup.viewButtonOnClick('#contract_confirmation_container');
 
         // Use robust initialization manager for API-dependent initialization
-        BinarySocket.wait('authorize').then(() => {
+        BinarySocket.wait('balance').then(() => {
             // Handle virtual account setup
             if (Client.get('is_virtual')) {
                 Header.upgradeMessageVisibility(); // To handle the upgrade buttons visibility

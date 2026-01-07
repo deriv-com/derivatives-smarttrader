@@ -166,7 +166,7 @@ const Header = (() => {
             waitForTopbarElements();
             bindClick();
             
-            await BinarySocket.wait('authorize');
+            await BinarySocket.wait('balance');
 
         } catch (error) {
             // eslint-disable-next-line no-console

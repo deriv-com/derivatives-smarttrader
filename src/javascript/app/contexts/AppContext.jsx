@@ -44,55 +44,27 @@ const AppProvider = ({ children }) => {
         }));
     });
 
-    // Subscribe to balance updates via WebSocket
+    // Note: Balance subscription is already done automatically in socket_base.js
+    // We just need to listen for balance updates via the second useEffect below
+
+    // Subscribe to balance updates (balance is the auth confirmation in new API)
     useEffect(() => {
-        if (!isLoggedIn) return;
-
-        const subscribeToBalance = () => {
-            // Wait for authorize response before subscribing to balance
-            BinarySocket.wait('authorize').then(() => {
-                BinarySocket.send({
-                    balance  : 1,
-                    subscribe: 1,
-                }, {
-                    callback: (response) => {
-                        if (response.error) {
-                            return;
-                        }
-
-                        if (response.balance) {
-                            setAccountInfo(prev => ({
-                                ...prev,
-                                balance : response.balance.balance,
-                                currency: response.balance.currency,
-                            }));
-                        }
-                    },
-                });
-            });
-        };
-
-        subscribeToBalance();
-    }, [isLoggedIn]);
-
-    // Subscribe to authorize updates
-    useEffect(() => {
-        const handleAuthorize = (response) => {
-            if (!response || response.msg_type !== 'authorize' || !response.authorize) {
+        const handleBalance = (response) => {
+            if (!response || response.msg_type !== 'balance' || !response.balance) {
                 return;
             }
 
-            if (response.authorize) {
-                const auth = response.authorize;
+            if (response.balance) {
+                const balance = response.balance;
                 setIsLoggedIn(true);
                 setAccountInfo({
-                    currency   : auth.currency || '',
-                    balance    : auth.balance || 0,
-                    loginid    : auth.loginid || '',
+                    currency   : balance.currency || '',
+                    balance    : balance.balance || 0,
+                    loginid    : balance.loginid || '',
                     accountType: getAccountType() || '',
                 });
                 setIsLoading(false);
-            
+
                 // Clear token exchange flag if it exists
                 if (window.tokenExchangeInProgress) {
                     window.tokenExchangeInProgress = false;
@@ -100,8 +72,8 @@ const AppProvider = ({ children }) => {
             }
         };
 
-        // Listen for authorize responses
-        BinarySocket.wait('authorize').then(handleAuthorize);
+        // Listen for balance responses (auth confirmation)
+        BinarySocket.wait('balance').then(handleBalance);
     }, []);
 
     // Helper function to format balance
