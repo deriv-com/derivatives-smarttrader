@@ -1,28 +1,77 @@
-const { localize }       = require('@deriv-com/translations');
 // const { init }           = require('@livechat/customer-sdk');
-const BinarySocket       = require('./socket');
-const Defaults           = require('../pages/trade/defaults');
-const RealityCheckData   = require('../pages/user/reality_check/reality_check.data');
-const ClientBase         = require('../../_common/base/client_base');
-const GTM                = require('../../_common/base/gtm');
-const SocketCache        = require('../../_common/base/socket_cache');
+const BinarySocket          = require('./socket');
+const Defaults              = require('../pages/trade/defaults');
+const RealityCheckData      = require('../pages/user/reality_check/reality_check.data');
+const ClientBase            = require('../../_common/base/client_base');
+const GTM                   = require('../../_common/base/gtm');
+const SocketCache           = require('../../_common/base/socket_cache');
+const { checkWhoAmI }       = require('../../_common/whoami');
+const { requestRestLogout } = require('../../_common/logout');
 // const { isBinaryDomain } = require('../../_common/utility');
-const getElementById     = require('../../_common/common_functions').getElementById;
-const removeCookies      = require('../../_common/storage').removeCookies;
-const urlFor             = require('../../_common/url').urlFor;
-const applyToAllElements = require('../../_common/utility').applyToAllElements;
-
-// Import logout modal - store promise to avoid race condition
-let logoutModalPromise;
-if (typeof window !== 'undefined') {
-    logoutModalPromise = import('../../../templates/_common/components/logout-modal.jsx')
-        .then(module => module.default);
-}
+const getElementById        = require('../../_common/common_functions').getElementById;
+const removeCookies         = require('../../_common/storage').removeCookies;
+const urlFor                = require('../../_common/url').urlFor;
+const applyToAllElements    = require('../../_common/utility').applyToAllElements;
 
 // const licenseID          = require('../../_common/utility').lc_licenseID;
 // const clientID           = require('../../_common/utility').lc_clientID;
 
 const Client = (() => {
+    let tab_visibility_handler = null;
+
+    /**
+     * Check whoami endpoint and handle unauthorized sessions
+     */
+    const performWhoAmICheck = async () => {
+        if (!ClientBase.isLoggedIn()) {
+            return;
+        }
+
+        try {
+            const result = await checkWhoAmI();
+            
+            if (result.error && result.error.code === 401) {
+                // Session is invalid, trigger logout via sendLogoutRequest
+                // eslint-disable-next-line no-console
+                console.log('[WhoAmI] Session unauthorized, logging out...');
+                
+                // sendLogoutRequest handles REST logout and cleanup
+                await sendLogoutRequest(false);
+            }
+        } catch (error) {
+            // eslint-disable-next-line no-console
+            console.error('[WhoAmI] Check failed:', error);
+        }
+    };
+
+    /**
+     * Sets up visibility change listener to check whoami when tab becomes visible
+     */
+    const setupVisibilityListener = () => {
+        // Remove existing listener if any
+        removeVisibilityListener();
+
+        // Create handler function
+        tab_visibility_handler = () => {
+            if (document.visibilityState === 'visible') {
+                // Tab became visible - check whoami
+                performWhoAmICheck();
+            }
+        };
+
+        // Add listener
+        document.addEventListener('visibilitychange', tab_visibility_handler);
+    };
+
+    /**
+     * Removes the visibility change listener
+     */
+    const removeVisibilityListener = () => {
+        if (tab_visibility_handler) {
+            document.removeEventListener('visibilitychange', tab_visibility_handler);
+            tab_visibility_handler = null;
+        }
+    };
 
     const processNewAccount = (options) => {
         if (ClientBase.setNewAccount(options)) {
@@ -39,7 +88,7 @@ const Client = (() => {
         // const secondary_bg_color    = 'secondary-bg-color';
         
         if (ClientBase.isLoggedIn()) {
-            BinarySocket.wait('authorize', 'balance').then(() => {
+            BinarySocket.wait('balance').then(() => {
                 // const client_logged_in = getElementById('client-logged-in');
                 // client_logged_in.classList.add('gr-centered');
 
@@ -176,21 +225,26 @@ const Client = (() => {
         }
     };
 
-    const sendLogoutRequest = (show_login_page, redirect_to) => {
+    const sendLogoutRequest = async (show_login_page) => {
         if (show_login_page) {
             sessionStorage.setItem('showLoginPage', 1);
         }
-        // Remove client_information cookie
-        removeCookies('client_information');
+        
         try {
-            BinarySocket.send({ logout: '1', passthrough: { redirect_to } }).then((response) => {
-                if (response.logout === 1) {
-                    GTM.pushDataLayer({ event: 'log_out' });
-                }
-            });
+            // Use REST logout instead of WebSocket
+            const logoutResponse = await requestRestLogout();
+            
+            if (logoutResponse.logout === 1) {
+                GTM.pushDataLayer({ event: 'log_out' });
+            }
+            
+            // Clean up app state using doLogout
+            doLogout(logoutResponse);
         } catch (error) {
             // eslint-disable-next-line no-console
-            console.error(error);
+            console.error('[Logout Error]', error);
+            // Even if REST logout fails, clean up app state
+            doLogout({ logout: 1 });
         }
     };
 
@@ -222,15 +276,11 @@ const Client = (() => {
 
     // });
 
-    const LOGOUT_MODAL_CONFIG = {
-        STORAGE_KEY: 'show_logout_modal',
-        get TITLE() { return localize('Log out successful'); },
-        get MESSAGE() { return localize('To sign out everywhere, log out from Home and your other active platforms.'); },
-        get BUTTON_TEXT() { return localize('Got it'); },
-    };
-
     const doLogout = (response) => {
         if (response.logout !== 1) return;
+        
+        // Remove visibility listener
+        removeVisibilityListener();
         
         // Remove cookies
         removeCookies('login', 'loginid', 'loginid_list', 'email', 'residence', 'settings');
@@ -247,42 +297,16 @@ const Client = (() => {
         // Clear client data
         ClientBase.clearAllAccounts();
         ClientBase.set('loginid', '');
-        localStorage.removeItem('session_token');
+        // NEW: Remove account_id and account_type instead of session_token
+        localStorage.removeItem('account_id');
+        localStorage.removeItem('account_type');
         
         // Clear caches
         SocketCache.clear();
         RealityCheckData.clear();
         
-        // Set flag to show logout modal after page reload
-        sessionStorage.setItem(LOGOUT_MODAL_CONFIG.STORAGE_KEY, '1');
-        
         // Reload the page
         window.location.reload();
-    };
-    
-    const checkAndShowLogoutModal = async () => {
-        // Check if we should show the logout modal after page reload
-        const shouldShowModal = sessionStorage.getItem(LOGOUT_MODAL_CONFIG.STORAGE_KEY) === '1';
-        
-        if (!shouldShowModal) return;
-        
-        sessionStorage.removeItem(LOGOUT_MODAL_CONFIG.STORAGE_KEY);
-        
-        // Wait for the module to load to avoid race condition
-        if (logoutModalPromise) {
-            try {
-                const LogoutModalModule = await logoutModalPromise;
-                LogoutModalModule.init({
-                    title     : LOGOUT_MODAL_CONFIG.TITLE,
-                    message   : LOGOUT_MODAL_CONFIG.MESSAGE,
-                    buttonText: LOGOUT_MODAL_CONFIG.BUTTON_TEXT,
-                    onClose   : () => LogoutModalModule.remove(),
-                });
-            } catch (error) {
-                // eslint-disable-next-line no-console
-                console.error('Failed to load logout modal:', error);
-            }
-        }
     };
 
     const getUpgradeInfo = () => {
@@ -328,9 +352,11 @@ const Client = (() => {
         activateByClientType,
         sendLogoutRequest,
         doLogout,
-        checkAndShowLogoutModal,
         getUpgradeInfo,
         defaultRedirectUrl,
+        setupVisibilityListener,
+        removeVisibilityListener,
+        performWhoAmICheck,
     }, ClientBase);
 })();
 

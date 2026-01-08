@@ -6,7 +6,7 @@ const getCurrentBinaryDomain = require('../config').getCurrentBinaryDomain;
 
 const ThirdPartyLinks = (() => {
     const init = () => {
-        BinarySocket.wait('authorize').then(() => {
+        BinarySocket.wait('balance').then(() => {
             document.body.addEventListener('click', clickHandler);
         });
     };

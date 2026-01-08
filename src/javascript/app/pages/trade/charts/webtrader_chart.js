@@ -48,10 +48,8 @@ const WebtraderChart = (() => {
                 require.ensure([], (require) => {
                     WebtraderCharts = require('@deriv-com/webtrader-charts');
                     WebtraderCharts.init({
-                        server: Config.getSocketURL(),
+                        server: Config.getChartSocketURL(),
                         appId : Config.getAppId(),
-                        brand : 'binary',
-                        lang  : getLanguage().toLowerCase(),
                     });
                     
                     // Override addNewChart to fix tooltip functionality

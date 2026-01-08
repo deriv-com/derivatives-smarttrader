@@ -24,28 +24,34 @@ const BinarySocketGeneral = (() => {
         handleError(response);
         Header.hideNotification('CONNECTION_ERROR');
         switch (response.msg_type) {
-            case 'authorize':
+            case 'balance':
+                // NEW SYSTEM: Balance response is the auth confirmation
                 if (response.error) {
                     const is_active_tab = sessionStorage.getItem('active_tab') === '1';
                     showNoticeMessage(mapErrorMessage(response.error));
-                    localStorage.removeItem('session_token');
+                    localStorage.removeItem('account_id');
+                    localStorage.removeItem('account_type');
                     
                     if (is_active_tab) {
                         sessionStorage.removeItem('active_tab');
                     }
                     Client.sendLogoutRequest(is_active_tab);
-                } else if (!isLoginPages() && !/authorize/.test(State.get('skip_response'))) {
-                    // Pure session token authentication - single path only
-                    Client.responseAuthorizeSessionToken(response);
-                    BinarySocket.send({ balance: 1, subscribe: 1 });
-                    SubscriptionManager.subscribe('transaction', { transaction: 1, subscribe: 1 }, () => false);
-                    BinarySocket.sendBuffered();
-                    LocalStore.remove('date_first_contact');
-                    LocalStore.remove('signup_device');
+                } else if (!isLoginPages() && !/balance/.test(State.get('skip_response'))) {
+                    // Check if this is the first balance (auth confirmation)
+                    const isFirstBalance = !Client.get('loginid');
+                    
+                    if (isFirstBalance) {
+                        // First balance response - set up subscriptions
+                        Client.responseBalance(response);
+                        SubscriptionManager.subscribe('transaction', { transaction: 1, subscribe: 1 }, () => false);
+                        BinarySocket.sendBuffered();
+                        LocalStore.remove('date_first_contact');
+                        LocalStore.remove('signup_device');
+                    }
+                    
+                    // Always update balance display
+                    updateBalance(response);
                 }
-                break;
-            case 'balance':
-                updateBalance(response);
                 break;
             case 'logout':
                 Client.doLogout(response);

@@ -29,7 +29,11 @@ const ClientBase = (() => {
         }
     };
 
-    const isLoggedIn = () => !!localStorage.getItem('session_token');
+    const isLoggedIn = () => {
+        const accountId = localStorage.getItem('account_id');
+        const accountType = localStorage.getItem('account_type');
+        return !!(accountId && accountType);
+    };
 
     /**
      * Stores the client information in local variable and localStorage
@@ -68,9 +72,6 @@ const ClientBase = (() => {
         let value;
         if (key === 'loginid') {
             value = current_account.loginid || SessionStore.get('active_loginid') || LocalStore.get('active_loginid');
-        } else if (key === 'token') {
-            // Always return session token for pure session token authentication
-            value = localStorage.getItem('session_token');
         } else {
             // Simple single-account property retrieval
             value = key ? current_account[key] : current_account;
@@ -114,53 +115,40 @@ const ClientBase = (() => {
     };
 
     /**
-     * Handle authorization response specifically for session token authentication
-     * Simplified for single-account token exchange
+     * Handle balance response as authentication confirmation
+     * Balance response serves as auth confirmation in new system
      */
-    const responseAuthorizeSessionToken = (response) => {
-        const authorize = response.authorize;
-        if (!authorize || !authorize.loginid) {
+    const responseBalance = (response) => {
+        const balance = response.balance;
+        if (!balance || !balance.loginid) {
             return;
         }
 
-        // Set current loginid
-        current_loginid = authorize.loginid;
+        // Set current loginid from balance response
+        current_loginid = balance.loginid;
         
-        // Get session token
-        const sessionToken = localStorage.getItem('session_token');
+        // Set account properties
+        set('loginid',    balance.loginid);
+        set('currency',   balance.currency);
+        set('balance',    balance.balance);
         
-        // Set account properties for single logged-in account
-        set('loginid',    authorize.loginid);
-        // Note: token is always retrieved from localStorage in pure session token system
-        set('email',      authorize.email || '');
-        set('country',    authorize.country || '');
-        set('currency',   authorize.currency);
-        set('is_virtual', +authorize.is_virtual);
-        set('balance',    authorize.balance);
+        // Determine if virtual based on account_type
+        // account_type 'demo' = virtual account, 'real' = real account
+        const account_type = localStorage.getItem('account_type');
+        const is_virtual = account_type === 'demo' ? 1 : 0;
+        set('is_virtual', is_virtual);
+        
         set('session_start', parseInt(moment().valueOf() / 1000));
         
-        // Set optional properties if they exist
-        if (authorize.landing_company_name) {
-            set('landing_company_shortcode', authorize.landing_company_name);
-        }
-        if (authorize.user_id) {
-            set('user_id', authorize.user_id);
-        }
-        
-        // Store session token for compatibility
-        current_account.token = sessionToken;
-        
-        // Single storage operation for account data
+        // Store account data
         LocalStore.setObject(storage_key, current_account);
-        LocalStore.set('active_loginid', authorize.loginid);
+        LocalStore.set('active_loginid', balance.loginid);
         
         // Set simplified client information cookie
         const client_information = {
-            loginid   : authorize.loginid,
-            email     : authorize.email || '',
-            currency  : authorize.currency,
-            is_virtual: +authorize.is_virtual,
-            user_id   : authorize.user_id || '',
+            loginid : balance.loginid,
+            currency: balance.currency,
+            is_virtual,
         };
         
         const currentDomain = `.${window.location.hostname.split('.').slice(-2).join('.')}`;
@@ -175,6 +163,9 @@ const ClientBase = (() => {
         current_loginid = undefined;
         current_account = {};
         LocalStore.setObject(storage_key, current_account);
+        // Clear account_id and account_type
+        localStorage.removeItem('account_id');
+        localStorage.removeItem('account_type');
     };
 
     const setNewAccount = (options) => {
@@ -358,12 +349,6 @@ const ClientBase = (() => {
         return false;
     };
 
-    /**
-     * Get session token if it exists
-     * @returns {string|null} - Session token or null if not found
-     */
-    const getStoredSessionToken = () => localStorage.getItem('session_token');
-
     return {
         init,
         isLoggedIn,
@@ -379,7 +364,7 @@ const ClientBase = (() => {
         isOfferingBlocked,
         hasCurrencyType,
         hasOnlyCurrencyType,
-        responseAuthorizeSessionToken,
+        responseBalance,
         clearAllAccounts,
         setNewAccount,
         currentLandingCompany,
@@ -389,7 +374,6 @@ const ClientBase = (() => {
         canTransferFunds,
         hasSvgAccount,
         canChangeCurrency,
-        getStoredSessionToken,
     };
 })();
 

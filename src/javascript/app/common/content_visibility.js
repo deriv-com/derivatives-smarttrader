@@ -51,7 +51,7 @@ const ContentVisibility = (() => {
 
     const init = () =>
         new Promise(resolve => {
-            BinarySocket.wait('authorize').then(() => {
+            BinarySocket.wait('balance').then(() => {
                 resolve();
             });
         })

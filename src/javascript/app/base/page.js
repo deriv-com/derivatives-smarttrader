@@ -84,7 +84,8 @@ const Page = (() => {
             // So, fall back to a more basic solution.
             const handleStorageEvent = (evt) => {
                 switch (evt.key) {
-                    case 'session_token':
+                    case 'account_id':
+                    case 'account_type':
                         if (evt.newValue !== evt.oldValue) {
                             setTimeout(() => {
                                 window.location.reload();
@@ -178,9 +179,15 @@ const Page = (() => {
             Login.redirectToLogin();
         }
         if (Client.isLoggedIn()) {
-            BinarySocket.wait('authorize').then(() => {
+            BinarySocket.wait('balance').then(() => {
                 RealityCheck.onLoad();
                 Menu.init();
+                
+                // Check whoami on init after logged in
+                Client.performWhoAmICheck();
+                
+                // Setup visibility listener to check whoami when tab becomes visible
+                Client.setupVisibilityListener();
             });
         } else {
             Menu.init();

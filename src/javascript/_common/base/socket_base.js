@@ -1,12 +1,10 @@
 const ClientBase       = require('./client_base');
 const SocketCache      = require('./socket_cache');
-const getLanguage      = require('../language').get;
 const State            = require('../storage').State;
 const cloneObject      = require('../utility').cloneObject;
 const getPropertyValue = require('../utility').getPropertyValue;
 const isEmptyObject    = require('../utility').isEmptyObject;
 const PromiseClass     = require('../utility').PromiseClass;
-const getAppId         = require('../../config').getAppId;
 const getSocketURL     = require('../../config').getSocketURL;
 
 /*
@@ -23,7 +21,6 @@ const BinarySocketBase = (() => {
     let is_disconnect_called = false;
     let is_connected_before  = false;
 
-    const socket_url = `${getSocketURL()}?app_id=${getAppId()}&l=${getLanguage()}&brand=Deriv`;
     const timeouts   = {};
     const promises   = {};
 
@@ -103,7 +100,7 @@ const BinarySocketBase = (() => {
         msg_types.forEach((msg_type) => {
             const last_response = State.get(['response', msg_type]);
             if (!last_response) {
-                if (msg_type !== 'authorize' || ClientBase.isLoggedIn()) {
+                if (ClientBase.isLoggedIn()) {
                     waiting_list.add(msg_type, promise_obj);
                     is_resolved = false;
                 }
@@ -200,35 +197,31 @@ const BinarySocketBase = (() => {
         config.wsEvent('init');
 
         // Remove token from URL immediately during initialization
+        // We may still receive token parameter but we don't use it anymore
         const urlParams = new URLSearchParams(window.location.search);
         const tokenParam = urlParams.get('token');
         if (tokenParam) {
-            // Set flag before removing token so header can show skeleton loaders
-            window.tokenExchangeInProgress = true;
-            
             const url = new URL(window.location.href);
             url.searchParams.delete('token');
             window.history.replaceState({}, document.title, url.toString());
         }
 
         if (isClose() || availability.is_updating) {
+            // Get socket URL dynamically (includes endpoint and account_id)
+            const socket_url = getSocketURL();
             binary_socket = new WebSocket(socket_url);
             State.set('response', {});
         }
 
-        binary_socket.onopen = async () => {
+        binary_socket.onopen = () => {
             config.wsEvent('open');
-
-            // Handle token exchange flow if token parameter exists in URL
-            const newSessionToken = await handleTokenExchange(tokenParam);
-
-            // Use newly exchanged token if available, otherwise use existing token
-            const sessionToken = newSessionToken || ClientBase.getStoredSessionToken();
-            if (sessionToken) {
-                send({ authorize: sessionToken }, { forced: true });
-            } else {
-                sendBufferedRequests();
+            
+            if (ClientBase.isLoggedIn()) {
+                send({ balance: 1, subscribe: 1 }, { forced: true });
             }
+            
+            // Send any buffered requests
+            sendBufferedRequests();
 
             if (typeof config.onOpen === 'function') {
                 config.onOpen(isReady());
@@ -242,98 +235,6 @@ const BinarySocketBase = (() => {
                 is_connected_before = true;
             }
         };
-
-        /**
-         * Handles token exchange flow for URL query parameter token authentication
-         * Token has already been removed from URL in init() for security
-         */
-        const handleTokenExchange = async (oneTimeToken) => {
-            if (oneTimeToken) {
-                try {
-                    // Exchange the token for session_token
-                    const sessionTokenResponse = await getSessionToken(oneTimeToken);
-
-                    if (sessionTokenResponse?.error) {
-                        // Reset flag and update header display after token exchange fails
-                        window.tokenExchangeInProgress = false;
-                        if (typeof window !== 'undefined' && window.SmartTrader?.Header?.updateLoginButtonsDisplay) {
-                            window.SmartTrader.Header.updateLoginButtonsDisplay();
-                        }
-                        return null;
-                    }
-
-                    if (sessionTokenResponse?.get_session_token?.token) {
-                        const sessionToken = sessionTokenResponse.get_session_token.token;
-                        
-                        // Store session token temporarily - will be moved to proper account after authorize
-                        localStorage.setItem('session_token', sessionToken);
-                        
-                        return sessionToken;
-                    }
-                } catch (error) {
-                    // Reset flag and update header display after token exchange fails
-                    window.tokenExchangeInProgress = false;
-                    if (typeof window !== 'undefined' && window.SmartTrader?.Header?.updateLoginButtonsDisplay) {
-                        window.SmartTrader.Header.updateLoginButtonsDisplay();
-                    }
-                    return null;
-                }
-            }
-
-            return null;
-        };
-
-        /**
-         * Exchanges one-time token for session token via API
-         * @param {string} oneTimeToken - The one-time token from URL parameters
-         * @returns {Promise} - API response with session token
-         */
-        const getSessionToken = (oneTimeToken) => new Promise((resolve, reject) => {
-            if (!oneTimeToken) {
-                reject(new Error('No token provided'));
-                return;
-            }
-
-            // Use the same WebSocket URL construction as the main socket
-            const wsUrl = `${getSocketURL()}?app_id=${getAppId()}&l=${getLanguage()}&brand=Deriv`;
-            
-            const ws = new WebSocket(wsUrl);
-                
-            let responseReceived = false;
-            const timeout = setTimeout(() => {
-                if (!responseReceived) {
-                    ws.close();
-                    reject(new Error('Token exchange timeout'));
-                }
-            }, 10000);
-
-            ws.onopen = () => {
-                ws.send(JSON.stringify({
-                    get_session_token: oneTimeToken,
-                    req_id           : Date.now(),
-                }));
-            };
-
-            ws.onmessage = (event) => {
-                responseReceived = true;
-                clearTimeout(timeout);
-                try {
-                    const response = JSON.parse(event.data);
-                    ws.close();
-                    resolve(response);
-                } catch (error) {
-                    ws.close();
-                    reject(error);
-                }
-            };
-
-            ws.onerror = (error) => {
-                responseReceived = true;
-                clearTimeout(timeout);
-                ws.close();
-                reject(error);
-            };
-        });
 
         binary_socket.onmessage = (msg) => {
             config.wsEvent('message');
