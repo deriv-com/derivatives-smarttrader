@@ -86,7 +86,7 @@ const AppProvider = ({ children }) => {
     const accountType = getAccountType();
     return `${
       accountType.charAt(0).toUpperCase() + accountType.slice(1)
-    } Account`;
+    } account`;
   };
 
   // Toggle mobile menu
