@@ -23,18 +23,10 @@ const Client = (() => {
      * Check whoami endpoint and handle unauthorized sessions
      */
     const performWhoAmICheck = async () => {
-        if (!ClientBase.isLoggedIn()) {
-            return;
-        }
-
         try {
             const result = await checkWhoAmI();
             
             if (result.error && result.error.code === 401) {
-                // Session is invalid, trigger logout via sendLogoutRequest
-                // eslint-disable-next-line no-console
-                console.log('[WhoAmI] Session unauthorized, logging out...');
-                
                 // sendLogoutRequest handles REST logout and cleanup
                 await sendLogoutRequest(false);
             }

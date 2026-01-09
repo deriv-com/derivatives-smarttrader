@@ -183,9 +183,6 @@ const Page = (() => {
                 RealityCheck.onLoad();
                 Menu.init();
                 
-                // Check whoami on init after logged in
-                Client.performWhoAmICheck();
-                
                 // Setup visibility listener to check whoami when tab becomes visible
                 Client.setupVisibilityListener();
             });
