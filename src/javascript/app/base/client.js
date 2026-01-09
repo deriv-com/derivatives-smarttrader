@@ -23,10 +23,6 @@ const Client = (() => {
      * Check whoami endpoint and handle unauthorized sessions
      */
     const performWhoAmICheck = async () => {
-        if (!ClientBase.isLoggedIn()) {
-            return;
-        }
-
         try {
             const result = await checkWhoAmI();
             
