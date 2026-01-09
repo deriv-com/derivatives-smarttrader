@@ -155,13 +155,6 @@ const Url = (() => {
         return `${origin}/${path}?${pars ? `${pars}` : ''}`;
     };
 
-    const urlForTransfer = (baseUrl, currency) => {
-        const lang_param = Language.get() ? `&lang=${Language.get()}` : '';
-        return `/transfer?acc=options&from=home&source=options${
-            baseUrl ? `&${baseUrl}` : ''
-        }${currency ? `&curr=${currency}` : ''}${lang_param}`;
-    };
-
     const getAllowedLocalStorageOrigin = (is_traders_hub_or_wallet) => {
     // TODO: [app-link-refactor] - Remove backwards compatibility for `deriv.app`
         const domain_zone = getTopLevelDomain();
@@ -239,7 +232,6 @@ const Url = (() => {
         urlForDeriv,
         urlForReports,
         urlForTradersHub,
-        urlForTransfer,
         getAllowedLocalStorageOrigin,
         getHashValue,
         updateParamsWithoutReload,
