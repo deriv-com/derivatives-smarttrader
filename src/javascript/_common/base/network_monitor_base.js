@@ -36,6 +36,9 @@ const NetworkMonitorBase = (() => {
         [pending_keys.ws_request]: 10000,
     };
 
+    let reconnect_attempt_count = 0;
+    const MAX_RECONNECT_ATTEMPTS = 3;
+
     let ws_config,
         network_status,
         updateUI;
@@ -62,6 +65,16 @@ const NetworkMonitorBase = (() => {
 
     const wsReconnect = (is_force_reconnect) => {
         if (isOnline() && (BinarySocket.hasReadyState(2, 3) || is_force_reconnect)) { // CLOSING or CLOSED or forced
+            reconnect_attempt_count++;
+            
+            if (reconnect_attempt_count >= MAX_RECONNECT_ATTEMPTS) {
+                reconnect_attempt_count = 0;
+                if (typeof ws_config.onConnectionError === 'function') {
+                    ws_config.onConnectionError();
+                }
+                return;
+            }
+            
             BinarySocket.init(ws_config);
         } else {
             BinarySocket.send({ ping: 1 }); // trigger a request to get stable status sooner
@@ -112,6 +125,7 @@ const NetworkMonitorBase = (() => {
             clearTimeout(pendings[k]);
             pendings[k] = undefined;
             if (k === pending_keys.ws_request) {
+                reconnect_attempt_count = 0; // Reset on successful connection
                 setStatus('online');
             }
         };
