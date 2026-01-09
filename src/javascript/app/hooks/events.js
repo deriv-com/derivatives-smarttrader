@@ -32,7 +32,13 @@ const useCustomEvent = (eventName) => {
     useEffect(() => {
         const handleEvent = () => {
             setHasNewChanges(true);
-            setTimeout(() => setHasNewChanges(false), 0);
+            // Use requestAnimationFrame for more reliable cross-browser timing
+            // This ensures the state update is processed before resetting
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    setHasNewChanges(false);
+                });
+            });
         };
 
         const unsubscribe = eventEmitter.subscribe(eventName, handleEvent);
