@@ -95,9 +95,19 @@ const BinarySocketGeneral = (() => {
         $('#content').empty().html($('<div/>', { class: 'container' }).append($('<p/>', { class: 'notice-msg center-text', text })));
     };
 
+    const onConnectionError = () => {
+        localStorage.removeItem('active_loginid');
+        localStorage.removeItem('account_id');
+        localStorage.removeItem('account_type');
+        localStorage.removeItem('current_account');
+
+        showNoticeMessage(localize('Connection failed. Please refresh this page to continue.'));
+    };
+
     return {
         onOpen,
         onMessage,
+        onConnectionError,
     };
 })();
 
