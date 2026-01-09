@@ -37,6 +37,7 @@ const NetworkMonitorBase = (() => {
     };
 
     let reconnect_attempt_count = 0;
+    const MAX_RECONNECT_ATTEMPTS = 3;
 
     let ws_config,
         network_status,
@@ -66,7 +67,7 @@ const NetworkMonitorBase = (() => {
         if (isOnline() && (BinarySocket.hasReadyState(2, 3) || is_force_reconnect)) { // CLOSING or CLOSED or forced
             reconnect_attempt_count++;
             
-            if (reconnect_attempt_count >= 3) {
+            if (reconnect_attempt_count >= MAX_RECONNECT_ATTEMPTS) {
                 reconnect_attempt_count = 0;
                 if (typeof ws_config.onConnectionError === 'function') {
                     ws_config.onConnectionError();
