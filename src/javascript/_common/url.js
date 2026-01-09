@@ -1,234 +1,258 @@
-const createElement          = require('./utility').createElement;
-const isEmptyObject          = require('./utility').isEmptyObject;
-const getTopLevelDomain      = require('./utility').getTopLevelDomain;
-const Language               = require('./language');
-const { SessionStore }       = require('./storage');
-const getCurrentBinaryDomain = require('../config').getCurrentBinaryDomain;
-require('url-polyfill');
+const createElement = require("./utility").createElement;
+const isEmptyObject = require("./utility").isEmptyObject;
+const getTopLevelDomain = require("./utility").getTopLevelDomain;
+const Language = require("./language");
+const { SessionStore } = require("./storage");
+const getCurrentBinaryDomain = require("../config").getCurrentBinaryDomain;
+require("url-polyfill");
 
 const Url = (() => {
-    let location_url,
-        static_host;
+  let location_url, static_host;
 
-    const init = (url) => {
-        location_url = url ? getLocation(url) : window.location;
-    };
+  const init = (url) => {
+    location_url = url ? getLocation(url) : window.location;
+  };
 
-    const getLocation = url => createElement('a', { href: decodeURIComponent(url) });
+  const getLocation = (url) =>
+    createElement("a", { href: decodeURIComponent(url) });
 
-    const reset = () => {
-        location_url = window ? window.location : location_url;
-    };
+  const reset = () => {
+    location_url = window ? window.location : location_url;
+  };
 
-    const params = (href) => {
-        const arr_params = [];
-        const parsed     = ((href ? new URL(href) : location_url).search || '').substr(1).split('&');
-        let p_l          = parsed.length;
-        while (p_l--) {
-            const param = parsed[p_l].split('=');
-            arr_params.push(param);
-        }
-        return arr_params;
-    };
+  const params = (href) => {
+    const arr_params = [];
+    const parsed = ((href ? new URL(href) : location_url).search || "")
+      .substr(1)
+      .split("&");
+    let p_l = parsed.length;
+    while (p_l--) {
+      const param = parsed[p_l].split("=");
+      arr_params.push(param);
+    }
+    return arr_params;
+  };
 
-    const paramsHash = (href) => {
-        const param_hash = {};
-        const arr_params = params(href);
-        let param        = arr_params.length;
-        while (param--) {
-            if (arr_params[param][0]) {
-                param_hash[arr_params[param][0]] = arr_params[param][1] || '';
-            }
-        }
-        return param_hash;
-    };
+  const paramsHash = (href) => {
+    const param_hash = {};
+    const arr_params = params(href);
+    let param = arr_params.length;
+    while (param--) {
+      if (arr_params[param][0]) {
+        param_hash[arr_params[param][0]] = arr_params[param][1] || "";
+      }
+    }
+    return param_hash;
+  };
 
-    const paramsHashToString = pars => (isEmptyObject(pars) ? '' : Object.keys(pars).map(key => `${key}=${pars[key] || ''}`).join('&'));
+  const paramsHashToString = (pars) =>
+    isEmptyObject(pars)
+      ? ""
+      : Object.keys(pars)
+          .map((key) => `${key}=${pars[key] || ""}`)
+          .join("&");
 
-    const normalizePath = path => (path ? path.replace(/(^\/|\/$|[^a-zA-Z0-9-_/])/g, '') : '');
+  const normalizePath = (path) =>
+    path ? path.replace(/(^\/|\/$|[^a-zA-Z0-9-_/])/g, "") : "";
 
-    const urlFor = (path, pars, language, should_change_to_legacy = false) => {
-        // Generate clean URLs without language parameters
-        let domain = window.location.origin;
-        
-        if (should_change_to_legacy) {
-            domain = domain.replace(/\/app/, '');
-        }
-        
-        const base_path = normalizePath(path) || 'trading';
-        const base_url = `${domain}/${base_path}.html`;
-        
-        // Only include non-language parameters
-        const url_params = new URLSearchParams(pars || '');
-        // Remove any language parameter that might have been passed
-        url_params.delete('lang');
-        
-        const query_string = url_params.toString();
-        return `${base_url}${query_string ? `?${query_string}` : ''}`;
-    };
+  const urlFor = (path, pars, language, should_change_to_legacy = false) => {
+    // Generate clean URLs without language parameters
+    let domain = window.location.origin;
 
-    const default_domain = 'binary.com';
-    const host_map = { // the exceptions regarding updating the URLs
-        'bot.binary.com'    : 'www.binary.bot',
-        'api.deriv.com'     : 'api.deriv.com', // same, shouldn't change
-        'academy.binary.com': 'academy.binary.com',
-        'blog.binary.com'   : 'blog.binary.com',
-    };
+    if (should_change_to_legacy) {
+      domain = domain.replace(/\/app/, "");
+    }
 
-    const urlForCurrentDomain = (href) => {
-        const current_domain = getCurrentBinaryDomain();
+    const base_path = normalizePath(path) || "trading";
+    const base_url = `${domain}/${base_path}.html`;
 
-        if (!current_domain) {
-            return href; // don't change when domain is not supported
-        }
+    // Only include non-language parameters
+    const url_params = new URLSearchParams(pars || "");
+    // Remove any language parameter that might have been passed
+    url_params.delete("lang");
 
-        const url_object = new URL(href);
-        if (Object.keys(host_map).includes(url_object.hostname)) {
-            url_object.hostname = host_map[url_object.hostname];
-        } else if (url_object.hostname.match(default_domain)) {
-            // to keep all non-Binary links unchanged, we use default domain for all Binary links in the codebase (javascript and templates)
-            url_object.hostname = url_object.hostname.replace(new RegExp(`\\.${default_domain}`, 'i'), `.${current_domain}`);
-        } else {
-            return href;
-        }
+    const query_string = url_params.toString();
+    return `${base_url}${query_string ? `?${query_string}` : ""}`;
+  };
 
-        return url_object.href;
-    };
+  const default_domain = "binary.com";
+  const host_map = {
+    // the exceptions regarding updating the URLs
+    "bot.binary.com": "www.binary.bot",
+    "api.deriv.com": "api.deriv.com", // same, shouldn't change
+    "academy.binary.com": "academy.binary.com",
+    "blog.binary.com": "blog.binary.com",
+  };
 
-    const urlForStatic = (path = '') => {
-        if (!static_host || static_host.length === 0) {
-            static_host = document.querySelector('script[src*="vendor.min.js"]');
-            if (static_host) {
-                static_host = static_host.getAttribute('src');
-            }
+  const urlForCurrentDomain = (href) => {
+    const current_domain = getCurrentBinaryDomain();
 
-            if (static_host && static_host.length > 0) {
-                static_host = static_host.substr(0, static_host.indexOf('/js/') + 1);
-            } else {
-                static_host = Url.websiteUrl();
-            }
-        }
+    if (!current_domain) {
+      return href; // don't change when domain is not supported
+    }
 
-        return static_host + path.replace(/(^\/)/g, '');
-    };
+    const url_object = new URL(href);
+    if (Object.keys(host_map).includes(url_object.hostname)) {
+      url_object.hostname = host_map[url_object.hostname];
+    } else if (url_object.hostname.match(default_domain)) {
+      // to keep all non-Binary links unchanged, we use default domain for all Binary links in the codebase (javascript and templates)
+      url_object.hostname = url_object.hostname.replace(
+        new RegExp(`\\.${default_domain}`, "i"),
+        `.${current_domain}`
+      );
+    } else {
+      return href;
+    }
 
-    const deriv_app_domain = `https://home.deriv.${getTopLevelDomain()}`;
+    return url_object.href;
+  };
 
-    const getAccountParam = () =>
-        Url.param('account') ||
-      (SessionStore.get('account')
-          ? SessionStore.get('account')
-          : '');
+  const urlForStatic = (path = "") => {
+    if (!static_host || static_host.length === 0) {
+      static_host = document.querySelector('script[src*="vendor.min.js"]');
+      if (static_host) {
+        static_host = static_host.getAttribute("src");
+      }
 
-    const urlForDeriv = (path, pars) =>
-        `${getAllowedLocalStorageOrigin() || deriv_app_domain}/${path}${
-            getAccountParam() ? `?account=${getAccountParam().toUpperCase()}` : '?'
-        }${pars ? `&${pars}` : ''}`;
+      if (static_host && static_host.length > 0) {
+        static_host = static_host.substr(0, static_host.indexOf("/js/") + 1);
+      } else {
+        static_host = Url.websiteUrl();
+      }
+    }
 
-    const urlForReports = (path, redirect_url, account_type) => {
-        let dtrader_domain;
-        
-        if (process.env.NODE_ENV !== 'production') {
-            dtrader_domain = 'https://staging-dtrader.deriv.com';
-        } else {
-            dtrader_domain = `https://dtrader.deriv.${getTopLevelDomain()}`;
-        }
-        
-        const encoded_redirect = encodeURIComponent(redirect_url);
-        const lang = Language.get();
-        const account_id = localStorage.getItem('active_loginid') || '';
-        return `${dtrader_domain}/${path}?redirect=${encoded_redirect}&account_type=${account_type}&account_id=${account_id}&lang=${lang}`;
-    };
+    return static_host + path.replace(/(^\/)/g, "");
+  };
 
-    const urlForTradersHub = (path, pars) => {
-        const origin = getAllowedLocalStorageOrigin(true) || deriv_app_domain;
-        return `${origin}/${path}?${pars ? `${pars}` : ''}`;
-    };
+  const deriv_app_domain = `https://home.deriv.${getTopLevelDomain()}`;
 
-    const getAllowedLocalStorageOrigin = (is_traders_hub_or_wallet) => {
-        // TODO: [app-link-refactor] - Remove backwards compatibility for `deriv.app`
-        const domain_zone = getTopLevelDomain();
-        
-        if (
-            /^smarttrader-staging\.deriv\.app$/i.test(window.location.hostname) ||
-            /^staging-smarttrader\.deriv\.com$/i.test(window.location.hostname)
-        ) {
-            return 'https://staging-home.deriv.com';
-        } else if (
-            /^smarttrader\.deriv\.app$/i.test(window.location.hostname) ||
-            /^smarttrader\.deriv\.com$/i.test(window.location.hostname)
-        ) {
-            return is_traders_hub_or_wallet ? `https://hub.deriv.${domain_zone}` : deriv_app_domain;
-        }
-        return is_traders_hub_or_wallet ? `https://hub.deriv.${domain_zone}` : deriv_app_domain;
-    };
+  const getAccountParam = () =>
+    Url.param("account") ||
+    (SessionStore.get("account") ? SessionStore.get("account") : "");
 
-    /**
-     * @param {Object} new_params - Object with param-value pairs. To delete param, set value to null.
-     * @param {boolean} should_preserve_old - Should existing query parameters be preserved.
-     */
-    const updateParamsWithoutReload = (new_params, should_preserve_old) => {
-        const updated_params = should_preserve_old
-            ? Object.assign(paramsHash(), new_params)
-            : new_params;
-        Object.keys(new_params).forEach(key => {
-            if (new_params[key] === null) {
-                delete updated_params[key];
-            }
-        });
-        const url = new URL(window.location);
-        url.search = paramsHashToString(updated_params);
-        window.history.replaceState({ url: url.href }, '', url.href);
-    };
+  const urlForDeriv = (path, pars) =>
+    `${getAllowedLocalStorageOrigin() || deriv_app_domain}/${path}${
+      getAccountParam() ? `?account=${getAccountParam().toUpperCase()}` : "?"
+    }${pars ? `&${pars}` : ""}`;
 
-    const getHashValue = (name) => {
-        const hash  = (location_url || window.location).hash;
-        const value = hash.split('=');
-        return new RegExp(name).test(hash) && value.length > 1 ? value[1] : '';
-    };
+  const urlForReports = (path, redirect_url, account_type) => {
+    let dtrader_domain;
 
-    const getStaticUrl = () => {
-        const host = 'https://deriv';
-        const domain = getTopLevelDomain();
-        let lang = Language.get().toLowerCase();
-    
-        if (lang && lang !== 'en') {
-            lang = `/${lang}`;
-        } else {
-            lang = '';
-        }
-        
-        if (lang.includes('_')) {
-            lang = lang.replace('_', '-');
-        }
-    
-        const url = `${host}.${domain}${lang}`;
-        return url;
-    };
+    if (process.env.NODE_ENV !== "production") {
+      dtrader_domain = "https://staging-dtrader.deriv.com";
+    } else {
+      dtrader_domain = `https://dtrader.deriv.${getTopLevelDomain()}`;
+    }
 
-    return {
-        init,
-        reset,
-        paramsHash,
-        getLocation,
-        paramsHashToString,
-        urlFor,
-        urlForCurrentDomain,
-        urlForStatic,
-        urlForDeriv,
-        urlForReports,
-        urlForTradersHub,
-        getAllowedLocalStorageOrigin,
-        getHashValue,
-        updateParamsWithoutReload,
-        getStaticUrl,
+    const encoded_redirect = encodeURIComponent(redirect_url);
+    const lang = Language.get();
+    const account_id = localStorage.getItem("active_loginid") || "";
+    return `${dtrader_domain}/${path}?redirect=${encoded_redirect}&account_type=${account_type}&account_id=${account_id}&lang=${lang}`;
+  };
 
-        param           : name => paramsHash()[name],
-        websiteUrl      : () => `${location.protocol}//${location.hostname}/`,
-        getDefaultDomain: () => default_domain,
-        getHostMap      : () => host_map,
-        resetStaticHost : () => { static_host = undefined; },
-    };
+  const urlForTradersHub = (path, pars) => {
+    const origin = getAllowedLocalStorageOrigin(true) || deriv_app_domain;
+    return `${origin}/${path}?${pars ? `${pars}` : ""}`;
+  };
+
+  const urlForTransfer = (baseUrl, currency) => {
+    const lang_param = Language.get() ? `&lang=${Language.get()}` : "";
+    return `/transfer?acc=options&from=home&source=options${
+      baseUrl ? `&${baseUrl}` : ""
+    }${currency ? `&curr=${currency}` : ""}${lang_param}`;
+  };
+
+  const getAllowedLocalStorageOrigin = (is_traders_hub_or_wallet) => {
+    // TODO: [app-link-refactor] - Remove backwards compatibility for `deriv.app`
+    const domain_zone = getTopLevelDomain();
+
+    if (
+      /^smarttrader-staging\.deriv\.app$/i.test(window.location.hostname) ||
+      /^staging-smarttrader\.deriv\.com$/i.test(window.location.hostname)
+    ) {
+      return "https://staging-home.deriv.com";
+    } else if (
+      /^smarttrader\.deriv\.app$/i.test(window.location.hostname) ||
+      /^smarttrader\.deriv\.com$/i.test(window.location.hostname)
+    ) {
+      return is_traders_hub_or_wallet
+        ? `https://hub.deriv.${domain_zone}`
+        : deriv_app_domain;
+    }
+    return is_traders_hub_or_wallet
+      ? `https://hub.deriv.${domain_zone}`
+      : deriv_app_domain;
+  };
+
+  /**
+   * @param {Object} new_params - Object with param-value pairs. To delete param, set value to null.
+   * @param {boolean} should_preserve_old - Should existing query parameters be preserved.
+   */
+  const updateParamsWithoutReload = (new_params, should_preserve_old) => {
+    const updated_params = should_preserve_old
+      ? Object.assign(paramsHash(), new_params)
+      : new_params;
+    Object.keys(new_params).forEach((key) => {
+      if (new_params[key] === null) {
+        delete updated_params[key];
+      }
+    });
+    const url = new URL(window.location);
+    url.search = paramsHashToString(updated_params);
+    window.history.replaceState({ url: url.href }, "", url.href);
+  };
+
+  const getHashValue = (name) => {
+    const hash = (location_url || window.location).hash;
+    const value = hash.split("=");
+    return new RegExp(name).test(hash) && value.length > 1 ? value[1] : "";
+  };
+
+  const getStaticUrl = () => {
+    const host = "https://deriv";
+    const domain = getTopLevelDomain();
+    let lang = Language.get().toLowerCase();
+
+    if (lang && lang !== "en") {
+      lang = `/${lang}`;
+    } else {
+      lang = "";
+    }
+
+    if (lang.includes("_")) {
+      lang = lang.replace("_", "-");
+    }
+
+    const url = `${host}.${domain}${lang}`;
+    return url;
+  };
+
+  return {
+    init,
+    reset,
+    paramsHash,
+    getLocation,
+    paramsHashToString,
+    urlFor,
+    urlForCurrentDomain,
+    urlForStatic,
+    urlForDeriv,
+    urlForReports,
+    urlForTradersHub,
+    urlForTransfer,
+    getAllowedLocalStorageOrigin,
+    getHashValue,
+    updateParamsWithoutReload,
+    getStaticUrl,
+
+    param: (name) => paramsHash()[name],
+    websiteUrl: () => `${location.protocol}//${location.hostname}/`,
+    getDefaultDomain: () => default_domain,
+    getHostMap: () => host_map,
+    resetStaticHost: () => {
+      static_host = undefined;
+    },
+  };
 })();
 
 module.exports = Url;

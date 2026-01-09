@@ -83,7 +83,7 @@ const AppProvider = ({ children }) => {
     const getAccountTypeDisplay = () => {
         if (!isLoggedIn) return '';
         const accountType = getAccountType();
-        return accountType.charAt(0).toUpperCase() + accountType.slice(1);
+        return accountType.charAt(0).toUpperCase() + accountType.slice(1) +' '+ 'Account';
     };
 
     // Toggle mobile menu
