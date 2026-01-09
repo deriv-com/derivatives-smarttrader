@@ -19,12 +19,14 @@ const urlFor = require('../../_common/url').urlFor;
 const createElement = require('../../_common/utility').createElement;
 const DevShortcuts = require('../../_common/dev_shortcuts');
 const { getI18nInstance, isTranslationsInitialized } = require('../../_common/translation-init');
+const { checkWhoAmI } = require('../../_common/whoami');
+const { getAccountId } = require('../../config');
 
 const BinaryLoader = (() => {
     let container;
     let active_script = null;
 
-    const init = () => {
+    const init = async () => {
         // Ensure translations are initialized
         if (!isTranslationsInitialized()) {
             // eslint-disable-next-line no-console
@@ -43,6 +45,22 @@ const BinaryLoader = (() => {
         }
 
         Page.showNotificationOutdatedBrowser();
+
+        // Check whoami BEFORE initializing Client to prevent connecting with stale credentials
+        const account_id = getAccountId();
+        if (account_id) {
+            const whoami_result = await checkWhoAmI();
+
+            // If session is invalid (401), clear credentials before any WebSocket connection
+            if (whoami_result.error?.code === 401) {
+                // Clear credentials to prevent WebSocket from connecting with stale account_id
+                localStorage.removeItem('account_id');
+                localStorage.removeItem('account_type');
+                localStorage.removeItem('active_loginid');
+                sessionStorage.removeItem('active_loginid');
+                localStorage.removeItem('current_account');
+            }
+        }
 
         Client.init();
         NetworkMonitor.init();
