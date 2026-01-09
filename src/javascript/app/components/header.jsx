@@ -47,7 +47,7 @@ const HeaderLeft = () => {
           <AccountInfo />
         </div>
       )}
-      <div className="header__menu-item header__menu-links mobile-hide client_logged_in mobile-hide">
+      <div className="header__menu-item header__menu-links  client_logged_in mobile-hide">
         <a
           className="url-reports-positions header__menu-links-item home-icon"
           href={`${getBrandHomeUrl()}?lang=${Language.get()}`}
@@ -65,7 +65,7 @@ const HeaderLeft = () => {
         </a>
       </div>
       {isLoggedIn && (
-        <div className="header__menu-item header__menu-links mobile-hide client_logged_in mobile-hide">
+        <div className="header__menu-item header__menu-links  client_logged_in mobile-hide">
           <a
             className="url-reports-positions header__menu-links-item"
             href={Url.urlForReports(
@@ -222,15 +222,9 @@ const LoginButtons = () => {
  * HeaderRight - Right section with account info or login buttons
  */
 const HeaderRight = () => {
-  const { isLoggedIn } = useApp();
-
-  const handleLogout = (e) => {
-    e.preventDefault();
-    Client.sendLogoutRequest();
-  };
+  const { isLoggedIn, accountInfo } = useApp();
 
   if (isLoggedIn) {
-    const { accountInfo } = useApp();
     const hasCurrency = accountInfo.currency && accountInfo.currency !== "";
 
     return (
@@ -240,7 +234,7 @@ const HeaderRight = () => {
         </div>
         <Button
           id="btn__transfer"
-          className=" btn header__btn-transfer"
+          className="btn header__btn-transfer "
           variant="primary"
           size="md"
           label={localize("Transfer")}
