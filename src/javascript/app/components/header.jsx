@@ -1,5 +1,5 @@
 import React from 'react';
-import { Skeleton } from '@deriv-com/quill-ui';
+import { Skeleton, Button } from '@deriv-com/quill-ui';
 import { localize } from '@deriv-com/translations';
 import MobileMenuComponent from './mobile_menu';
 import LanguageMenuModal from '../../../templates/_common/components/language-menu-modal';
@@ -7,10 +7,12 @@ import { renderReactComponent } from '../../_common/react_root_manager';
 import { getElementById } from '../../_common/common_functions';
 import Url from '../../_common/url';
 import Login from '../../_common/base/login';
-import Client from '../base/client';
 import Language from '../../_common/language';
 import { AppProvider, useApp } from '../contexts/AppContext';
-import { getBrandHomeUrl, getPlatformHostname } from '../../../templates/_common/brand.config';
+import {
+    getBrandHomeUrl,
+    getPlatformHostname,
+} from '../../../templates/_common/brand.config';
 import { getAccountType } from '../../config';
 
 const BUILD_HASH = process.env.BUILD_HASH || '';
@@ -20,7 +22,7 @@ const BUILD_HASH = process.env.BUILD_HASH || '';
  */
 const HeaderLeft = () => {
     const { isLoggedIn, toggleMobileMenu } = useApp();
-    
+
     // Get URL parameters for Reports link
     const account_type = getAccountType();
     const redirect_url = getPlatformHostname();
@@ -31,32 +33,52 @@ const HeaderLeft = () => {
                 <img
                     id='header__hamburger'
                     className='header__hamburger mobile-show'
-                    src={Url.urlForStatic(`images/pages/header/ic-hamburger.svg?${BUILD_HASH}`)}
+                    src={Url.urlForStatic(
+                        `images/pages/header/ic-hamburger.svg?${BUILD_HASH}`
+                    )}
                     alt='Menu'
                     onClick={toggleMobileMenu}
                     style={{ cursor: 'pointer' }}
                 />
             </span>
-            <div className='header-menu-item header-menu-links'>
-                <a className='url-deriv-com' href={`${getBrandHomeUrl()}?lang=${Language.get()}`}>
-                    <img
-                        className='deriv-com-logo'
-                        src={Url.urlForStatic(`images/pages/header/deriv-com-logo.svg?${BUILD_HASH}`)}
-                        alt='Deriv'
-                    />
+            {isLoggedIn && (
+                <div className='mobile-show'>
+                    <AccountInfo />
+                </div>
+            )}
+            <div className='header__menu-item header__menu-links  client_logged_in mobile-hide'>
+                <a
+                    className='url-reports-positions header__menu-links-item home-icon'
+                    href={`${getBrandHomeUrl()}?lang=${Language.get()}`}
+                >
+                    <span className='header__menu-item--label'>
+                        <img
+                            className='header__icon-text reports-icon'
+                            src={Url.urlForStatic(
+                                `images/pages/header/deriv-com-logo.svg?${BUILD_HASH}`
+                            )}
+                            alt='Deriv Home'
+                        />
+                        <span>{localize('Home')}</span>
+                    </span>
                 </a>
             </div>
-            <div className='header-divider is-logout mobile-hide' />
             {isLoggedIn && (
-                <div className='header__menu-item header__menu-links client_logged_in mobile-hide'>
+                <div className='header__menu-item header__menu-links  client_logged_in mobile-hide'>
                     <a
                         className='url-reports-positions header__menu-links-item'
-                        href={Url.urlForReports('reports/positions', redirect_url, account_type)}
+                        href={Url.urlForReports(
+                            'reports/positions',
+                            redirect_url,
+                            account_type
+                        )}
                     >
                         <span className='header__menu-item--label'>
                             <img
                                 className='header__icon-text reports-icon'
-                                src={Url.urlForStatic(`images/pages/header/ic-reports.svg?${BUILD_HASH}`)}
+                                src={Url.urlForStatic(
+                                    `images/pages/header/ic-reports.svg?${BUILD_HASH}`
+                                )}
                                 alt=''
                             />
                             <span>{localize('Reports')}</span>
@@ -75,28 +97,18 @@ const AccountInfo = () => {
     const { accountInfo, getFormattedBalance, getAccountTypeDisplay } = useApp();
 
     // Show loading skeleton for entire account info until we have data from authorize
-    const isLoading = typeof accountInfo.balance === 'undefined' || !accountInfo.loginid;
-
-    // Get account icon based on currency
-    const getAccountIcon = () => {
-        if (accountInfo.accountType === 'demo') {
-            return Url.urlForStatic(`images/pages/header/ic-currency-virtual.svg?${BUILD_HASH}`);
-        }
-        const currency = accountInfo.currency ? accountInfo.currency.toLowerCase() : 'usd';
-        return Url.urlForStatic(`images/pages/header/ic-currency-${currency}.svg?${BUILD_HASH}`);
-    };
+    const isLoading =
+    typeof accountInfo.balance === 'undefined' || !accountInfo.loginid;
 
     return (
         <div className='acc-info__wrapper'>
-            <div className='acc-info__separator mobile-hide' />
             <div className='account-info-wrapper'>
                 {isLoading ? (
-                    <div data-testid='dt_acc_info' id='dt_core_account-info_acc-info' className='acc-info'>
-                        <span className='acc-info__id'>
-                            <span className='acc-info__id-icon'>
-                                <Skeleton.Square width={32} height={32} rounded />
-                            </span>
-                        </span>
+                    <div
+                        data-testid='dt_acc_info mobile-hide'
+                        id='dt_core_account-info_acc-info'
+                        className='acc-info'
+                    >
                         <div className='acc-info__content'>
                             <div className='acc-info__account-type-header'>
                                 <Skeleton.Square width={60} height={16} />
@@ -107,20 +119,22 @@ const AccountInfo = () => {
                         </div>
                     </div>
                 ) : (
-                    <div data-testid='dt_acc_info' id='dt_core_account-info_acc-info' className='acc-info'>
-                        <span className='acc-info__id'>
-                            <span className='acc-info__id-icon'>
-                                <img
-                                    id='header__acc-icon'
-                                    className='header__acc-icon'
-                                    src={getAccountIcon()}
-                                    alt={accountInfo.currency || 'USD'}
-                                />
-                            </span>
-                        </span>
+                    <div
+                        data-testid='dt_acc_info'
+                        id='dt_core_account-info_acc-info'
+                        className='acc-info'
+                    >
+                        <span className='acc-info__id' />
                         <div className='acc-info__content'>
                             <div className='acc-info__account-type-header'>
-                                <p id='header__acc-type' className='acc-info__account-type'>
+                                <p
+                                    id='header__acc-type'
+                                    className={`acc-info__account-type${
+                                        getAccountTypeDisplay().toLowerCase().includes('demo')
+                                            ? ' acc-info__account-type--virtual'
+                                            : ''
+                                    }`}
+                                >
                                     {getAccountTypeDisplay()}
                                 </p>
                             </div>
@@ -131,7 +145,10 @@ const AccountInfo = () => {
                                     className='acc-info__balance'
                                 >
                                     {getFormattedBalance()}
-                                    <span className='symbols'> {accountInfo.currency || 'USD'}</span>
+                                    <span className='symbols'>
+                                        {' '}
+                                        {accountInfo.currency || 'USD'}
+                                    </span>
                                 </p>
                             </div>
                         </div>
@@ -163,8 +180,16 @@ const LoginButtons = () => {
         return (
             <div className='header__btn'>
                 <div className='skeleton-loaders-container'>
-                    <Skeleton.Square width={72} height={32} className='btn header__btn-login skeleton-btn-login' />
-                    <Skeleton.Square width={72} height={32} className='btn header__btn-login skeleton-btn-signup' />
+                    <Skeleton.Square
+                        width={72}
+                        height={32}
+                        className='btn header__btn-login skeleton-btn-login'
+                    />
+                    <Skeleton.Square
+                        width={72}
+                        height={32}
+                        className='btn header__btn-login skeleton-btn-signup'
+                    />
                 </div>
             </div>
         );
@@ -196,27 +221,32 @@ const LoginButtons = () => {
  * HeaderRight - Right section with account info or login buttons
  */
 const HeaderRight = () => {
-    const { isLoggedIn } = useApp();
-
-    const handleLogout = (e) => {
-        e.preventDefault();
-        Client.sendLogoutRequest();
-    };
+    const { isLoggedIn, accountInfo } = useApp();
 
     if (isLoggedIn) {
+        const hasCurrency = accountInfo.currency && accountInfo.currency !== '';
+
         return (
             <div className='header__menu-right client_logged_in'>
-                <div className='header__divider mobile-hide' />
-                <AccountInfo />
-                <div className='header__divider mobile-hide' />
-                <a
-                    id='btn__logout'
-                    className='btn header__btn-logout logout mobile-hide'
-                    onClick={handleLogout}
-                    href='#'
-                >
-                    {localize('Log out')}
-                </a>
+                <div className='mobile-hide'>
+                    <AccountInfo />
+                </div>
+                <Button
+                    id='btn__transfer'
+                    className='btn header__btn-transfer '
+                    variant='primary'
+                    size='md'
+                    label={localize('Transfer')}
+                    onClick={() => {
+                        if (hasCurrency) {
+                            window.location.href = Url.urlForTransfer(
+                                '',
+                                accountInfo.currency
+                            );
+                        }
+                    }}
+                    disabled={!hasCurrency}
+                />
             </div>
         );
     }

@@ -35,9 +35,9 @@ const AppProvider = ({ children }) => {
     const [availableLanguages] = useState(() => {
         const allLanguages = Language.getAll();
         const allowedLanguages = Language.getAllowedLanguages();
-        
+
         // Map language codes to display format with flags
-        return allowedLanguages.map(code => ({
+        return allowedLanguages.map((code) => ({
             code,
             name: allLanguages[code],
             flag: code.toLowerCase(),
@@ -77,18 +77,21 @@ const AppProvider = ({ children }) => {
     }, []);
 
     // Helper function to format balance
-    const getFormattedBalance = () => formatMoney(accountInfo.currency || 'USD', accountInfo.balance || 0, true);
+    const getFormattedBalance = () =>
+        formatMoney(accountInfo.currency || 'USD', accountInfo.balance || 0, true);
 
     // Helper function to get account type display name
     const getAccountTypeDisplay = () => {
         if (!isLoggedIn) return '';
         const accountType = getAccountType();
-        return accountType.charAt(0).toUpperCase() + accountType.slice(1);
+        return `${
+            accountType.charAt(0).toUpperCase() + accountType.slice(1)
+        } account`;
     };
 
     // Toggle mobile menu
     const toggleMobileMenu = () => {
-        setIsMobileMenuOpen(prev => !prev);
+        setIsMobileMenuOpen((prev) => !prev);
     };
 
     // Close mobile menu

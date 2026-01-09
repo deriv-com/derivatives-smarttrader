@@ -5,7 +5,10 @@ import Url from '../../_common/url';
 import Client from '../base/client';
 import Language from '../../_common/language';
 import { useApp } from '../contexts/AppContext';
-import { getPlatformHostname } from '../../../templates/_common/brand.config';
+import {
+    getPlatformHostname,
+    getBrandHomeUrl,
+} from '../../../templates/_common/brand.config';
 import { getAccountType } from '../../config';
 
 const BUILD_HASH = process.env.BUILD_HASH || '';
@@ -35,7 +38,10 @@ const MobileMenuHeader = ({ onClose, onLanguageClick }) => {
                     onClick={onLanguageClick}
                 >
                     <LabelPairedGlobeSmRegularIcon />
-                    <span id='mobile__menu-language-text' className='mobile__menu-language-text'>
+                    <span
+                        id='mobile__menu-language-text'
+                        className='mobile__menu-language-text'
+                    >
                         {langCode}
                     </span>
                 </div>
@@ -53,20 +59,27 @@ const MobileMenuContent = ({ onReportsClick, onLogoutClick, isVisible }) => {
     return (
         <div
             id='mobile_menu-content'
-            className={`mobile__menu-content ${isVisible ? 'mobile__menu-content--active' : ''}`}
+            className={`mobile__menu-content ${
+                isVisible ? 'mobile__menu-content--active' : ''
+            }`}
         >
             <div className='mobile__platform-switcher-lists'>
-                <div className='mobile__platform-switcher-item'>
+                <a
+                    className='mobile__platform-switcher-item'
+                    href={`${getBrandHomeUrl()}?lang=${Language.get()}`}
+                >
                     <img
-                        id='mobile__platform-switcher-icon-trade'
+                        id='mobile__platform-switcher-icon-home'
                         className='mobile__platform-switcher-icon'
-                        src={Url.urlForStatic(`images/pages/header/ic-trade.svg?${BUILD_HASH}`)}
-                        alt=''
+                        src={Url.urlForStatic(
+                            `images/pages/header/deriv-com-logo.svg?${BUILD_HASH}`
+                        )}
+                        alt='Deriv Home'
                     />
-                    <div className='mobile__platform-switcher-text mobile__platform-switcher-text-bold'>
-                        {localize('Trade')}
+                    <div className='mobile__platform-switcher-text'>
+                        {localize('Home')}
                     </div>
-                </div>
+                </a>
                 {isLoggedIn && (
                     <>
                         <div
@@ -76,14 +89,20 @@ const MobileMenuContent = ({ onReportsClick, onLogoutClick, isVisible }) => {
                         >
                             <img
                                 className='mobile__platform-switcher-icon reports-icon'
-                                src={Url.urlForStatic(`images/pages/header/ic-reports.svg?${BUILD_HASH}`)}
+                                src={Url.urlForStatic(
+                                    `images/pages/header/ic-reports.svg?${BUILD_HASH}`
+                                )}
                                 alt=''
                             />
-                            <div className='mobile__platform-switcher-text'>{localize('Reports')}</div>
+                            <div className='mobile__platform-switcher-text'>
+                                {localize('Reports')}
+                            </div>
                             <img
                                 id='mobile__platform-switcher-icon-arrowright'
                                 className='mobile__platform-switcher-icon-right'
-                                src={Url.urlForStatic(`images/pages/header/ic-chevron-right.svg?${BUILD_HASH}`)}
+                                src={Url.urlForStatic(
+                                    `images/pages/header/ic-chevron-right.svg?${BUILD_HASH}`
+                                )}
                                 alt=''
                             />
                         </div>
@@ -93,10 +112,14 @@ const MobileMenuContent = ({ onReportsClick, onLogoutClick, isVisible }) => {
                         >
                             <img
                                 className='mobile__platform-switcher-icon logout-icon'
-                                src={Url.urlForStatic(`images/pages/header/ic-logout.svg?${BUILD_HASH}`)}
+                                src={Url.urlForStatic(
+                                    `images/pages/header/ic-logout.svg?${BUILD_HASH}`
+                                )}
                                 alt=''
                             />
-                            <div className='mobile__platform-switcher-text'>{localize('Log out')}</div>
+                            <div className='mobile__platform-switcher-text'>
+                                {localize('Log out')}
+                            </div>
                         </div>
                     </>
                 )}
@@ -126,23 +149,35 @@ const ReportsSubmenu = ({ onBack }) => {
                 <img
                     id='mobile__menu-content-submenu-icon-back'
                     className='mobile__menu-content-submenu-icon'
-                    src={Url.urlForStatic(`images/pages/header/ic-chevron-left.svg?${BUILD_HASH}`)}
+                    src={Url.urlForStatic(
+                        `images/pages/header/ic-chevron-left.svg?${BUILD_HASH}`
+                    )}
                     alt='Back'
                 />
-                <div className='mobile__menu-content-submenu-header-text'>{localize('Reports')}</div>
+                <div className='mobile__menu-content-submenu-header-text'>
+                    {localize('Reports')}
+                </div>
             </div>
             <div className='mobile__menu-content-submenu-lists'>
                 <a
                     className='url-reports-positions mobile__menu-content-submenu-item mobile__platform-switcher-item'
-                    href={Url.urlForReports('reports/positions', redirect_url, account_type)}
+                    href={Url.urlForReports(
+                        'reports/positions',
+                        redirect_url,
+                        account_type
+                    )}
                 >
                     <img
                         id='mobile__menu-content-submenu-icon-open'
                         className='mobile__menu-content-submenu-icon'
-                        src={Url.urlForStatic(`images/pages/header/ic-portfolio.svg?${BUILD_HASH}`)}
+                        src={Url.urlForStatic(
+                            `images/pages/header/ic-portfolio.svg?${BUILD_HASH}`
+                        )}
                         alt=''
                     />
-                    <div className='mobile__menu-content-submenu-item-text'>{localize('Open positions')}</div>
+                    <div className='mobile__menu-content-submenu-item-text'>
+                        {localize('Open positions')}
+                    </div>
                 </a>
                 <a
                     className='url-reports-profit mobile__menu-content-submenu-item mobile__platform-switcher-item'
@@ -151,22 +186,34 @@ const ReportsSubmenu = ({ onBack }) => {
                     <img
                         id='mobile__menu-content-submenu-icon-profit'
                         className='mobile__menu-content-submenu-icon'
-                        src={Url.urlForStatic(`images/pages/header/ic-profit-table.svg?${BUILD_HASH}`)}
+                        src={Url.urlForStatic(
+                            `images/pages/header/ic-profit-table.svg?${BUILD_HASH}`
+                        )}
                         alt=''
                     />
-                    <div className='mobile__menu-content-submenu-item-text'>{localize('Profit table')}</div>
+                    <div className='mobile__menu-content-submenu-item-text'>
+                        {localize('Profit table')}
+                    </div>
                 </a>
                 <a
                     className='url-reports-statement mobile__menu-content-submenu-item mobile__platform-switcher-item'
-                    href={Url.urlForReports('reports/statement', redirect_url, account_type)}
+                    href={Url.urlForReports(
+                        'reports/statement',
+                        redirect_url,
+                        account_type
+                    )}
                 >
                     <img
                         id='mobile__menu-content-submenu-icon-statement'
                         className='mobile__menu-content-submenu-icon'
-                        src={Url.urlForStatic(`images/pages/header/ic-statement.svg?${BUILD_HASH}`)}
+                        src={Url.urlForStatic(
+                            `images/pages/header/ic-statement.svg?${BUILD_HASH}`
+                        )}
                         alt=''
                     />
-                    <div className='mobile__menu-content-submenu-item-text'>{localize('Statements')}</div>
+                    <div className='mobile__menu-content-submenu-item-text'>
+                        {localize('Statements')}
+                    </div>
                 </a>
             </div>
         </div>
@@ -176,7 +223,12 @@ const ReportsSubmenu = ({ onBack }) => {
 /**
  * LanguageSubmenu - Submenu for language selection
  */
-const LanguageSubmenu = ({ onBack, onLanguageSelect, availableLanguages, currentLanguage }) => (
+const LanguageSubmenu = ({
+    onBack,
+    onLanguageSelect,
+    availableLanguages,
+    currentLanguage,
+}) => (
     <div
         id='mobile__menu-content-submenu-language'
         className='mobile__menu-content-submenu mobile__menu-content-submenu--active mobile__menu-content-submenu-language mobile__menu-content'
@@ -189,17 +241,23 @@ const LanguageSubmenu = ({ onBack, onLanguageSelect, availableLanguages, current
             <img
                 id='mobile__menu-content-submenu-language-icon-back'
                 className='mobile__menu-content-submenu-icon'
-                src={Url.urlForStatic(`images/pages/header/ic-chevron-left.svg?${BUILD_HASH}`)}
+                src={Url.urlForStatic(
+                    `images/pages/header/ic-chevron-left.svg?${BUILD_HASH}`
+                )}
                 alt='Back'
             />
-            <div className='mobile__menu-content-submenu-header-text'>{localize('Select language')}</div>
+            <div className='mobile__menu-content-submenu-header-text'>
+                {localize('Select language')}
+            </div>
         </div>
         <div className='mobile__menu-content-submenu-lists mobile__language-grid'>
-            {availableLanguages.map(lang => (
+            {availableLanguages.map((lang) => (
                 <div
                     key={lang.code}
                     className={`mobile__language-item${
-                        currentLanguage === lang.code ? ' mobile__language-item--active' : ''
+                        currentLanguage === lang.code
+                            ? ' mobile__language-item--active'
+                            : ''
                     }`}
                     data-language={lang.code}
                     onClick={() => onLanguageSelect(lang.code)}
@@ -215,7 +273,13 @@ const LanguageSubmenu = ({ onBack, onLanguageSelect, availableLanguages, current
  * MobileMenuComponent - Main mobile menu component with state management
  */
 const MobileMenuComponent = () => {
-    const { isMobileMenuOpen, closeMobileMenu, availableLanguages, handleLanguageChange, currentLanguage } = useApp();
+    const {
+        isMobileMenuOpen,
+        closeMobileMenu,
+        availableLanguages,
+        handleLanguageChange,
+        currentLanguage,
+    } = useApp();
     const [activeSubmenu, setActiveSubmenu] = useState(null); // null, 'reports', or 'language'
 
     // Handle body scroll locking when menu opens/closes
@@ -257,18 +321,23 @@ const MobileMenuComponent = () => {
     };
 
     const handleLanguageSelect = async (langCode) => {
-        // Use centralized language change from AppContext
+    // Use centralized language change from AppContext
         await handleLanguageChange(langCode);
     };
 
     return (
         <div
             id='mobile__container'
-            className={`mobile__container mobile-show ${isMobileMenuOpen ? 'mobile__container--active' : ''}`}
+            className={`mobile__container mobile-show ${
+                isMobileMenuOpen ? 'mobile__container--active' : ''
+            }`}
         >
             <div id='mobile__menu' className='mobile__menu'>
-                <MobileMenuHeader onClose={handleClose} onLanguageClick={handleLanguageClick} />
-                
+                <MobileMenuHeader
+                    onClose={handleClose}
+                    onLanguageClick={handleLanguageClick}
+                />
+
                 <MobileMenuContent
                     onReportsClick={handleReportsClick}
                     onLogoutClick={handleLogout}
@@ -276,7 +345,7 @@ const MobileMenuComponent = () => {
                 />
 
                 {activeSubmenu === 'reports' && <ReportsSubmenu onBack={handleBack} />}
-                
+
                 {activeSubmenu === 'language' && (
                     <LanguageSubmenu
                         onBack={handleBack}

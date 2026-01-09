@@ -74,7 +74,7 @@ const Header = (() => {
 
     // Expose functions via SmartTrader namespace to avoid circular dependencies
     if (typeof window !== 'undefined') {
-        // Initialize SmartTrader namespace
+    // Initialize SmartTrader namespace
         window.SmartTrader = window.SmartTrader || {};
         window.SmartTrader.Header = {
             addHeaderReadyCallback,
@@ -85,11 +85,16 @@ const Header = (() => {
 
     // Define topbar detection function before onLoad
     const waitForTopbarElements = () => {
-        const targetSelectors = ['topbar-help-centre', 'topbar-whatsapp', 'topbar-fullscreen'];
+        const targetSelectors = [
+            'topbar-help-centre',
+            'topbar-whatsapp',
+            'topbar-logout',
+            'topbar-fullscreen',
+        ];
         const attachedListeners = new Set();
-        
+
         const checkAndBindElements = () => {
-            targetSelectors.forEach(selector => {
+            targetSelectors.forEach((selector) => {
                 if (!attachedListeners.has(selector)) {
                     const element = getElementById(selector);
                     if (element) {
@@ -104,6 +109,11 @@ const Header = (() => {
                                     window.open('https://wa.me/35699578341', '_blank');
                                 });
                                 break;
+                            case 'topbar-logout':
+                                element.addEventListener('click', () => {
+                                    logoutOnClick();
+                                });
+                                break;
                             case 'topbar-fullscreen':
                                 element.addEventListener('click', () => {
                                     toggleFullscreen();
@@ -116,7 +126,7 @@ const Header = (() => {
                     }
                 }
             });
-            
+
             // If all elements are found, stop observing
             if (attachedListeners.size === targetSelectors.length) {
                 if (observer) observer.disconnect();
@@ -124,21 +134,21 @@ const Header = (() => {
             }
             return false;
         };
-        
+
         // Try immediately first
         if (checkAndBindElements()) return;
-        
+
         // Set up MutationObserver to watch for DOM changes
         const observer = new MutationObserver(() => {
             checkAndBindElements();
         });
-        
+
         // Start observing the document body for child additions
         observer.observe(document.body, {
             childList: true,
             subtree  : true,
         });
-        
+
         // Also set up a fallback timeout check every 100ms for 5 seconds
         let attempts = 0;
         const maxAttempts = 50; // 5 seconds
@@ -159,26 +169,25 @@ const Header = (() => {
             if (headerContainer) {
                 initHeaderComponent();
             }
-            
+
             updateLoginButtonsDisplay();
-            
+
             // Call topbar detection for fullscreen button
             waitForTopbarElements();
             bindClick();
-            
-            await BinarySocket.wait('balance');
 
+            await BinarySocket.wait('balance');
         } catch (error) {
             // eslint-disable-next-line no-console
             console.error('Header.onLoad() error:', error);
         }
-    
+
         fullscreen_map.event.forEach((event) => {
             document.addEventListener(event, onFullScreen, false);
         });
-        
+
         applyFeatureFlags();
-        
+
         // Mark header as ready and trigger any waiting callbacks
         triggerHeaderReadyCallbacks();
     };
@@ -223,35 +232,42 @@ const Header = (() => {
     };
 
     const updateLoginButtonsDisplay = () => {
-        // Get login and signup buttons
+    // Get login and signup buttons
         const btn_login = getElementById('btn__login');
         const btn_signup = getElementById('btn__signup');
-        
+        const topbar_logout = getElementById('topbar-logout');
+
         if (!btn_login || !btn_signup) return;
 
         // Hide buttons initially
         btn_login.style.display = 'none';
         btn_signup.style.display = 'none';
-        
+
+        // Hide logout button initially
+        if (topbar_logout) {
+            topbar_logout.style.display = 'none';
+        }
+
         // Check if user is logged out
         const is_logged_out = !Client.isLoggedIn();
-        
+
         // If user is logged in, reset token exchange flag (authentication completed successfully)
         if (!is_logged_out && window.tokenExchangeInProgress) {
             window.tokenExchangeInProgress = false;
         }
-        
+
         // Check if token exchange is in progress and user is not logged in - if so, show skeleton loaders
         if (window.tokenExchangeInProgress && is_logged_out) {
             showHeaderSkeletonLoaders();
             return;
         }
-        
+
         // Check if we're on a trading page and if trading is still loading
         const is_trading_page = window.location.pathname.includes('/trading');
         const trading_init_progress = getElementById('trading_init_progress');
-        const is_trading_loading = trading_init_progress && trading_init_progress.style.display !== 'none';
-        
+        const is_trading_loading =
+      trading_init_progress && trading_init_progress.style.display !== 'none';
+
         // If user is logged out, always show login buttons
         if (is_logged_out) {
             removeHeaderSkeletonLoaders();
@@ -259,13 +275,18 @@ const Header = (() => {
             btn_signup.style.display = 'flex';
             return;
         }
-        
+
+        // User is logged in, show logout button
+        if (topbar_logout) {
+            topbar_logout.style.display = 'inline-flex';
+        }
+
         // On trading pages, sync with purchase container loading state (only for logged-in users)
         if (is_trading_page && is_trading_loading) {
             showHeaderSkeletonLoaders();
             return;
         }
-        
+
         // For logged-in users, hide login buttons and skeleton loaders
         removeHeaderSkeletonLoaders();
     };
@@ -274,29 +295,33 @@ const Header = (() => {
         const btn_login = getElementById('btn__login');
         const btn_signup = getElementById('btn__signup');
         const skeleton_container = getElementById('skeleton-loaders-container');
-        
+
         if (!skeleton_container) return;
-        
+
         // Hide actual buttons
         if (btn_login) btn_login.style.display = 'none';
         if (btn_signup) btn_signup.style.display = 'none';
-        
+
         // Show React skeleton loaders container
         skeleton_container.style.display = 'flex';
     };
 
     const removeHeaderSkeletonLoaders = () => {
         const skeleton_container = getElementById('skeleton-loaders-container');
-        
+
         // Hide React skeleton loaders container
         if (skeleton_container) {
             skeleton_container.style.display = 'none';
         }
-        
+
         // Also remove any legacy DOM skeleton loaders that might exist
-        const skeleton_login = document.querySelector('.skeleton-btn-login:not(.skeleton-loaders-container .skeleton-btn-login)');
-        const skeleton_signup = document.querySelector('.skeleton-btn-signup:not(.skeleton-loaders-container .skeleton-btn-signup)');
-        
+        const skeleton_login = document.querySelector(
+            '.skeleton-btn-login:not(.skeleton-loaders-container .skeleton-btn-login)'
+        );
+        const skeleton_signup = document.querySelector(
+            '.skeleton-btn-signup:not(.skeleton-loaders-container .skeleton-btn-signup)'
+        );
+
         if (skeleton_login) skeleton_login.remove();
         if (skeleton_signup) skeleton_signup.remove();
     };
@@ -305,11 +330,11 @@ const Header = (() => {
         updateLoginButtonsDisplay();
         const btn_login = getElementById('btn__login');
         const btn_signup = getElementById('btn__signup');
-        
+
         if (btn_login) {
             btn_login.onclick = Login.redirectToLogin;
         }
-        
+
         if (btn_signup) {
             btn_signup.onclick = Login.redirectToSignup;
         }
@@ -337,7 +362,9 @@ const Header = (() => {
 
         const el_language_select_text = getElementById('language-select__text');
         if (el_language_select_text) {
-            el_language_select_text.textContent = current_language ? current_language.toUpperCase() : 'EN';
+            el_language_select_text.textContent = current_language
+                ? current_language.toUpperCase()
+                : 'EN';
         }
 
         // const el_language_select_img = getElementById('language-select__logo');
@@ -376,9 +403,7 @@ const Header = (() => {
     };
 
     const upgradeMessageVisibility = () => {
-        BinarySocket.wait(
-            'authorize',
-        ).then(() => {
+        BinarySocket.wait('authorize').then(() => {
             const upgrade_msg = document.getElementsByClassName('upgrademessage');
 
             if (!upgrade_msg) {
@@ -486,13 +511,11 @@ const Header = (() => {
               : Object.values(upgrade_info.upgrade_links)[0];
                 showUpgrade(upgrade_url, upgrade_link_txt);
                 showUpgradeBtn(upgrade_url, upgrade_btn_txt);
-
             } else {
                 applyToAllElements(upgrade_msg, (el) => {
                     el.setVisibility(0);
                 });
             }
-
         });
     };
 
@@ -504,7 +527,6 @@ const Header = (() => {
         button_text,
         button_link,
     }) => {
-
         if (notifications.some((notification) => notification === key)) return;
 
         const notification_content = getElementById('header__notification-content');
@@ -549,7 +571,6 @@ const Header = (() => {
     };
 
     const hideNotification = (key) => {
-
         if (!notifications.some((notification) => notification === key)) return;
 
         notifications.splice(notifications.indexOf(key), 1);
