@@ -98,30 +98,28 @@ const Purchase = () => {
         }
     };
 
-    const observer = new IntersectionObserver((entries) => {
-        const targetElement = responsivePurchaser.current;
-        entries.forEach(entry => {
-            if (entry.boundingClientRect.top < window.innerHeight || entry.isIntersecting) {
-                targetElement?.classList?.add('hide');
-            } else {
-                targetElement?.classList?.remove('hide');
-            }
-        });
-    });
-      
-    const purchaseSection = document.querySelectorAll('.purchase-footer');
-    
     useEffect(() => {
-    
+        const observer = new IntersectionObserver((entries) => {
+            const targetElement = responsivePurchaser.current;
+            entries.forEach(entry => {
+                if (entry.boundingClientRect.top < window.innerHeight || entry.isIntersecting) {
+                    targetElement?.classList?.add('hide');
+                } else {
+                    targetElement?.classList?.remove('hide');
+                }
+            });
+        });
+
+        const purchaseSection = document.querySelectorAll('.purchase-footer');
+
         if (purchaseSection.length) {
             observer.observe(purchaseSection[0]);
-           
         }
 
         return () => {
             observer.disconnect();
         };
-    }, [responsivePurchaser,purchaseSection]);
+    }, []);
 
     if (show_popup) {
         return <ContractDetails />;
