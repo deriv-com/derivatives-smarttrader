@@ -107,24 +107,24 @@ const BinaryLoader = (() => {
 
         // Make sure content is properly loaded or visible before scrolling to anchor.
         ContentVisibility.init().then(() => {
-            BinarySocket.wait('balance').then(() => {
-                GTM.pushDataLayer({ event: 'page_load' });
+            // BinarySocket.wait('balance').then(() => {
+            GTM.pushDataLayer({ event: 'page_load' });
 
-                // reroute LiveChat group
-                LiveChat.rerouteGroup();
+            // reroute LiveChat group
+            LiveChat.rerouteGroup();
 
-                // first time load.
-                const last_image = $('#content img').last();
-                if (last_image) {
-                    last_image.on('load', () => {
-                        ScrollToAnchor.init();
-                    });
-                }
+            // first time load.
+            const last_image = $('#content img').last();
+            if (last_image) {
+                last_image.on('load', () => {
+                    ScrollToAnchor.init();
+                });
+            }
 
-                ScrollToAnchor.init();
+            ScrollToAnchor.init();
 
-                ContentVisibility.centerAlignSelect(true);
-            });
+            ContentVisibility.centerAlignSelect(true);
+            // });
         });
 
         if (active_script) {

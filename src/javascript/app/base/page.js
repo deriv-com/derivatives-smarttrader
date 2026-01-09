@@ -63,8 +63,9 @@ const Page = (() => {
             }
         }
 
+        // Only reload if old currency exists and currencies are different
         if (removedSessionAndBalance(newValue) !== removedSessionAndBalance(oldValue || '{}') &&
-            old_currency !== new_currency) {
+            old_currency && old_currency !== new_currency) {
             reload();
         }
     };
