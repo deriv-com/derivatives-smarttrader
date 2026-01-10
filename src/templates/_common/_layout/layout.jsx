@@ -1,6 +1,7 @@
 import React from 'react';
 import { LabelPairedGlobeSmRegularIcon } from '@deriv/quill-icons';
 import Head from './head.jsx';
+import { localize } from '@deriv-com/translations';
 // import Elevio from '../includes/elevio.jsx';
 import Gtm from '../includes/gtm.jsx';
 
@@ -55,7 +56,7 @@ const Topbar = () => (
                 id='topbar-logout'
                 className='logout no-underline'
                 data-balloon-pos='up'
-                data-balloon='Logout'
+                data-balloon={localize('Log out')}
                 style={{ display: 'none' }} // Initially hidden, will be shown via JS when logged in
             >
                 <img src={it.url_for('images/pages/header/ic-logout.svg')} />

@@ -34,6 +34,7 @@ const requestRestLogout = async () => {
                 await fetch(data.logout_url, {
                     method     : 'GET',
                     credentials: 'include',
+                    redirect:'manual'
                 });
             }
         }
@@ -41,8 +42,9 @@ const requestRestLogout = async () => {
         // Return success response - cleanup is handled by doLogout
         return { logout: 1 };
     } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error('[REST Logout Error]', error);
+         // Ignore CORS errors
+         // eslint-disable-next-line no-console
+         console.warn('[Logout Notice]:', error);
         // Return success response even if REST call fails - cleanup is handled by doLogout
         return { logout: 1 };
     }
