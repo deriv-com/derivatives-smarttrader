@@ -1,7 +1,7 @@
 import React from 'react';
 import { LabelPairedGlobeSmRegularIcon } from '@deriv/quill-icons';
-import Head from './head.jsx';
 import { localize } from '@deriv-com/translations';
+import Head from './head.jsx';
 // import Elevio from '../includes/elevio.jsx';
 import Gtm from '../includes/gtm.jsx';
 
