@@ -232,20 +232,29 @@ const HeaderRight = () => {
                 <div className='mobile-hide'>
                     <AccountInfo />
                 </div>
-                <Button
-                    id='btn__transfer'
-                    className='btn header__btn-transfer '
-                    variant='primary'
-                    size='md'
-                    label={localize('Transfer')}
-                    onClick={() => {
-                        if (hasCurrency) {
-                            const lang_param = Language.get() ? `&lang=${Language.get()}` : '';
-                            window.location.href = `${getBrandUrl()}/transfer?acc=options&from=home&source=options${`&curr=${accountInfo.currency}`}${lang_param}`;
-                        }
-                    }}
-                    disabled={!hasCurrency}
-                />
+                {!hasCurrency ? (
+                    <Skeleton.Square
+                        width={100}
+                        height={32}
+                        className='btn header__btn-transfer'
+                    />
+                ) : (
+                    <Button
+                        id='btn__transfer'
+                        className='btn header__btn-transfer '
+                        variant='primary'
+                        size='md'
+                        label={localize('Transfer')}
+                        onClick={() => {
+                            if (hasCurrency) {
+                                const lang_param = Language.get()
+                                    ? `&lang=${Language.get()}`
+                                    : '';
+                                window.location.href = `${getBrandUrl()}/transfer?acc=options&from=home&source=options${`&curr=${accountInfo.currency}`}${lang_param}`;
+                            }
+                        }}
+                    />
+                )}
             </div>
         );
     }
