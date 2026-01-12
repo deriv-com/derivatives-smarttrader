@@ -239,10 +239,8 @@ const HeaderRight = () => {
                     label={localize('Transfer')}
                     onClick={() => {
                         if (hasCurrency) {
-                            window.location.href = Url.urlForTransfer(
-                                '',
-                                accountInfo.currency
-                            );
+                            const lang_param = Language.get() ? `&lang=${Language.get()}` : '';
+                            window.location.href = `${getBrandHomeUrl()}/transfer?acc=options&from=home&source=options${`&curr=${accountInfo.currency}`}${lang_param}`;
                         }
                     }}
                     disabled={!hasCurrency}
