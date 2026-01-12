@@ -7,6 +7,9 @@ const getElementById = require('../../_common/common_functions').getElementById;
 const Url = require('../../_common/url');
 const applyToAllElements = require('../../_common/utility').applyToAllElements;
 const Language = require('../../_common/language');
+const {
+    updateTooltipTranslations,
+} = require('../../_common/tooltip_translations');
 const createElement = require('../../_common/utility').createElement;
 const getTopLevelDomain = require('../../_common/utility').getTopLevelDomain;
 const DerivLiveChat = require('../pages/livechat.jsx');
@@ -187,6 +190,9 @@ const Header = (() => {
         });
 
         applyFeatureFlags();
+
+        // Initialize tooltip translations
+        updateTooltipTranslations();
 
         // Mark header as ready and trigger any waiting callbacks
         triggerHeaderReadyCallbacks();
