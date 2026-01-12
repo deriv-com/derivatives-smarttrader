@@ -146,7 +146,7 @@ const Url = (() => {
 
         const encoded_redirect = encodeURIComponent(redirect_url);
         const lang = Language.get();
-        const account_id = localStorage.getItem('active_loginid') || '';
+        const account_id = localStorage.getItem('account_id') || '';
         return `${dtrader_domain}/${path}?redirect=${encoded_redirect}&account_type=${account_type}&account_id=${account_id}&lang=${lang}`;
     };
 
