@@ -11,6 +11,7 @@ import Language from '../../_common/language';
 import { AppProvider, useApp } from '../contexts/AppContext';
 import {
     getBrandHomeUrl,
+    getBrandUrl,
     getPlatformHostname,
 } from '../../../templates/_common/brand.config';
 import { getAccountType } from '../../config';
@@ -240,7 +241,7 @@ const HeaderRight = () => {
                     onClick={() => {
                         if (hasCurrency) {
                             const lang_param = Language.get() ? `&lang=${Language.get()}` : '';
-                            window.location.href = `${getBrandHomeUrl()}/transfer?acc=options&from=home&source=options${`&curr=${accountInfo.currency}`}${lang_param}`;
+                            window.location.href = `${getBrandUrl()}/transfer?acc=options&from=home&source=options${`&curr=${accountInfo.currency}`}${lang_param}`;
                         }
                     }}
                     disabled={!hasCurrency}
