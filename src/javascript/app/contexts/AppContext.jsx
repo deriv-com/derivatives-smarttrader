@@ -85,10 +85,11 @@ const AppProvider = ({ children }) => {
     const getAccountTypeDisplay = () => {
         if (!isLoggedIn) return '';
         const accountType = getAccountType();
-        // Directly pass either "Demo account" or "Real account" to localize
+        // Only localize the word "account"
+        const localizedAccount = localize('account');
         return accountType === 'demo'
-            ? localize('Demo account')
-            : localize('Real account');
+            ? `Demo ${localizedAccount}`
+            : `Real ${localizedAccount}`;
     };
 
     // Toggle mobile menu
