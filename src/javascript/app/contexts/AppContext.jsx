@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { localize } from '@deriv-com/translations';
 import Client from '../base/client';
 import BinarySocket from '../../_common/base/socket_base';
 import { formatMoney } from '../../_common/base/currency_base';
@@ -84,9 +85,11 @@ const AppProvider = ({ children }) => {
     const getAccountTypeDisplay = () => {
         if (!isLoggedIn) return '';
         const accountType = getAccountType();
-        return `${
-            accountType.charAt(0).toUpperCase() + accountType.slice(1)
-        } account`;
+        // Only localize the word "account"
+        const localizedAccount = localize('account');
+        return accountType === 'demo'
+            ? `Demo ${localizedAccount}`
+            : `Real ${localizedAccount}`;
     };
 
     // Toggle mobile menu
