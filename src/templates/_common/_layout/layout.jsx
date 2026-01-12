@@ -56,6 +56,7 @@ const Topbar = () => (
                 id='topbar-logout'
                 className='logout no-underline'
                 data-balloon-pos='up'
+                data-balloon-id='logout-tooltip' // Add a unique ID for the tooltip
                 data-balloon={localize('Log out')}
                 style={{ display: 'none' }} // Initially hidden, will be shown via JS when logged in
             >
