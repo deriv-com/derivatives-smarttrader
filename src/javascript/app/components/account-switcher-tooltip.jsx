@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { localize } from '@deriv-com/translations';
-import { LegacyClose1pxIcon } from '@deriv/quill-icons/Legacy';
+import { LegacyClose1pxIcon } from '@deriv/quill-icons';
 
 // Constant for localStorage key
 export const TOOLTIP_SHOWN_KEY = 'account_switcher_tooltip_shown';
@@ -24,6 +24,7 @@ const AccountSwitcherTooltip = ({ onClose, isVisible }) => {
                 document.body.classList.remove('tooltip-active');
             };
         }
+        return () => {}; // Empty cleanup function for when !isVisible
     }, [isVisible]);
 
     if (!isVisible) return null;

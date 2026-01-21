@@ -201,6 +201,7 @@ const AppProvider = ({ children }) => {
             }
 
             // if the user is unauthorized, whoami will handle logout so no need to handle it here
+            // eslint-disable-next-line no-console
             console.error('Error fetching derivatives account:', err);
             if (!silent) throw err;
             return null;

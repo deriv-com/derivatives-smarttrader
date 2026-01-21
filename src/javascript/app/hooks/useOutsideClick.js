@@ -8,7 +8,7 @@ import { useEffect } from 'react';
  */
 const useOutsideClick = (ref, callback, isActive = true) => {
     useEffect(() => {
-        if (!isActive) return;
+        if (!isActive) return () => {}; // Return empty cleanup function when not active
 
         const handleClickOutside = (event) => {
             // If the ref or ref.current is null, or if the element contains the clicked target, do nothing

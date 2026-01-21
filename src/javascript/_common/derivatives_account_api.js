@@ -2,6 +2,16 @@
  * REST API utility module for fetching derivatives account data
  * A standalone implementation without React Query
  */
+/* eslint-disable no-await-in-loop, no-continue */
+
+/**
+ * Creates a promise that resolves after the specified time
+ * @param {number} ms - Time to sleep in milliseconds
+ * @returns {Promise} Promise that resolves after the specified time
+ */
+const sleep = (ms) => new Promise(resolve => {
+    setTimeout(resolve, ms);
+});
 
 const { isProduction } = require('../config');
 const { getApiCoreUrl } = require('../../templates/_common/brand.config');
@@ -75,11 +85,13 @@ const fetchREST = async (endpoint, options, retryConfig = {}) => {
 
                 // Handle authentication errors automatically
                 if (error.isAuthError) {
+                    // eslint-disable-next-line no-console
                     console.error('Authentication error detected, logging out:', error);
                     // Don't await to prevent blocking other operations
                     // We just need to trigger the logout process
                     setTimeout(() => {
                         Client.sendLogoutRequest(false).catch((logoutError) => {
+                            // eslint-disable-next-line no-console
                             console.error('Error during automatic logout:', logoutError);
                         });
                     }, 0);
@@ -92,10 +104,8 @@ const fetchREST = async (endpoint, options, retryConfig = {}) => {
           (error.status === 429 || error.status >= 500);
                 if (shouldRetry) {
                     attempts++;
-                    // Wait before retrying
-                    await new Promise((resolve) =>
-                        setTimeout(resolve, retryDelay * attempts),
-                    );
+                    // Wait before retrying with exponential backoff
+                    await sleep(retryDelay * attempts);
                     continue;
                 }
 
@@ -109,9 +119,7 @@ const fetchREST = async (endpoint, options, retryConfig = {}) => {
             if (error instanceof TypeError && attempts < maxAttempts - 1) {
                 // Network error - retry
                 attempts++;
-                await new Promise((resolve) =>
-                    setTimeout(resolve, retryDelay * attempts),
-                );
+                await sleep(retryDelay * attempts);
                 continue;
             }
             // If we've reached this point and still have an error, throw it

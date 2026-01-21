@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Skeleton, Button } from '@deriv-com/quill-ui';
 import { localize } from '@deriv-com/translations';
-import { StandaloneChevronDownRegularIcon } from '@deriv/quill-icons/Standalone';
+import { StandaloneChevronDownRegularIcon } from '@deriv/quill-icons';
 import AccountDropdown from './account-dropdown';
 import AccountSwitcherTooltip, {
     TOOLTIP_SHOWN_KEY,
@@ -199,15 +199,15 @@ const AccountInfo = () => {
                                             {getAccountTypeDisplay()}
                                         </span>
                                         {derivativesAccountInfo &&
-                      derivativesAccountInfo?.data?.length > 1 && (
-                      <span
+                                        derivativesAccountInfo?.data?.length > 1 && (
+                                            <span
                                                 className={`acc-info__select-arrow ${isDropdownOpen ? 'acc-info__select-arrow--active' : ''}`}
                                             >
                                                 <StandaloneChevronDownRegularIcon
-                              fill='#000000'
-                              width={20}
-                              height={20}
-                          />
+                                                    fill='#000000'
+                                                    width={20}
+                                                    height={20}
+                                                />
                                             </span>
                                         )}
                                     </p>
