@@ -30,7 +30,7 @@ const AccountDropdown = ({
                     <div className='acc-dropdown__drag-indicator' />
                 </div>
                 <div className='acc-dropdown__list'>
-                    {accounts.map((account) => (
+                    {accounts && accounts.map((account) => (
                         <div
                             key={account.loginid}
                             className='acc-dropdown__account-wrapper'
