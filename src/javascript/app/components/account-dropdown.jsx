@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { getNumberFormat } from '../../_common/base/currency_base';
 
@@ -10,10 +11,6 @@ const AccountDropdown = ({
     activeAccount,
     setIsDropdownOpen,
 }) => {
-    // Check if device is mobile/tablet based on window width
-    const isDesktop = window.innerWidth >= 880;
-    const isMobileOrTablet = !isDesktop;
-
     const handleOverlayClick = () => {
         if (setIsDropdownOpen) {
             setIsDropdownOpen(false);
@@ -24,18 +21,14 @@ const AccountDropdown = ({
 
     return (
         <>
-            {isMobileOrTablet && (
-                <div
-                    className='acc-dropdown__overlay'
-                    onClick={handleOverlayClick}
-                />
-            )}
+            <div
+                className='mobile-show acc-dropdown__overlay'
+                onClick={handleOverlayClick}
+            />
             <div className='acc-dropdown__container acc-dropdown__container--enter-done'>
-                {isMobileOrTablet && (
-                    <div className='acc-dropdown__drag-handle'>
-                        <div className='acc-dropdown__drag-indicator' />
-                    </div>
-                )}
+                <div className='mobile-show acc-dropdown__drag-handle'>
+                    <div className='acc-dropdown__drag-indicator' />
+                </div>
                 <div className='acc-dropdown__list'>
                     {accounts.map((account) => (
                         <div
@@ -90,6 +83,26 @@ const AccountDropdown = ({
             </div>
         </>
     );
+};
+
+AccountDropdown.propTypes = {
+   
+    accounts: PropTypes.arrayOf(
+        PropTypes.shape({
+            balance   : PropTypes.number.isRequired,
+            currency  : PropTypes.string,
+            is_virtual: PropTypes.oneOfType([PropTypes.number, PropTypes.bool]).isRequired,
+            loginid   : PropTypes.string.isRequired,
+        })
+    ).isRequired,
+    activeAccount: PropTypes.shape({
+        balance : PropTypes.number.isRequired,
+        currency: PropTypes.string,
+    }),
+    activeAccountId  : PropTypes.string.isRequired,
+    isVisible        : PropTypes.bool.isRequired,
+    onAccountSelect  : PropTypes.func.isRequired,
+    setIsDropdownOpen: PropTypes.func,
 };
 
 export default AccountDropdown;
