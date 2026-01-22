@@ -186,6 +186,9 @@ const Page = (() => {
                 
                 // Setup visibility listener to check whoami when tab becomes visible
                 Client.setupVisibilityListener();
+                
+                // Setup focus listener to check whoami when window gains focus
+                Client.setupFocusListener();
             });
         } else {
             Menu.init();
