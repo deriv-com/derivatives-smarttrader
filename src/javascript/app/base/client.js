@@ -18,6 +18,7 @@ const applyToAllElements    = require('../../_common/utility').applyToAllElement
 
 const Client = (() => {
     let tab_visibility_handler = null;
+    let window_focus_handler = null;
 
     /**
      * Check whoami endpoint and handle unauthorized sessions
@@ -62,6 +63,33 @@ const Client = (() => {
         if (tab_visibility_handler) {
             document.removeEventListener('visibilitychange', tab_visibility_handler);
             tab_visibility_handler = null;
+        }
+    };
+
+    /**
+     * Sets up focus change listener to check whoami when window gains focus
+     */
+    const setupFocusListener = () => {
+        // Remove existing listener if any
+        removeFocusListener();
+
+        // Create handler function
+        window_focus_handler = () => {
+            // Window gained focus - check whoami
+            performWhoAmICheck();
+        };
+
+        // Add listener
+        window.addEventListener('focus', window_focus_handler);
+    };
+
+    /**
+     * Removes the focus change listener
+     */
+    const removeFocusListener = () => {
+        if (window_focus_handler) {
+            window.removeEventListener('focus', window_focus_handler);
+            window_focus_handler = null;
         }
     };
 
@@ -271,8 +299,9 @@ const Client = (() => {
     const doLogout = (response) => {
         if (response.logout !== 1) return;
         
-        // Remove visibility listener
+        // Remove visibility and focus listeners
         removeVisibilityListener();
+        removeFocusListener();
         
         // Remove cookies
         removeCookies('login', 'loginid', 'loginid_list', 'email', 'residence', 'settings');
@@ -348,6 +377,8 @@ const Client = (() => {
         defaultRedirectUrl,
         setupVisibilityListener,
         removeVisibilityListener,
+        setupFocusListener,
+        removeFocusListener,
         performWhoAmICheck,
     }, ClientBase);
 })();
