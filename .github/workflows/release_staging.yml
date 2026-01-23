@@ -31,6 +31,8 @@ jobs:
           # RUDDERSTACK_KEY: ${{ vars.RUDDERSTACK_KEY }}
           # GROWTHBOOK_CLIENT_KEY: ${{ vars.GROWTHBOOK_CLIENT_KEY }}
           # REMOTE_CONFIG_URL: ${{ vars.REMOTE_CONFIG_URL }}
+          POSTHOG_KEY: ${{ secrets.POSTHOG_KEY }}
+          POSTHOG_HOST: ${{ vars.POSTHOG_HOST }}
 
       - name: Versioning
         uses: "./.github/actions/versioning"

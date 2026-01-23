@@ -23,6 +23,12 @@ inputs:
   # REMOTE_CONFIG_URL:
   #   description: "Remote config for enabling cs chat tools"
   #   required: false
+  POSTHOG_KEY:
+    description: 'PostHog API key'
+    required: false
+  POSTHOG_HOST:
+    description: 'PostHog host URL'
+    required: false
 runs:
   using: composite
   steps:
@@ -36,5 +42,7 @@ runs:
         # RUDDERSTACK_KEY: ${{ inputs.RUDDERSTACK_KEY }}
         # GROWTHBOOK_CLIENT_KEY: ${{ inputs.GROWTHBOOK_CLIENT_KEY }}
         # REMOTE_CONFIG_URL: ${{ inputs.REMOTE_CONFIG_URL }}
+        POSTHOG_KEY: ${{ inputs.POSTHOG_KEY }}
+        POSTHOG_HOST: ${{ inputs.POSTHOG_HOST }}
       run: node_modules/grunt/bin/grunt releaseci --$TARGET_ENV
       shell: bash

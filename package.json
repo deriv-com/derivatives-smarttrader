@@ -108,7 +108,7 @@
     "@babel/polyfill": "7.12.1",
     "@binary-com/binary-document-uploader": "^2.4.4",
     "@binary-com/binary-style": "^0.2.26",
-    "@deriv-com/analytics": "^1.26.1",
+    "@deriv-com/analytics": "1.33.0",   
     "@deriv-com/auth-client": "^1.5.2",
     "@deriv-com/quill-ui": "^1.24.4",
     "@deriv-com/translations": "^1.4.0",
