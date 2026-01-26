@@ -7,13 +7,14 @@
 
 .acc-info {
   align-items: center;
-  cursor: default;
   display: flex;
   flex-direction: row;
   height: 100%;
   justify-content: center;
   padding: 0 1.6rem;
   width: max-content;
+  cursor: pointer;
+  z-index: 12;
 
   &:hover {
     background: transparent !important;
@@ -54,17 +55,37 @@
   &__account-type-header {
     margin-bottom: 2px;
   }
+  &__select-arrow {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 4px;
+    vertical-align: middle;
+    line-height: 1;
+
+    &--disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+  }
   &__account-type {
     font-size: 12px;
     line-height: 1.2;
     margin: 0;
     font-weight: normal;
+    display: flex;
+    align-items: center;
+    justify-self: center;
+    cursor: pointer;
+    position: relative;
 
     color: var(--status-success);
 
     &--virtual {
       color: var(--status-warning);
     }
+  }
+  &__account-label {
+    margin-right: 4px;
   }
   &__balance-section {
     display: flex;

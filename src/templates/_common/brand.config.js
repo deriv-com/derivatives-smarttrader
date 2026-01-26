@@ -23,6 +23,10 @@ const brand_config_data = {
             staging   : 'https://staging-auth.deriv.com/sessions/whoami',
             production: 'https://auth.deriv.com/sessions/whoami',
         },
+         api_core: {
+            staging: "staging-api-core.deriv.com",
+            production: "api-core.deriv.com"
+        },
         logout_endpoint: {
             staging   : 'https://staging-auth.deriv.com/self-service/logout/browser',
             production: 'https://auth.deriv.com/self-service/logout/browser',
@@ -59,6 +63,10 @@ const getWebSocketUrl = () => isProduction
 const getWhoAmIURL = () => isProduction
     ? brand_config_data.platform.whoami_endpoint.production
     : brand_config_data.platform.whoami_endpoint.staging;
+const getApiCoreUrl = () =>
+    isProduction
+        ? brand_config_data.platform.api_core.production
+        : brand_config_data.platform.api_core.staging;
 
 const getLogoutURL = () => isProduction
     ? brand_config_data.platform.logout_endpoint.production
@@ -90,4 +98,5 @@ module.exports = {
     getWebSocketUrl,
     getWhoAmIURL,
     getLogoutURL,
+    getApiCoreUrl
 };
