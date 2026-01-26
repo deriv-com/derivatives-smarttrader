@@ -84,7 +84,9 @@ jobs:
             PR NUMBER: ${{ github.event.pull_request.number }}
 
             Please review this pull request with a focus on:
-             **Code Quality & Correctness**
+            **IMPORTANT: Only suggest non-logic changes** - Focus on code quality, patterns, and best practices. Do NOT suggest changes that alter business logic, algorithms, or functional behavior.
+             
+            **Code Quality & Correctness**
             - TypeScript type safety and proper type definitions
             - React best practices (hooks, component patterns, performance)
             - Next.js specific patterns (SSR, SSG, API routes, routing)
