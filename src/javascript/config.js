@@ -77,23 +77,38 @@ const getAppId = () => {
 
 const isBinaryApp = () => +getAppId() === binary_desktop_app_id;
 
+const sanitizeInput = (input) => {
+    if (typeof input !== 'string') return null;
+    // Remove any characters that are not alphanumeric, hyphen, underscore, or specific safe characters
+    return input.replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 100); // Also limit length
+};
+
 const getAccountId = () => {
     // Check URL parameter first
     const urlParams = new URLSearchParams(window.location.search);
     const urlAccountId = urlParams.get('account_id');
     if (urlAccountId) {
-        // Store and clean up URL
-        window.localStorage.setItem('account_id', urlAccountId);
-        const url = new URL(window.location);
-        url.searchParams.delete('account_id');
-        window.history.replaceState({}, '', url);
-        return urlAccountId;
+        const sanitizedAccountId = sanitizeInput(urlAccountId);
+        if (sanitizedAccountId) {
+            // Store and clean up URL
+            window.localStorage.setItem('account_id', sanitizedAccountId);
+            const url = new URL(window.location);
+            url.searchParams.delete('account_id');
+            window.history.replaceState({}, '', url);
+            return sanitizedAccountId;
+        }
     }
     
     // Check localStorage
     const storedAccountId = window.localStorage.getItem('account_id');
     if (storedAccountId) {
-        return storedAccountId;
+        const sanitizedStoredAccountId = sanitizeInput(storedAccountId);
+        if (sanitizedStoredAccountId) {
+            return sanitizedStoredAccountId;
+        } else {
+            // Clean up invalid stored data
+            window.localStorage.removeItem('account_id');
+        }
     }
     
     // No account_id available
@@ -144,7 +159,7 @@ const getSocketURL = () => {
     
     if (accountId && accountType) {
         endpoint = accountType === 'real' ? '/real' : '/demo';
-        queryParams = `?account_id=${accountId}`;
+        queryParams = `?account_id=${encodeURIComponent(accountId)}`;
     }
     
     return `wss://${server_url}${endpoint}${queryParams}`;
