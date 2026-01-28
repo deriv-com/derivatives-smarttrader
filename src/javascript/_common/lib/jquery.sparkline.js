@@ -964,9 +964,17 @@
                 if (userValues === 'html' || userValues === undefined) {
                     vals = this.getAttribute(options.get('tagValuesAttribute'));
                     if (vals === undefined || vals === null) {
-                        vals = $this.html();
+                        // Use jQuery's text() method to safely extract text content
+                        // This avoids regex-based HTML parsing and safely handles comments
+                        vals = $this.text();
+                        // Check if the element contains only HTML comments
+                        var htmlContent = $this.html();
+                        var commentMatch = htmlContent.match(/^\s*<!--\s*(.*?)\s*-->\s*$/);
+                        if (commentMatch) {
+                            vals = commentMatch[1];
+                        }
                     }
-                    values = vals.replace(/(^\s*<!--)|(-->\s*$)|\s+/g, '').split(',');
+                    values = vals.replace(/\s+/g, '').split(',');
                 } else {
                     values = userValues;
                 }
