@@ -66,6 +66,11 @@ const Path           = require('path');
 const Url            = require('url');
 const common         = require('./common');
 
+// Utility function to escape special regex characters
+const escapeRegExp = (string) => {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+};
+
 program
     .version('0.2.2')
     .description('Build .jsx templates into /dist folder')
@@ -300,7 +305,13 @@ async function compile(page) {
 }
 
 const getFilteredPages = () => {
-    const path_regex = new RegExp(program.path, 'i');
+    if (!program.path) {
+        return common.pages;
+    }
+    
+    // Escape special regex characters to prevent ReDoS attacks
+    const escaped_path = escapeRegExp(program.path);
+    const path_regex = new RegExp(escaped_path, 'i');
     return common.pages.filter(p => path_regex.test(p.save_as));
 };
 
