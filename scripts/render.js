@@ -79,6 +79,11 @@ program
  * Common functions
  */
 
+// Helper function to escape regex special characters
+const escapeRegExp = (string) => {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+};
+
 const getConfig = () => (
     {
         add_translations: false,
@@ -300,8 +305,19 @@ async function compile(page) {
 }
 
 const getFilteredPages = () => {
-    const path_regex = new RegExp(program.path, 'i');
-    return common.pages.filter(p => path_regex.test(p.save_as));
+    if (!program.path) {
+        return common.pages;
+    }
+    
+    try {
+        // Escape regex special characters to prevent injection
+        const escaped_path = escapeRegExp(program.path);
+        const path_regex = new RegExp(escaped_path, 'i');
+        return common.pages.filter(p => path_regex.test(p.save_as));
+    } catch (error) {
+        console.error(color.red(`Invalid path pattern: ${program.path}`));
+        return [];
+    }
 };
 
 (async () => {
