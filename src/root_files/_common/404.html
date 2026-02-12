@@ -41,16 +41,25 @@
     }
 
     function redirect(lang) {
-        var base = /^(.+?).github.io$/.test(window.location.hostname) ? window.location.origin + '/binary-static' : window.location.origin;
+        var base = /^(.+?)\.github\.io$/.test(window.location.hostname) ? window.location.origin + '/binary-static' : window.location.origin;
 
-        // Save language to localStorage for @deriv-com/translations
+        // Save language to localStorage for @deriv-com/translations - using proper escaping
         if (lang) {
-            localStorage.setItem('i18n_language', JSON.stringify(lang.toUpperCase()));
+            localStorage.setItem('i18n_language', JSON.stringify(lang.replace(/[<>"'&]/g, function(match) {
+                switch(match) {
+                    case '<': return '&lt;';
+                    case '>': return '&gt;';
+                    case '"': return '&quot;';
+                    case "'": return '&#39;';
+                    case '&': return '&amp;';
+                    default: return match;
+                }
+            }).toUpperCase()));
         }
 
         // redirect to /en/ page if pathname contains an unsupported language:
         const supported_langs_regex = Object.keys(langs).join('|');
-        if (new RegExp(`^/(?!${supported_langs_regex})\\w{2,5}/\\w+`).test(window.location.pathname.toLowerCase())) {
+        if (new RegExp(`^/(?!${supported_langs_regex.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})\\w{2,5}/\\w+`).test(window.location.pathname.toLowerCase())) {
             window.location.href = base + '/trading.html';
             return;
         }
@@ -88,14 +97,19 @@
     }
     function getTopLevelDomain() {
         const current_domain = window.location.hostname;
-        return (current_domain && current_domain.indexOf('.') >= 0) ? current_domain.split('.').splice(-1) : 'com';
+        // Improved hostname validation - check for valid domain structure
+        if (current_domain && /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?)*$/.test(current_domain) && current_domain.indexOf('.') >= 0) {
+            return current_domain.split('.').splice(-1)[0];
+        }
+        return 'com';
     };
     
     function onLoad() {
         var btn__home = document.getElementById('btn__home');
-        var home_url = `https://smarttrader.deriv.${getTopLevelDomain()}`;
+        var home_url = 'https://smarttrader.deriv.' + getTopLevelDomain();
         btn__home.href = home_url;
-        btn__home.innerHTML = home_url;
+        // Properly escape the URL for safe display
+        btn__home.textContent = home_url;
     }
     document.addEventListener('DOMContentLoaded', function() {
         onLoad();

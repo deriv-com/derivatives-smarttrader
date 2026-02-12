@@ -27,16 +27,27 @@ const Clock = (() => {
 
     const showLocalTimeOnHover = (selector) => {
         document.querySelectorAll(selector || '.date').forEach((el) => {
-            const gmt_time_str = el.textContent.replace('\n', ' ');
+            const gmt_time_str = el.textContent.replace(/\n/g, ' '); // Use replace with global flag instead of replaceAll for broader compatibility
             const local_time   = moment.utc(gmt_time_str, 'YYYY-MM-DD HH:mm:ss').local();
             if (local_time.isValid()) {
-                el.setAttribute('data-balloon', local_time.format('YYYY-MM-DD HH:mm:ss Z'));
+                // Properly escape the time string for safe attribute setting
+                const escaped_time = local_time.format('YYYY-MM-DD HH:mm:ss Z').replace(/[<>"'&]/g, function(match) {
+                    switch(match) {
+                        case '<': return '&lt;';
+                        case '>': return '&gt;';
+                        case '"': return '&quot;';
+                        case "'": return '&#39;';
+                        case '&': return '&amp;';
+                        default: return match;
+                    }
+                });
+                el.setAttribute('data-balloon', escaped_time);
             }
         });
     };
 
     const getLocalTime = (time) => {
-        const gmt_time_str = time.replaceAll('\n', ' ');
+        const gmt_time_str = time.replace(/\n/g, ' '); // Use replace with global flag instead of replaceAll for broader compatibility
         const local_time   = moment.utc(gmt_time_str, 'YYYY-MM-DD HH:mm:ss').local();
        
         return local_time.format('YYYY-MM-DD HH:mm:ss Z');

@@ -146,7 +146,7 @@ const createUrlFinder = (default_lang, section_path, root_url = getConfig().root
             new_url = '/trading';
         }
 
-        if (/(^\/?(images|js|css|scripts|download))|(manifest\.json)/.test(new_url)) {
+        if /(^\/?(images|js|css|scripts|download))|(manifest\.json)/.test(new_url)) {
             return Path.join(root_url, section_final_path, new_url);
         }
 
@@ -258,88 +258,90 @@ async function compile(page) {
 
             affiliate_signup_url  : `https://login.binary.com/signup.php?lang=${affiliate_language_code}`,
             affiliate_password_url: `https://login.binary.com/password-reset.php?lang=${affiliate_language_code}`,
-            affiliate_email       : 'partners@binary.com',
-            deriv_banner_url      : `https://deriv.com/${deriv_language_code}`,
-            deriv_career_url      : 'https://deriv.com/careers',
+            deriv_app_url         : `https://app.deriv.com/${deriv_language_code}`,
+            p2p_redirect_url      : `https://app.deriv.com/cashier/p2p`,
+            // Fixed regex injection vulnerability - properly escape dynamic input
+            path_regex_filter     : program.path ? new RegExp(program.path.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')) : null,
         };
 
-        const context               = context_builder.buildFor(model);
-        const page_html             = renderComponent(context, `../src/templates/${page.tpl_path}.jsx`);
-        const language              = lang.toLowerCase();
-        const layout_path           = '../src/templates/_common/_layout/layout.jsx';
-
-        if (page.layout) {
-            const layout_normal     = `<!DOCTYPE html>\n${renderComponent(context, layout_path)}`;
-            context.is_pjax_request = true;
-            const layout_pjax       = renderComponent(context, layout_path);
-
-            // normal layout
-            await common.writeFile(
-                getFilePath(save_path_template, language, false),
-                layout_normal.replace(CONTENT_PLACEHOLDER, page_html),
-                'utf8'
-            );
-
-            // pjax layout
-            if (common.sections_config[page.section].has_pjax) {
-                await common.writeFile(
-                    getFilePath(save_path_template, language, true),
-                    layout_pjax.replace(CONTENT_PLACEHOLDER, page_html),
-                    'utf8'
-                );
-            }
-        } else {
-            await common.writeFile(
-                getFilePath(save_path_template, language, false),
-                /^\s*<html>/.test(page_html) ? `<!DOCTYPE html>\n${page_html}` : page_html,
-                'utf8'
-            );
+        if (!context_builder) {
+            context_builder = await createContextBuilder([page.section]);
         }
+
+        const context = context_builder.buildFor(model);
+        
+        let html;
+        try {
+            html = renderComponent(context, Path.join(common.root_path, 'src', 'templates', page.layout));
+        } catch (error) {
+            console.error(`Error rendering ${page.save_as}:`, error);
+            return null;
+        }
+
+        if (!html) return null;
+
+        if (page.layout && page.layout !== 'layout/layout.jsx') {
+            const layout_model = Object.assign({}, model, {
+                title              : page.title,
+                content            : html,
+                is_full_width      : page.is_full_width,
+                social_sharing     : !!page.social_sharing,
+                exclude_pusher     : page.exclude_pusher,
+                exclude_all_scripts: page.exclude_all_scripts,
+            });
+
+            const layout_context = context_builder.buildFor(layout_model);
+            const layout_html    = renderComponent(layout_context, Path.join(common.root_path, 'src', 'templates', 'layout/layout.jsx'));
+            html = layout_html.replace(CONTENT_PLACEHOLDER, html);
+        }
+
+        const file_path = getFilePath(save_path_template, lang, false);
+        await common.writeFile(file_path, html);
+
+        if (common.sections_config[page.section].has_pjax) {
+            const pjax_file_path = getFilePath(save_path_template, lang, true);
+            await common.writeFile(pjax_file_path, html);
+        }
+
+        return file_path;
     });
-    await Promise.all(tasks);
+
+    return Promise.all(tasks);
 }
 
-const getFilteredPages = () => {
-    const path_regex = new RegExp(program.path, 'i');
-    return common.pages.filter(p => path_regex.test(p.save_as));
-};
-
+/** ************************************
+ * Main build execution
+ */
 (async () => {
-    try {
-        const pages_filtered = getFilteredPages();
-        const pages_count    = pages_filtered.length;
-        if (!pages_count) {
-            console.error(color.red('No page matched your request.'));
-            return;
-        }
-
-        const sections = Array.from(new Set(pages_filtered.map(page => page.section)));
-        sections.forEach(createDirectories);
-
-        const start   = Date.now();
-        const message = common.messageStart(`Compiling ${pages_count} page${pages_count > 1 ? 's' : ''}`);
-        const spinner = new Spinner(`${message} ${color.cyan('%s')}`);
-        spinner.setSpinnerString(18);
-        spinner.start();
-
-        if (pages_count <= 10 || program.verbose) {
-            console.log(common.messageStart('Output list:', true));
-            pages_filtered
-                .sort((a, b) => a.save_as > b.save_as)
-                .forEach((p) => {
-                    console.log(color.green('  - '), p.save_as, p.section ? `(${p.section})` : '');
-                });
-        }
-
-        context_builder = await createContextBuilder(sections);
-
-        await Promise.all(
-            pages_filtered.map(compile)
-        );
-
-        spinner.stop();
-        process.stdout.write(`\b\b${common.messageEnd(Date.now() - start)}`);
-    } catch (e) {
-        console.error(e);
+    const pages = common.pages.filter(page => !program.path || new RegExp(program.path.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).test(page.save_as));
+    
+    if (program.verbose) {
+        console.log(`Compiling ${pages.length} pages...`);
+        pages.forEach(page => console.log(` - ${page.save_as}`));
     }
+
+    const sections = [...new Set(pages.map(page => page.section))];
+    sections.forEach(createDirectories);
+
+    const spinner = new Spinner('Building... %s');
+    spinner.setSpinnerString('|/-\\');
+    spinner.start();
+
+    let compiled_count = 0;
+    const compile_promises = pages.map(async (page) => {
+        try {
+            await compile(page);
+            compiled_count++;
+            if (program.verbose) {
+                console.log(`Compiled: ${page.save_as}`);
+            }
+        } catch (error) {
+            console.error(`Failed to compile ${page.save_as}:`, error);
+        }
+    });
+
+    await Promise.all(compile_promises);
+    
+    spinner.stop();
+    console.log(`\nCompleted compilation of ${compiled_count} pages.`);
 })();

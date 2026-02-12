@@ -77,13 +77,19 @@ const ThirdPartyLinks = (() => {
         } catch (e) {
             return false;
         }
+        
+        const currentBinaryDomain = getCurrentBinaryDomain() || 'binary.com';
+        // Improved hostname validation - escape special regex characters and use more precise patterns
+        const escapedDomain = currentBinaryDomain.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        
         return !!destination.host
-            && !new RegExp(`^.*\\.${getCurrentBinaryDomain() || 'binary\\.com'}$`).test(destination.host) // destination host is not binary subdomain
+            && !new RegExp(`^([a-zA-Z0-9-]+\\.)*${escapedDomain}$`).test(destination.host) // destination host is not binary subdomain
             // TODO: [app-link-refactor] - Remove backwards compatibility for `deriv.app`
-            && !(/deriv\\.app$/.test(destination.host) || /app\\.deriv\\.com$/.test(destination.host)) // destination host is not deriv.app
-            && !/^.*\\.binary\\.bot$/.test(destination.host) // destination host is not binary subdomain
-            && !/www.(betonmarkets|xodds).com/.test(destination.host) // destination host is not binary old domain
-            && !/deriv.(app|com)/.test(destination.host) // destination host is not deriv
+            && !/^([a-zA-Z0-9-]+\.)*deriv\.app$/.test(destination.host) // destination host is not deriv.app
+            && !/^([a-zA-Z0-9-]+\.)*app\.deriv\.com$/.test(destination.host) // destination host is not app.deriv.com
+            && !/^([a-zA-Z0-9-]+\.)*binary\.bot$/.test(destination.host) // destination host is not binary.bot subdomain
+            && !/^www\.(betonmarkets|xodds)\.com$/.test(destination.host) // destination host is not binary old domain
+            && !/^([a-zA-Z0-9-]+\.)*deriv\.(app|com)$/.test(destination.host) // destination host is not deriv
             && window.location.host !== destination.host;
     };
 

@@ -82,12 +82,24 @@ const getAccountId = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const urlAccountId = urlParams.get('account_id');
     if (urlAccountId) {
+        // Validate and sanitize account ID
+        const sanitizedAccountId = urlAccountId.replace(/[<>"'&]/g, function(match) {
+            switch(match) {
+                case '<': return '&lt;';
+                case '>': return '&gt;';
+                case '"': return '&quot;';
+                case "'": return '&#39;';
+                case '&': return '&amp;';
+                default: return match;
+            }
+        });
+        
         // Store and clean up URL
-        window.localStorage.setItem('account_id', urlAccountId);
+        window.localStorage.setItem('account_id', sanitizedAccountId);
         const url = new URL(window.location);
         url.searchParams.delete('account_id');
         window.history.replaceState({}, '', url);
-        return urlAccountId;
+        return sanitizedAccountId;
     }
     
     // Check localStorage
@@ -144,7 +156,7 @@ const getSocketURL = () => {
     
     if (accountId && accountType) {
         endpoint = accountType === 'real' ? '/real' : '/demo';
-        queryParams = `?account_id=${accountId}`;
+        queryParams = `?account_id=${encodeURIComponent(accountId)}`;
     }
     
     return `wss://${server_url}${endpoint}${queryParams}`;

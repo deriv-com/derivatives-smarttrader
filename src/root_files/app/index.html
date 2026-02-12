@@ -30,7 +30,22 @@
                 var search                = window.location.search ? window.location.search : '';
                 var has_external_referrer = document.referrer && !/\.(binary\.(com|me)|deriv\.com)/.test(document.referrer);
                 var has_utm_source        = /utm_source/.test(search);
-                var utm_source            = has_external_referrer && !has_utm_source ? ((search ? '&' : '?') + 'utm_source=' + new URL(document.referrer).hostname) : '';
+                var utm_source            = '';
+                
+                // Secure URL construction with proper validation
+                if (has_external_referrer && !has_utm_source) {
+                    try {
+                        var referrer_url = new URL(document.referrer);
+                        var hostname = referrer_url.hostname;
+                        // Validate hostname format and escape for safe URL construction
+                        if (/^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?)*$/.test(hostname)) {
+                            utm_source = (search ? '&' : '?') + 'utm_source=' + encodeURIComponent(hostname);
+                        }
+                    } catch (e) {
+                        // Invalid referrer URL, skip utm_source
+                        utm_source = '';
+                    }
+                }
                 
                 window.location.href = '/trading.html' + (search || utm_source ? '?' + search.replace(/^\?/, '') + (search && utm_source ? '&' : '') + utm_source.replace(/^\?/, '') : '');
             }
@@ -45,8 +60,23 @@
                 var cookieLang = getCookieItem('language');
                 
                 if (!storedLang && cookieLang) {
-                    // Migrate from cookie to localStorage
-                    localStorage.setItem('i18n_language', JSON.stringify(cookieLang.toUpperCase()));
+                    // Migrate from cookie to localStorage with proper escaping
+                    try {
+                        var escapedLang = cookieLang.replace(/[<>"'&]/g, function(match) {
+                            switch(match) {
+                                case '<': return '&lt;';
+                                case '>': return '&gt;';
+                                case '"': return '&quot;';
+                                case "'": return '&#39;';
+                                case '&': return '&amp;';
+                                default: return match;
+                            }
+                        }).toUpperCase();
+                        localStorage.setItem('i18n_language', JSON.stringify(escapedLang));
+                    } catch (e) {
+                        // If there's an error, set default language
+                        localStorage.setItem('i18n_language', JSON.stringify('EN'));
+                    }
                 } else if (!storedLang && !cookieLang) {
                     // Set default language for first-time visitors
                     localStorage.setItem('i18n_language', JSON.stringify('EN'));
