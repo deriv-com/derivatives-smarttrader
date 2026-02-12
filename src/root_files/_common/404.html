@@ -41,7 +41,9 @@
     }
 
     function redirect(lang) {
-        var base = /^(.+?).github.io$/.test(window.location.hostname) ? window.location.origin + '/binary-static' : window.location.origin;
+        // Use proper hostname validation
+        var isGitHubPages = /^[^.]+\.github\.io$/i.test(window.location.hostname);
+        var base = isGitHubPages ? window.location.origin + '/binary-static' : window.location.origin;
 
         // Save language to localStorage for @deriv-com/translations
         if (lang) {
@@ -88,14 +90,21 @@
     }
     function getTopLevelDomain() {
         const current_domain = window.location.hostname;
-        return (current_domain && current_domain.indexOf('.') >= 0) ? current_domain.split('.').splice(-1) : 'com';
+        // Improved domain validation with proper TLD extraction
+        if (current_domain && /^[a-z0-9.-]+\.[a-z]{2,}$/i.test(current_domain)) {
+            const parts = current_domain.split('.');
+            return parts[parts.length - 1];
+        }
+        return 'com';
     };
     
     function onLoad() {
         var btn__home = document.getElementById('btn__home');
-        var home_url = `https://smarttrader.deriv.${getTopLevelDomain()}`;
+        var tld = getTopLevelDomain();
+        // Properly escape the TLD for use in URL
+        var home_url = 'https://smarttrader.deriv.' + encodeURIComponent(tld);
         btn__home.href = home_url;
-        btn__home.innerHTML = home_url;
+        btn__home.textContent = home_url;
     }
     document.addEventListener('DOMContentLoaded', function() {
         onLoad();

@@ -77,13 +77,24 @@ const ThirdPartyLinks = (() => {
         } catch (e) {
             return false;
         }
+        
+        // Get current binary domain with proper validation
+        const currentBinaryDomain = getCurrentBinaryDomain();
+        if (!currentBinaryDomain) return true; // If we can't determine domain, treat as third-party
+        
+        // Properly escape domain for use in regex and validate hostname format
+        const escapedDomain = currentBinaryDomain.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const isValidHostname = /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(destination.host);
+        
         return !!destination.host
-            && !new RegExp(`^.*\\.${getCurrentBinaryDomain() || 'binary\\.com'}$`).test(destination.host) // destination host is not binary subdomain
+            && isValidHostname // Ensure hostname is valid
+            && !new RegExp(`^([a-zA-Z0-9-]+\\.)?${escapedDomain}$`, 'i').test(destination.host) // destination host is not binary subdomain
             // TODO: [app-link-refactor] - Remove backwards compatibility for `deriv.app`
-            && !(/deriv\\.app$/.test(destination.host) || /app\\.deriv\\.com$/.test(destination.host)) // destination host is not deriv.app
-            && !/^.*\\.binary\\.bot$/.test(destination.host) // destination host is not binary subdomain
-            && !/www.(betonmarkets|xodds).com/.test(destination.host) // destination host is not binary old domain
-            && !/deriv.(app|com)/.test(destination.host) // destination host is not deriv
+            && !/^([a-zA-Z0-9-]+\.)?deriv\.app$/i.test(destination.host) // destination host is not deriv.app
+            && !/^([a-zA-Z0-9-]+\.)?app\.deriv\.com$/i.test(destination.host) // destination host is not app.deriv.com
+            && !/^([a-zA-Z0-9-]+\.)?binary\.bot$/i.test(destination.host) // destination host is not binary.bot subdomain
+            && !/^www\.(betonmarkets|xodds)\.com$/i.test(destination.host) // destination host is not binary old domain
+            && !/^([a-zA-Z0-9-]+\.)?deriv\.(app|com)$/i.test(destination.host) // destination host is not deriv
             && window.location.host !== destination.host;
     };
 

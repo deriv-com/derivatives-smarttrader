@@ -82,21 +82,23 @@ const getAccountId = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const urlAccountId = urlParams.get('account_id');
     if (urlAccountId) {
-        // Store and clean up URL
-        window.localStorage.setItem('account_id', urlAccountId);
-        const url = new URL(window.location);
-        url.searchParams.delete('account_id');
-        window.history.replaceState({}, '', url);
-        return urlAccountId;
+        // Validate account_id format before storing
+        if (/^[a-zA-Z0-9_-]+$/.test(urlAccountId)) {
+            window.localStorage.setItem('account_id', urlAccountId);
+            const url = new URL(window.location);
+            url.searchParams.delete('account_id');
+            window.history.replaceState({}, '', url);
+            return urlAccountId;
+        }
     }
     
     // Check localStorage
     const storedAccountId = window.localStorage.getItem('account_id');
-    if (storedAccountId) {
+    if (storedAccountId && /^[a-zA-Z0-9_-]+$/.test(storedAccountId)) {
         return storedAccountId;
     }
     
-    // No account_id available
+    // No valid account_id available
     return null;
 };
 
@@ -144,7 +146,8 @@ const getSocketURL = () => {
     
     if (accountId && accountType) {
         endpoint = accountType === 'real' ? '/real' : '/demo';
-        queryParams = `?account_id=${accountId}`;
+        // Properly encode account_id for use in query parameter
+        queryParams = `?account_id=${encodeURIComponent(accountId)}`;
     }
     
     return `wss://${server_url}${endpoint}${queryParams}`;

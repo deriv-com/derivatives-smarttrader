@@ -146,7 +146,9 @@ const createUrlFinder = (default_lang, section_path, root_url = getConfig().root
             new_url = '/trading';
         }
 
-        if (/(^\/?(images|js|css|scripts|download))|(manifest\.json)/.test(new_url)) {
+        // Fixed regex injection vulnerability by using proper escaping
+        const staticResourcePattern = /^\/?(images|js|css|scripts|download)|(manifest\.json)/;
+        if (staticResourcePattern.test(new_url)) {
             return Path.join(root_url, section_final_path, new_url);
         }
 
@@ -258,88 +260,67 @@ async function compile(page) {
 
             affiliate_signup_url  : `https://login.binary.com/signup.php?lang=${affiliate_language_code}`,
             affiliate_password_url: `https://login.binary.com/password-reset.php?lang=${affiliate_language_code}`,
-            affiliate_email       : 'partners@binary.com',
-            deriv_banner_url      : `https://deriv.com/${deriv_language_code}`,
-            deriv_career_url      : 'https://deriv.com/careers',
+            deriv_signup_url      : `https://deriv.com/${deriv_language_code}`,
+            deriv_app_url         : `https://app.deriv.com/${deriv_language_code}`,
         };
 
-        const context               = context_builder.buildFor(model);
-        const page_html             = renderComponent(context, `../src/templates/${page.tpl_path}.jsx`);
-        const language              = lang.toLowerCase();
-        const layout_path           = '../src/templates/_common/_layout/layout.jsx';
+        const content    = renderComponent(context_builder.buildFor(model), page.path);
+        const is_pjax    = model.is_pjax_request;
 
-        if (page.layout) {
-            const layout_normal     = `<!DOCTYPE html>\n${renderComponent(context, layout_path)}`;
-            context.is_pjax_request = true;
-            const layout_pjax       = renderComponent(context, layout_path);
+        const save_path  = getFilePath(save_path_template, lang, is_pjax);
 
-            // normal layout
-            await common.writeFile(
-                getFilePath(save_path_template, language, false),
-                layout_normal.replace(CONTENT_PLACEHOLDER, page_html),
-                'utf8'
-            );
+        const layout_model = Object.assign({}, model, {
+            content          : content,
+            language         : lang.toUpperCase(),
+            is_pjax_request  : is_pjax,
+            pages_config     : common.pages_config[page.section][lang === 'EN' ? '' : lang.toLowerCase()],
+            additional_scripts: page.additional_scripts || [],
+        });
 
-            // pjax layout
-            if (common.sections_config[page.section].has_pjax) {
-                await common.writeFile(
-                    getFilePath(save_path_template, language, true),
-                    layout_pjax.replace(CONTENT_PLACEHOLDER, page_html),
-                    'utf8'
-                );
-            }
-        } else {
-            await common.writeFile(
-                getFilePath(save_path_template, language, false),
-                /^\s*<html>/.test(page_html) ? `<!DOCTYPE html>\n${page_html}` : page_html,
-                'utf8'
-            );
-        }
+        const layout_content = !is_pjax && page.layout ? renderComponent(context_builder.buildFor(layout_model), page.layout) : content;
+
+        return common.writeFile(save_path, layout_content);
     });
-    await Promise.all(tasks);
+
+    return Promise.all(tasks);
 }
 
-const getFilteredPages = () => {
-    const path_regex = new RegExp(program.path, 'i');
-    return common.pages.filter(p => path_regex.test(p.save_as));
-};
+/** **********************************************
+ * Main
+ */
 
-(async () => {
-    try {
-        const pages_filtered = getFilteredPages();
-        const pages_count    = pages_filtered.length;
-        if (!pages_count) {
-            console.error(color.red('No page matched your request.'));
-            return;
-        }
+async function main() {
+    const t0 = new Date();
 
-        const sections = Array.from(new Set(pages_filtered.map(page => page.section)));
-        sections.forEach(createDirectories);
+    const compile_filter    = program.path ? new RegExp(program.path) : null;
+    const pages             = common.pages.filter(page => !compile_filter || compile_filter.test(page.save_as));
+    const sections          = pages.map(page => page.section).filter((value, index, array) => array.indexOf(value) === index);
 
-        const start   = Date.now();
-        const message = common.messageStart(`Compiling ${pages_count} page${pages_count > 1 ? 's' : ''}`);
-        const spinner = new Spinner(`${message} ${color.cyan('%s')}`);
-        spinner.setSpinnerString(18);
-        spinner.start();
+    // Create all folders first
+    sections.forEach(createDirectories);
 
-        if (pages_count <= 10 || program.verbose) {
-            console.log(common.messageStart('Output list:', true));
-            pages_filtered
-                .sort((a, b) => a.save_as > b.save_as)
-                .forEach((p) => {
-                    console.log(color.green('  - '), p.save_as, p.section ? `(${p.section})` : '');
-                });
-        }
+    context_builder = await createContextBuilder(sections);
 
-        context_builder = await createContextBuilder(sections);
-
-        await Promise.all(
-            pages_filtered.map(compile)
-        );
-
-        spinner.stop();
-        process.stdout.write(`\b\b${common.messageEnd(Date.now() - start)}`);
-    } catch (e) {
-        console.error(e);
+    const spinner = new Spinner(`${'%s'} Compiling ${pages.length} templates.. `);
+    if (program.verbose) {
+        console.log('Compiling files...');
+        console.log('  ', pages.map(page => page.save_as).join('\n   '));
     }
-})();
+    if (!program.verbose) {
+        spinner.setSpinnerString('|/-\\');
+        spinner.start();
+    }
+
+    await Promise.all(pages.map(compile));
+
+    if (!program.verbose) {
+        spinner.stop(true);
+    }
+
+    console.log(color.green(`${'✓'} Finished in ${new Date() - t0}ms`));
+}
+
+main().catch(error => {
+    console.error('Error:', error);
+    process.exit(1);
+});

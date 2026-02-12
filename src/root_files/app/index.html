@@ -30,7 +30,19 @@
                 var search                = window.location.search ? window.location.search : '';
                 var has_external_referrer = document.referrer && !/\.(binary\.(com|me)|deriv\.com)/.test(document.referrer);
                 var has_utm_source        = /utm_source/.test(search);
-                var utm_source            = has_external_referrer && !has_utm_source ? ((search ? '&' : '?') + 'utm_source=' + new URL(document.referrer).hostname) : '';
+                var utm_source            = '';
+                
+                if (has_external_referrer && !has_utm_source) {
+                    try {
+                        var referrerUrl = new URL(document.referrer);
+                        var hostname = referrerUrl.hostname;
+                        // Properly encode the hostname for use in URL parameter
+                        utm_source = (search ? '&' : '?') + 'utm_source=' + encodeURIComponent(hostname);
+                    } catch (e) {
+                        // If URL parsing fails, don't add utm_source
+                        utm_source = '';
+                    }
+                }
                 
                 window.location.href = '/trading.html' + (search || utm_source ? '?' + search.replace(/^\?/, '') + (search && utm_source ? '&' : '') + utm_source.replace(/^\?/, '') : '');
             }

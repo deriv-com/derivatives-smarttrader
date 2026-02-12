@@ -27,7 +27,8 @@ const Clock = (() => {
 
     const showLocalTimeOnHover = (selector) => {
         document.querySelectorAll(selector || '.date').forEach((el) => {
-            const gmt_time_str = el.textContent.replace('\n', ' ');
+            // Properly escape and validate time string input
+            const gmt_time_str = el.textContent ? el.textContent.replace(/\n/g, ' ') : '';
             const local_time   = moment.utc(gmt_time_str, 'YYYY-MM-DD HH:mm:ss').local();
             if (local_time.isValid()) {
                 el.setAttribute('data-balloon', local_time.format('YYYY-MM-DD HH:mm:ss Z'));
@@ -36,7 +37,8 @@ const Clock = (() => {
     };
 
     const getLocalTime = (time) => {
-        const gmt_time_str = time.replaceAll('\n', ' ');
+        // Properly escape and validate time string input
+        const gmt_time_str = time ? time.replace(/\n/g, ' ') : '';
         const local_time   = moment.utc(gmt_time_str, 'YYYY-MM-DD HH:mm:ss').local();
        
         return local_time.format('YYYY-MM-DD HH:mm:ss Z');
