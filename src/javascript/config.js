@@ -41,9 +41,13 @@ const getAppId = () => {
     const is_new_app    = /\/app\//.test(window.location.pathname);
     
     if (config_app_id) {
-        // eslint-disable-next-line no-console
-        console.log('Using config_app_id:', config_app_id);
-        app_id = config_app_id;
+        // Security: Validate app_id format before use
+        const safe_app_id = /^\d+$/.test(config_app_id) ? config_app_id : null;
+        if (safe_app_id) {
+            // eslint-disable-next-line no-console
+            console.log('Using config_app_id:', safe_app_id);
+            app_id = safe_app_id;
+        }
     } else if (/desktop-app/i.test(window.location.href) || window.localStorage.getItem('config.is_desktop_app')) {
         window.localStorage.removeItem('config.default_app_id');
         window.localStorage.setItem('config.is_desktop_app', 1);
@@ -60,7 +64,8 @@ const getAppId = () => {
     } else if (/staging-smarttrader\.deriv\.app/i.test(window.location.hostname)) { // TODO: [app-link-refactor] - Remove backwards compatibility for `deriv.app`
         window.localStorage.removeItem('config.default_app_id');
         app_id = 22169;
-    } else if (user_app_id.length) {
+    } else if (user_app_id.length && /^\d+$/.test(user_app_id)) {
+        // Security: Validate user_app_id format
         window.localStorage.setItem('config.default_app_id', user_app_id); // it's being used in endpoint chrome extension - please do not remove
         app_id = user_app_id;
     } else if (/localhost/i.test(window.location.hostname)) {
@@ -82,21 +87,25 @@ const getAccountId = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const urlAccountId = urlParams.get('account_id');
     if (urlAccountId) {
-        // Store and clean up URL
-        window.localStorage.setItem('account_id', urlAccountId);
-        const url = new URL(window.location);
-        url.searchParams.delete('account_id');
-        window.history.replaceState({}, '', url);
-        return urlAccountId;
+        // Security: Validate account_id format to prevent injection
+        const safe_account_id = /^[a-zA-Z0-9_-]+$/.test(urlAccountId) ? urlAccountId : null;
+        if (safe_account_id) {
+            // Store and clean up URL
+            window.localStorage.setItem('account_id', safe_account_id);
+            const url = new URL(window.location);
+            url.searchParams.delete('account_id');
+            window.history.replaceState({}, '', url);
+            return safe_account_id;
+        }
     }
     
-    // Check localStorage
+    // Check localStorage with validation
     const storedAccountId = window.localStorage.getItem('account_id');
-    if (storedAccountId) {
+    if (storedAccountId && /^[a-zA-Z0-9_-]+$/.test(storedAccountId)) {
         return storedAccountId;
     }
     
-    // No account_id available
+    // No valid account_id available
     return null;
 };
 
@@ -135,6 +144,11 @@ const getSocketURL = () => {
         server_url = getWebSocketUrl();
     }
     
+    // Security: Validate server_url format to prevent injection
+    if (server_url && !/^[a-zA-Z0-9.-]+$/.test(server_url)) {
+        server_url = getWebSocketUrl(); // fallback to default
+    }
+    
     // Determine endpoint based on account_type and account_id
     const accountType = getAccountType();
     const accountId = getAccountId();
@@ -144,7 +158,7 @@ const getSocketURL = () => {
     
     if (accountId && accountType) {
         endpoint = accountType === 'real' ? '/real' : '/demo';
-        queryParams = `?account_id=${accountId}`;
+        queryParams = `?account_id=${encodeURIComponent(accountId)}`;
     }
     
     return `wss://${server_url}${endpoint}${queryParams}`;
@@ -157,6 +171,11 @@ const getChartSocketURL = () => {
     if (!server_url) {
         // Use centralized brand config for environment-based server selection
         server_url = getWebSocketUrl();
+    }
+    
+    // Security: Validate server_url format to prevent injection
+    if (server_url && !/^[a-zA-Z0-9.-]+$/.test(server_url)) {
+        server_url = getWebSocketUrl(); // fallback to default
     }
     
     // Always use public endpoint for charts (market data doesn't require authentication)

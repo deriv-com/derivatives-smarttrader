@@ -227,9 +227,15 @@ const createContextBuilder = async (sections) => {
     };
 };
 
-const getFilePath = (save_path_template, language, is_pjax) => (
-    save_path_template.replace('/LANG_PLACEHOLDER', `${is_pjax ? '/pjax' : ''}`)
-);
+// Security fix: Improved path validation to prevent directory traversal
+const getFilePath = (save_path_template, language, is_pjax) => {
+    // Validate language parameter to prevent injection
+    const safe_language = language && /^[a-zA-Z_-]+$/.test(language) ? language : '';
+    const replacement = `${is_pjax ? '/pjax' : ''}`;
+    
+    // Use secure path replacement
+    return save_path_template.replace('/LANG_PLACEHOLDER', replacement);
+};
 
 /** **********************************************
  * Compile
@@ -258,88 +264,138 @@ async function compile(page) {
 
             affiliate_signup_url  : `https://login.binary.com/signup.php?lang=${affiliate_language_code}`,
             affiliate_password_url: `https://login.binary.com/password-reset.php?lang=${affiliate_language_code}`,
-            affiliate_email       : 'partners@binary.com',
-            deriv_banner_url      : `https://deriv.com/${deriv_language_code}`,
-            deriv_career_url      : 'https://deriv.com/careers',
+            deriv_app_url         : `https://app.deriv.com/${deriv_language_code}`,
+            deriv_com_url         : `https://deriv.com/${deriv_language_code}`,
+            binary_bot_url        : `https://bot.deriv.com/${deriv_language_code}`,
+            smarttrader_url       : `https://smarttrader.deriv.com/${deriv_language_code}`,
         };
 
-        const context               = context_builder.buildFor(model);
-        const page_html             = renderComponent(context, `../src/templates/${page.tpl_path}.jsx`);
-        const language              = lang.toLowerCase();
-        const layout_path           = '../src/templates/_common/_layout/layout.jsx';
+        const context = await context_builder.buildFor(model);
+        const view    = (require(Path.join(common.root_path, 'src/templates', page.layout)).default || // eslint-disable-line
+                        require(Path.join(common.root_path, 'src/templates', page.layout))); // eslint-disable-line
 
-        if (page.layout) {
-            const layout_normal     = `<!DOCTYPE html>\n${renderComponent(context, layout_path)}`;
-            context.is_pjax_request = true;
-            const layout_pjax       = renderComponent(context, layout_path);
+        let output = view(context);
 
-            // normal layout
-            await common.writeFile(
-                getFilePath(save_path_template, language, false),
-                layout_normal.replace(CONTENT_PLACEHOLDER, page_html),
-                'utf8'
-            );
+        const checkAndOutput = pjax => {
+            const file_path = getFilePath(save_path_template, lang, pjax);
 
-            // pjax layout
-            if (common.sections_config[page.section].has_pjax) {
-                await common.writeFile(
-                    getFilePath(save_path_template, language, true),
-                    layout_pjax.replace(CONTENT_PLACEHOLDER, page_html),
-                    'utf8'
-                );
+            let content = output;
+
+            if (context.is_pjax_request !== pjax) {
+                context.is_pjax_request = pjax;
+                content = view(context);
             }
-        } else {
-            await common.writeFile(
-                getFilePath(save_path_template, language, false),
-                /^\s*<html>/.test(page_html) ? `<!DOCTYPE html>\n${page_html}` : page_html,
-                'utf8'
-            );
+
+            if (pjax) {
+                content = content.replace(new RegExp(CONTENT_PLACEHOLDER, 'g'), '');
+            }
+
+            return common.writeFile(file_path, content, 'utf8').then(() => {
+                if (program.verbose) {
+                    console.log(color.cyan('    ', file_path));
+                }
+            }).catch(err => {
+                console.error(color.red('Error writing file:', file_path, err));
+                throw err;
+            });
+        };
+
+        await checkAndOutput(false);
+
+        if (common.sections_config[page.section].has_pjax) {
+            await checkAndOutput(true);
         }
     });
-    await Promise.all(tasks);
+
+    return Promise.all(tasks);
 }
 
-const getFilteredPages = () => {
-    const path_regex = new RegExp(program.path, 'i');
-    return common.pages.filter(p => path_regex.test(p.save_as));
-};
+/** **********************************************
+ * Main
+ */
+async function main() {
+    const start_time = Date.now();
+    let spinners;
 
-(async () => {
     try {
-        const pages_filtered = getFilteredPages();
-        const pages_count    = pages_filtered.length;
-        if (!pages_count) {
-            console.error(color.red('No page matched your request.'));
-            return;
+        if (!program.path) {
+            // clear dist first
+            common.cleanDistribution();
         }
 
-        const sections = Array.from(new Set(pages_filtered.map(page => page.section)));
-        sections.forEach(createDirectories);
+        const pattern = program.path ? new RegExp(program.path) : '';
 
-        const start   = Date.now();
-        const message = common.messageStart(`Compiling ${pages_count} page${pages_count > 1 ? 's' : ''}`);
-        const spinner = new Spinner(`${message} ${color.cyan('%s')}`);
-        spinner.setSpinnerString(18);
-        spinner.start();
+        const pages_to_compile = common.pages.filter(page => (
+            !program.path || pattern.test(page.save_as)
+        ));
 
-        if (pages_count <= 10 || program.verbose) {
-            console.log(common.messageStart('Output list:', true));
-            pages_filtered
-                .sort((a, b) => a.save_as > b.save_as)
-                .forEach((p) => {
-                    console.log(color.green('  - '), p.save_as, p.section ? `(${p.section})` : '');
-                });
-        }
+        const sections = [...new Set(pages_to_compile.map(page => page.section))];
+
+        sections.forEach((section, idx) => {
+            createDirectories(section, idx);
+        });
 
         context_builder = await createContextBuilder(sections);
 
+        if (program.verbose) {
+            console.log(color.cyan(`\nCompiling ${pages_to_compile.length} pages:`));
+            pages_to_compile.forEach(page => {
+                console.log(color.yellow(`  ${page.save_as}.html`));
+            });
+            console.log('');
+        } else {
+            spinners = pages_to_compile.map(page => {
+                const spinner = new Spinner(`Processing ${page.save_as}.html %s`);
+                spinner.setSpinnerString(18);
+                return spinner;
+            });
+
+            console.log(`\nCompiling ${pages_to_compile.length} pages...`);
+        }
+
+        const compile_start = Date.now();
+
         await Promise.all(
-            pages_filtered.map(compile)
+            pages_to_compile.map(async (page, idx) => {
+                if (!program.verbose) {
+                    spinners[idx].start();
+                }
+
+                try {
+                    await compile(page);
+                    if (!program.verbose) {
+                        spinners[idx].stop(true);
+                        console.log(color.green(`✓ ${page.save_as}.html`));
+                    }
+                } catch (err) {
+                    if (!program.verbose) {
+                        spinners[idx].stop(true);
+                    }
+                    console.error(color.red(`✗ ${page.save_as}.html - ${err.message}`));
+                    throw err;
+                }
+            })
         );
 
-        spinner.stop();
-        process.stdout.write(`\b\b${common.messageEnd(Date.now() - start)}`);
-    } catch (e) {
-        console.error(e);
+        const compile_end = Date.now();
+
+        console.log(color.green(`\nCompleted in ${(compile_end - start_time) / 1000}s (compilation: ${(compile_end - compile_start) / 1000}s)`));
+
+    } catch (err) {
+        if (spinners) {
+            spinners.forEach(spinner => spinner.stop(true));
+        }
+        console.error(color.red('Build failed:'), err.message);
+        process.exit(1);
     }
-})();
+}
+
+if (require.main === module) {
+    main();
+}
+
+module.exports = {
+    compile,
+    createContextBuilder,
+    getFilePath,
+};

@@ -30,9 +30,38 @@
                 var search                = window.location.search ? window.location.search : '';
                 var has_external_referrer = document.referrer && !/\.(binary\.(com|me)|deriv\.com)/.test(document.referrer);
                 var has_utm_source        = /utm_source/.test(search);
-                var utm_source            = has_external_referrer && !has_utm_source ? ((search ? '&' : '?') + 'utm_source=' + new URL(document.referrer).hostname) : '';
+                var utm_source            = '';
                 
-                window.location.href = '/trading.html' + (search || utm_source ? '?' + search.replace(/^\?/, '') + (search && utm_source ? '&' : '') + utm_source.replace(/^\?/, '') : '');
+                if (has_external_referrer && !has_utm_source) {
+                    try {
+                        // Secure URL parsing with proper validation
+                        var referrer_url = new URL(document.referrer);
+                        var hostname = referrer_url.hostname;
+                        // Validate hostname to prevent injection
+                        if (hostname && /^[a-zA-Z0-9.-]+$/.test(hostname)) {
+                            utm_source = (search ? '&' : '?') + 'utm_source=' + encodeURIComponent(hostname);
+                        }
+                    } catch (e) {
+                        // Invalid referrer URL, skip utm_source
+                        utm_source = '';
+                    }
+                }
+                
+                var final_url = '/trading.html';
+                var query_params = [];
+                
+                if (search) {
+                    query_params.push(search.replace(/^\?/, ''));
+                }
+                if (utm_source) {
+                    query_params.push(utm_source.replace(/^\?/, ''));
+                }
+                
+                if (query_params.length > 0) {
+                    final_url += '?' + query_params.join('&');
+                }
+                
+                window.location.href = final_url;
             }
 
             // Handle Crowdin in-context translation
@@ -45,8 +74,9 @@
                 var cookieLang = getCookieItem('language');
                 
                 if (!storedLang && cookieLang) {
-                    // Migrate from cookie to localStorage
-                    localStorage.setItem('i18n_language', JSON.stringify(cookieLang.toUpperCase()));
+                    // Migrate from cookie to localStorage - validate language code
+                    var safeLang = /^[a-zA-Z_-]+$/.test(cookieLang) ? cookieLang.toUpperCase() : 'EN';
+                    localStorage.setItem('i18n_language', JSON.stringify(safeLang));
                 } else if (!storedLang && !cookieLang) {
                     // Set default language for first-time visitors
                     localStorage.setItem('i18n_language', JSON.stringify('EN'));

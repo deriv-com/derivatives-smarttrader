@@ -77,13 +77,17 @@ const ThirdPartyLinks = (() => {
         } catch (e) {
             return false;
         }
+        
+        const currentBinaryDomain = getCurrentBinaryDomain();
+        
         return !!destination.host
-            && !new RegExp(`^.*\\.${getCurrentBinaryDomain() || 'binary\\.com'}$`).test(destination.host) // destination host is not binary subdomain
+            && !new RegExp(`^([a-zA-Z0-9-]+\\.)*${currentBinaryDomain ? currentBinaryDomain.replace(/\./g, '\\.') : 'binary\\.com'}$`).test(destination.host) // destination host is not binary subdomain - improved regex with proper escaping and subdomain handling
             // TODO: [app-link-refactor] - Remove backwards compatibility for `deriv.app`
-            && !(/deriv\\.app$/.test(destination.host) || /app\\.deriv\\.com$/.test(destination.host)) // destination host is not deriv.app
-            && !/^.*\\.binary\\.bot$/.test(destination.host) // destination host is not binary subdomain
-            && !/www.(betonmarkets|xodds).com/.test(destination.host) // destination host is not binary old domain
-            && !/deriv.(app|com)/.test(destination.host) // destination host is not deriv
+            && !/^([a-zA-Z0-9-]+\.)*deriv\.app$/.test(destination.host) // destination host is not deriv.app - improved regex
+            && !/^([a-zA-Z0-9-]+\.)*app\.deriv\.com$/.test(destination.host) // destination host is not app.deriv.com - improved regex
+            && !/^([a-zA-Z0-9-]+\.)*binary\.bot$/.test(destination.host) // destination host is not binary.bot subdomain - improved regex
+            && !/^www\.(betonmarkets|xodds)\.com$/.test(destination.host) // destination host is not binary old domain - improved regex
+            && !/^([a-zA-Z0-9-]+\.)*(deriv\.(app|com))$/.test(destination.host) // destination host is not deriv - improved regex
             && window.location.host !== destination.host;
     };
 
