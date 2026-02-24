@@ -1,5 +1,4 @@
-const extend                 = require('extend');
-const getCurrentBinaryDomain = require('../config').getCurrentBinaryDomain;
+const extend = require('extend');
 require('./lib/polyfills/element.matches');
 
 /**

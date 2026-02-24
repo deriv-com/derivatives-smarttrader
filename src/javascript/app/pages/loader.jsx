@@ -1,5 +1,5 @@
 /* eslint-disable import/no-unresolved */
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Skeleton } from '@deriv-com/quill-ui';
 import Portal from './portal';
 import { getElementById } from '../../_common/common_functions';
