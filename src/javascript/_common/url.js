@@ -1,9 +1,9 @@
 const createElement = require('./utility').createElement;
 const isEmptyObject = require('./utility').isEmptyObject;
-const getTopLevelDomain = require('./utility').getTopLevelDomain;
 const Language = require('./language');
 const { SessionStore } = require('./storage');
 const getCurrentBinaryDomain = require('../config').getCurrentBinaryDomain;
+const { substituteDerivDomain } = require('../../templates/_common/brand.config');
 require('url-polyfill');
 
 const Url = (() => {
@@ -124,25 +124,23 @@ const Url = (() => {
         return static_host + path.replace(/(^\/)/g, '');
     };
 
-    const deriv_app_domain = `https://home.deriv.${getTopLevelDomain()}`;
+    const home_domain = substituteDerivDomain('https://home.deriv.com');
 
     const getAccountParam = () =>
         Url.param('account') ||
     (SessionStore.get('account') ? SessionStore.get('account') : '');
 
     const urlForDeriv = (path, pars) =>
-        `${getAllowedLocalStorageOrigin() || deriv_app_domain}/${path}${
+        `${getAllowedLocalStorageOrigin() || home_domain}/${path}${
             getAccountParam() ? `?account=${getAccountParam().toUpperCase()}` : '?'
         }${pars ? `&${pars}` : ''}`;
 
     const urlForReports = (path, redirect_url, account_type) => {
-        let dtrader_domain;
-
-        if (process.env.NODE_ENV !== 'production') {
-            dtrader_domain = 'https://staging-dtrader.deriv.com';
-        } else {
-            dtrader_domain = `https://dtrader.deriv.${getTopLevelDomain()}`;
-        }
+        const dtrader_domain = substituteDerivDomain(
+            process.env.NODE_ENV !== 'production'
+                ? 'https://staging-dtrader.deriv.com'
+                : 'https://dtrader.deriv.com'
+        );
 
         const encoded_redirect = encodeURIComponent(redirect_url);
         const lang = Language.get();
@@ -150,31 +148,15 @@ const Url = (() => {
         return `${dtrader_domain}/${path}?redirect=${encoded_redirect}&account_type=${account_type}&account_id=${account_id}&lang=${lang}`;
     };
 
-    const urlForTradersHub = (path, pars) => {
-        const origin = getAllowedLocalStorageOrigin(true) || deriv_app_domain;
-        return `${origin}/${path}?${pars ? `${pars}` : ''}`;
-    };
-
-    const getAllowedLocalStorageOrigin = (is_traders_hub_or_wallet) => {
+    const getAllowedLocalStorageOrigin = () => {
     // TODO: [app-link-refactor] - Remove backwards compatibility for `deriv.app`
-        const domain_zone = getTopLevelDomain();
-
         if (
             /^smarttrader-staging\.deriv\.app$/i.test(window.location.hostname) ||
-      /^staging-smarttrader\.deriv\.com$/i.test(window.location.hostname)
+            /^staging-(smarttrader|dsmarttrader)\.deriv\.(com|be|me)$/i.test(window.location.hostname)
         ) {
-            return 'https://staging-home.deriv.com';
-        } else if (
-            /^smarttrader\.deriv\.app$/i.test(window.location.hostname) ||
-      /^smarttrader\.deriv\.com$/i.test(window.location.hostname)
-        ) {
-            return is_traders_hub_or_wallet
-                ? `https://hub.deriv.${domain_zone}`
-                : deriv_app_domain;
+            return substituteDerivDomain('https://staging-home.deriv.com');
         }
-        return is_traders_hub_or_wallet
-            ? `https://hub.deriv.${domain_zone}`
-            : deriv_app_domain;
+        return home_domain;
     };
 
     /**
@@ -202,8 +184,6 @@ const Url = (() => {
     };
 
     const getStaticUrl = () => {
-        const host = 'https://deriv';
-        const domain = getTopLevelDomain();
         let lang = Language.get().toLowerCase();
 
         if (lang && lang !== 'en') {
@@ -216,8 +196,7 @@ const Url = (() => {
             lang = lang.replace('_', '-');
         }
 
-        const url = `${host}.${domain}${lang}`;
-        return url;
+        return substituteDerivDomain(`https://deriv.com${lang}`);
     };
 
     return {
@@ -231,7 +210,6 @@ const Url = (() => {
         urlForStatic,
         urlForDeriv,
         urlForReports,
-        urlForTradersHub,
         getAllowedLocalStorageOrigin,
         getHashValue,
         updateParamsWithoutReload,

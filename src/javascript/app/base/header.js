@@ -11,7 +11,7 @@ const {
     updateTooltipTranslations,
 } = require('../../_common/tooltip_translations');
 const createElement = require('../../_common/utility').createElement;
-const getTopLevelDomain = require('../../_common/utility').getTopLevelDomain;
+const { substituteDerivDomain } = require('../../../templates/_common/brand.config');
 const DerivLiveChat = require('../pages/livechat.jsx');
 const Chat = require('../../_common/chat.js').default;
 const getRemoteConfig = require('../hooks/useRemoteConfig').getRemoteConfig;
@@ -104,7 +104,7 @@ const Header = (() => {
                         switch (selector) {
                             case 'topbar-help-centre':
                                 element.addEventListener('click', () => {
-                                    window.location = `https://www.deriv.${getTopLevelDomain()}/help-centre/`;
+                                    window.location = substituteDerivDomain('https://www.deriv.com/help-centre/');
                                 });
                                 break;
                             case 'topbar-whatsapp':

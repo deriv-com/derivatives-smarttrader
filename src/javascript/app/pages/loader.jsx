@@ -1,5 +1,5 @@
 /* eslint-disable import/no-unresolved */
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Skeleton } from '@deriv-com/quill-ui';
 import Portal from './portal';
 import { getElementById } from '../../_common/common_functions';
@@ -52,16 +52,12 @@ const Loader = () => {
  
     useEffect(() => {
         const hide_page_loader = dataManager.getContract('hide_page_loader');
-        const sso_finished = dataManager.getContract('sso_finished');
-        
-        // Check for session token authentication - if user is authenticated via session token, hide loader
         const isSessionTokenAuth = !!localStorage.getItem('session_token');
 
-        if (hide_page_loader || sso_finished || isSessionTokenAuth) {
+        if (hide_page_loader || isSessionTokenAuth) {
             setLoading(false);
         }
-           
-    }, [has_contract_change, dataManager.getContract('sso_finished')]);
+    }, [has_contract_change]);
 
     useEffect(() => {
         const handleLoad = () => {
