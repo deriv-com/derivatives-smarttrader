@@ -78,9 +78,11 @@ const getBrandLoginUrl = () => getBrandUrl('login');
 const getBrandSignupUrl = () => getBrandUrl('signup');
 const getPlatformName = () => brand_config_data.platform.name;
 const getPlatformLogo = () => brand_config_data.platform.logo;
-const getPlatformHostname = () => isProduction
-    ? brand_config_data.platform.hostname.production
-    : brand_config_data.platform.hostname.staging;
+const getPlatformHostname = () => substituteDerivDomain(
+    isProduction
+        ? brand_config_data.platform.hostname.production
+        : brand_config_data.platform.hostname.staging
+);
 
 const getWebSocketUrl = () => substituteDerivDomain(
     isProduction
