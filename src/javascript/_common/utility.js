@@ -1,5 +1,4 @@
-const extend                 = require('extend');
-const getCurrentBinaryDomain = require('../config').getCurrentBinaryDomain;
+const extend = require('extend');
 require('./lib/polyfills/element.matches');
 
 /**
@@ -266,17 +265,6 @@ const getStaticHash = () => {
     return static_hash;
 };
 
-const getTopLevelDomain = () => {
-    const current_domain = getCurrentBinaryDomain();
-    return current_domain ? current_domain.split('.').splice(-1) : 'com';
-};
-
-const getHostname = () => {
-    const is_staging = /staging-smarttrader/.test(window.location.hostname);
-
-    return `https://${is_staging ? 'staging-app' : 'app'}.deriv.${getTopLevelDomain()}`;
-};
-
 class PromiseClass {
     constructor() {
         this.promise = new Promise((resolve, reject) => {
@@ -323,8 +311,6 @@ module.exports = {
     getStaticHash,
     PromiseClass,
     removeObjProperties,
-    getTopLevelDomain,
-    getHostname,
     tryParseJSON,
     lc_licenseID,
     lc_clientID,
