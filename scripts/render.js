@@ -299,7 +299,6 @@ async function compile(page) {
     await Promise.all(tasks);
 }
 
-// [AI]
 // Escape regex metacharacters so user input is treated as literal (prevents ReDoS / regex injection).
 const escapeRegexLiteral = (str) => String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -310,7 +309,6 @@ const getFilteredPages = () => {
     const path_regex = new RegExp(escapeRegexLiteral(program.path), 'i');
     return common.pages.filter(p => path_regex.test(p.save_as));
 };
-// [/AI]
 
 (async () => {
     try {

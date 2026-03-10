@@ -4,7 +4,6 @@ const Client                = require('../../base/client');
 const formatMoney           = require('../../common/currency').formatMoney;
 const getPropertyValue      = require('../../../_common/utility').getPropertyValue;
 
-// [AI]
 const updateBalance = (response) => {
     if (getPropertyValue(response, 'error')) {
         return;
