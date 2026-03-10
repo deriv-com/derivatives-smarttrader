@@ -71,7 +71,7 @@ program
     .description('Build .jsx templates into /dist folder')
     .option('-d, --dev',                 'Build for your gh-pages')
     .option('-b, --branch [branchname]', 'Build your changes to a sub-folder named: branchname')
-    .option('-p, --path [save_as]',      'Compile only the template(s) that match the regex save_as')
+    .option('-p, --path [save_as]',      'Compile only the template(s) whose path contains save_as (literal, case-insensitive)')
     .option('-v, --verbose',             'Displays the list of paths to be compiled')
     .parse(process.argv);
 
@@ -299,10 +299,18 @@ async function compile(page) {
     await Promise.all(tasks);
 }
 
+// [AI]
+// Escape regex metacharacters so user input is treated as literal (prevents ReDoS / regex injection).
+const escapeRegexLiteral = (str) => String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 const getFilteredPages = () => {
-    const path_regex = new RegExp(program.path, 'i');
+    if (!program.path) {
+        return common.pages;
+    }
+    const path_regex = new RegExp(escapeRegexLiteral(program.path), 'i');
     return common.pages.filter(p => path_regex.test(p.save_as));
 };
+// [/AI]
 
 (async () => {
     try {
