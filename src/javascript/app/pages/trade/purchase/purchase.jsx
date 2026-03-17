@@ -119,7 +119,7 @@ const Purchase = () => {
         return () => {
             observer.disconnect();
         };
-    }, []);
+    }, [data]);
 
     if (show_popup) {
         return <ContractDetails />;

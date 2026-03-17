@@ -13,7 +13,7 @@
   justify-content: center;
   padding: 0 1.6rem;
   width: max-content;
-  cursor: pointer;
+  cursor: default;
   z-index: 12;
 
   &:hover {
@@ -34,6 +34,10 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+
+    &--clickable {
+      cursor: pointer;
+    }
   }
   &__id {
     display: flex;
@@ -75,7 +79,7 @@
     display: flex;
     align-items: center;
     justify-self: center;
-    cursor: pointer;
+    cursor: inherit;
     position: relative;
 
     color: var(--status-success);
@@ -86,6 +90,7 @@
   }
   &__account-label {
     margin-right: 4px;
+    font-size: 14px;
   }
   &__balance-section {
     display: flex;
@@ -95,7 +100,7 @@
     line-height: 1.4;
     pointer-events: none;
     margin: 0;
-    font-size: 14px;
+    font-size: 16px;
     color: var(--text-general-bold);
     font-weight: bold;
 

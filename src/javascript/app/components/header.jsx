@@ -182,10 +182,12 @@ const AccountInfo = () => {
                             data-testid='dt_acc_info'
                             id='dt_core_account-info_acc-info'
                             className='acc-info'
-                            onClick={toggleDropdown}
                         >
                             <span className='acc-info__id' />
-                            <div className='acc-info__content'>
+                            <div
+                                className={`acc-info__content${derivativesAccountInfo?.data?.length > 1 ? ' acc-info__content--clickable' : ''}`}
+                                onClick={derivativesAccountInfo?.data?.length > 1 ? toggleDropdown : undefined}
+                            >
                                 <div className='acc-info__account-type-header'>
                                     <p
                                         id='header__acc-type'
@@ -364,11 +366,11 @@ const HeaderRight = () => {
                     />
                 ) : (
                     <Button
-                        id={hasOnlyDemo ? 'btn__try-real' : 'btn__transfer'}
+                        id={hasOnlyDemo ? 'btn__try-real' : 'btn__deposit'}
                         className='btn header__btn-transfer'
                         variant='primary'
                         size='md'
-                        label={localize(hasOnlyDemo ? 'Try Real' : 'Transfer')}
+                        label={localize(hasOnlyDemo ? 'Try Real' : 'Deposit')}
                         onClick={() => {
                             if (hasOnlyDemo) {
                                 showCompleteProfileModal();
