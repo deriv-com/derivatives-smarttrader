@@ -60,6 +60,8 @@ const getPlugins = (app, grunt) => ([
                     CROWDIN_URL          : JSON.stringify(process.env.CROWDIN_URL),
                     R2_PROJECT_NAME      : JSON.stringify(process.env.R2_PROJECT_NAME),
                     CROWDIN_BRANCH_NAME  : JSON.stringify(process.env.CROWDIN_BRANCH_NAME),
+                    POSTHOG_KEY          : JSON.stringify(process.env.POSTHOG_KEY),
+                    POSTHOG_HOST         : JSON.stringify(process.env.POSTHOG_HOST),
                 },
             }),
         ]
@@ -82,6 +84,8 @@ const getPlugins = (app, grunt) => ([
                     CROWDIN_URL          : JSON.stringify(process.env.CROWDIN_URL),
                     R2_PROJECT_NAME      : JSON.stringify(process.env.R2_PROJECT_NAME),
                     CROWDIN_BRANCH_NAME  : JSON.stringify(process.env.CROWDIN_BRANCH_NAME),
+                    POSTHOG_KEY          : JSON.stringify(process.env.POSTHOG_KEY),
+                    POSTHOG_HOST         : JSON.stringify(process.env.POSTHOG_HOST),
                 },
             }),
         ]

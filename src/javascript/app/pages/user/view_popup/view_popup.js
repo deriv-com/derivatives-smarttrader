@@ -17,6 +17,7 @@ const changePocNumbersToString = require('../../../common/request_middleware').c
 const getElementById           = require('../../../../_common/common_functions').getElementById;
 const urlFor                   = require('../../../../_common/url').urlFor;
 const Utility                  = require('../../../../_common/utility');
+const { substituteDerivDomain } = require('../../../../../templates/_common/brand.config');
 const dataManager              = require('../../../common/data_manager').default;
 
 const ViewPopup = (() => {
@@ -337,7 +338,7 @@ const ViewPopup = (() => {
                 cd_info_msg: info_msg,
             });
             if (is_unsupported_contract) {
-                const redirect_url = `https://home.deriv.${Utility.getTopLevelDomain()}`;
+                const redirect_url = substituteDerivDomain('https://home.deriv.com');
                 const message = Callputspread.isCallputspread(contract.contract_type) ?
                     localize('This contract is only available on <a href="{{url}}" target="_blank" rel="noopener noreferrer">DTrader</a>.', { url: redirect_url }) :
                     localize('This contract is only available on DTrader.<br/><a href="{{url}}" target="_blank" rel="noopener noreferrer">Go to Dtrader</a> to close or cancel this contract.', { url: redirect_url });

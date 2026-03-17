@@ -5,7 +5,6 @@ const getPropertyValue      = require('../../../_common/utility').getPropertyVal
 // Global balance update event for React components to listen to
 const BALANCE_UPDATED_EVENT = 'balance_updated';
 
-// [AI]
 const updateBalance = (response) => {
     if (getPropertyValue(response, 'error')) {
         return;

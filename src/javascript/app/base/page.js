@@ -22,7 +22,7 @@ const scrollToTop      = require('../../_common/scroll').scrollToTop;
 const toISOFormat      = require('../../_common/string_util').toISOFormat;
 const Url              = require('../../_common/url');
 const Analytics        = require('../../_common/analytics');
-const { requestSingleSignOn, requestSingleLogout } = require('../../_common/auth');
+const dataManager      = require('../common/data_manager').default;
 const Chat             = require('../../_common/chat.js').default;
 const createElement    = require('../../_common/utility').createElement;
 const isLoginPages     = require('../../_common/utility').isLoginPages;
@@ -144,10 +144,7 @@ const Page = (() => {
         } else {
             init();
 
-            // if the user has logged in previously, silent login
-            requestSingleSignOn();
-            // if the user has logged out previously, silent logout
-            requestSingleLogout(Client.sendLogoutRequest);
+            dataManager.setContract({ hide_page_loader: true });
 
             if (!isLoginPages()) {
                 // Use proper language detection instead of urlLang
@@ -186,6 +183,9 @@ const Page = (() => {
                 
                 // Setup visibility listener to check whoami when tab becomes visible
                 Client.setupVisibilityListener();
+                
+                // Setup focus listener to check whoami when window gains focus
+                Client.setupFocusListener();
             });
         } else {
             Menu.init();
