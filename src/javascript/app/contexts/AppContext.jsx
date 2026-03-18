@@ -170,17 +170,12 @@ const AppProvider = ({ children }) => {
                     (account) => account.status === 'active',
                 );
 
-                const accountList = activeAccounts.map((account) => {
-                    // Convert balance string to number, removing any commas (e.g., "9,603.52" -> 9603.52)
-                    const balanceNumber = parseFloat(account.balance.replace(/,/g, ''));
-
-                    return {
-                        balance   : balanceNumber,
-                        currency  : account.currency || 'USD',
-                        is_virtual: account.account_type === 'real' ? 0 : 1,
-                        loginid   : account.account_id,
-                    };
-                });
+                const accountList = activeAccounts.map((account) => ({
+                    account_id  : account.account_id,
+                    account_type: account.account_type,
+                    balance     : account.balance,
+                    currency    : account.currency || 'USD',
+                }));
 
                 // Update state with successful data
                 setDerivativesAccountInfo({

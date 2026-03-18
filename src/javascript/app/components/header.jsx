@@ -219,13 +219,12 @@ const AccountInfo = () => {
                                         activeAccount={accountInfo}
                                         isVisible={isDropdownOpen}
                                         setIsDropdownOpen={setIsDropdownOpen}
-                                        onAccountSelect={(loginid, is_virtual) => {
+                                        onAccountSelect={(account_id, account_type) => {
                                             setIsDropdownOpen(false);
 
                                             // Set account_id and account_type in URL to trigger account switch
-                                            const account_type = is_virtual ? 'demo' : 'real';
                                             const url = new URL(window.location.href);
-                                            url.searchParams.set('account_id', loginid);
+                                            url.searchParams.set('account_id', account_id);
                                             url.searchParams.set('account_type', account_type);
 
                                             // Navigate to new URL which will trigger the account change mechanism
@@ -323,8 +322,8 @@ const LoginButtons = () => {
 const hasOnlyDemoAccounts = (accountList) => {
     if (!accountList || accountList.length === 0) return false;
 
-    // Check if all accounts have is_virtual flag set to 1
-    return accountList.every((account) => account.is_virtual === 1);
+    // Check if all accounts are demo
+    return accountList.every((account) => account.account_type === 'demo');
 };
 
 /**

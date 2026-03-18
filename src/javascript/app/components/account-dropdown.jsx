@@ -30,34 +30,38 @@ const AccountDropdown = ({
                     <div className='acc-dropdown__drag-indicator' />
                 </div>
                 <div className='acc-dropdown__list'>
-                    {accounts && accounts.map((account) => (
+                    {accounts && [...accounts].sort((a, b) => {
+                        if (a.account_type === 'real' && b.account_type === 'demo') return -1;
+                        if (a.account_type === 'demo' && b.account_type === 'real') return 1;
+                        return 0;
+                    }).map((account) => (
                         <div
-                            key={account.loginid}
+                            key={account.account_id}
                             className='acc-dropdown__account-wrapper'
                             onClick={() => {
-                                if (account.loginid !== activeAccountId) {
-                                    onAccountSelect(account.loginid, account.is_virtual);
+                                if (account.account_id !== activeAccountId) {
+                                    onAccountSelect(account.account_id, account.account_type);
                                 }
                             }}
                         >
                             <div
                                 className={classNames('acc-dropdown__account', {
                                     'acc-dropdown__account--selected':
-                    account.loginid === activeAccountId,
+                    account.account_id === activeAccountId,
                                 })}
                             >
                                 <div
                                     className={classNames('acc-dropdown__account-name', {
                                         'acc-dropdown__account-name--demo':
-                      account.is_virtual === 1,
+                      account.account_type === 'demo',
                                         'acc-dropdown__account-name--real':
-                      account.is_virtual !== 1,
+                      account.account_type === 'real',
                                     })}
                                 >
-                                    {account.is_virtual === 1 ? 'Demo account' : 'Real account'}
+                                    {account.account_type === 'demo' ? 'Demo account' : 'Real account'}
                                 </div>
                                 <div className='acc-dropdown__account-balance'>
-                                    {account.loginid === activeAccountId && activeAccount ? (
+                                    {account.account_id === activeAccountId && activeAccount ? (
                                         <>
                                             {getNumberFormat(
                                                 activeAccount.balance,
@@ -91,10 +95,10 @@ AccountDropdown.propTypes = {
    
     accounts: PropTypes.arrayOf(
         PropTypes.shape({
-            balance   : PropTypes.number.isRequired,
-            currency  : PropTypes.string,
-            is_virtual: PropTypes.oneOfType([PropTypes.number, PropTypes.bool]).isRequired,
-            loginid   : PropTypes.string.isRequired,
+            account_id  : PropTypes.string.isRequired,
+            account_type: PropTypes.string.isRequired,
+            balance     : PropTypes.string.isRequired,
+            currency    : PropTypes.string,
         })
     ).isRequired,
     activeAccount: PropTypes.shape({
