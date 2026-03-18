@@ -34,9 +34,11 @@ const AccountDropdown = ({
                         <div
                             key={account.loginid}
                             className='acc-dropdown__account-wrapper'
-                            onClick={() =>
-                                onAccountSelect(account.loginid, account.is_virtual)
-                            }
+                            onClick={() => {
+                                if (account.loginid !== activeAccountId) {
+                                    onAccountSelect(account.loginid, account.is_virtual);
+                                }
+                            }}
                         >
                             <div
                                 className={classNames('acc-dropdown__account', {
