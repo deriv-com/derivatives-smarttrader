@@ -1,9 +1,9 @@
 const isProduction = process.env.NODE_ENV === 'production';
 
 const brand_config_data = {
-    brand_name   : 'Deriv',
-    brand_logo   : 'deriv-com-logo.svg',
-    brand_domains: ['deriv.com', 'deriv.be', 'deriv.me'],
+    brand_name    : 'Deriv',
+    brand_logo    : 'deriv-com-logo.svg',
+    brand_domains : ['deriv.com', 'deriv.be', 'deriv.me'],
     brand_hostname: {
         staging   : 'staging-home.deriv.com/dashboard',
         production: 'home.deriv.com/dashboard',
@@ -84,17 +84,23 @@ const getPlatformHostname = () => substituteDerivDomain(
         : brand_config_data.platform.hostname.staging
 );
 
-const getWebSocketUrl = () => substituteDerivDomain(
+const getWebSocketUrl = () => `${substituteDerivDomain(
     isProduction
         ? brand_config_data.api_core.production
         : brand_config_data.api_core.staging
-) + '/options/v1/ws';
+)  }/options/v1/ws`;
 
 const getWhoAmIURL = () => `https://${substituteDerivDomain(
     isProduction
         ? brand_config_data.auth.production
         : brand_config_data.auth.staging
 )}/sessions/whoami`;
+
+const getApiCoreUrl = (isProd) => substituteDerivDomain(
+    isProd
+        ? brand_config_data.api_core.production
+        : brand_config_data.api_core.staging
+);
 
 const getLogoutURL = () => `https://${substituteDerivDomain(
     isProduction
@@ -124,6 +130,7 @@ module.exports = {
     getPlatformLogo,
     getPlatformHostname,
     getPlatformSettings, // Legacy compatibility
+    getApiCoreUrl,
     getWebSocketUrl,
     getWhoAmIURL,
     getLogoutURL,
