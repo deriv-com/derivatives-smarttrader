@@ -2,6 +2,7 @@ name: Weekly Workflow Summary Collector
 
 on:
   schedule:
+    - cron: "0 10 * * 3" # Every Wednesday at 10:00 UTC (14:00 GST)
     - cron: "0 10 * * 5" # Every Friday at 10:00 UTC (14:00 GST)
   workflow_dispatch:
 
@@ -24,9 +25,43 @@ jobs:
       # ── Step 1: Metadata ─────────────────────────────────────────────────
       - name: Compute metadata
         id: meta
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
         run: |
           echo "date=$(date -u +%Y-%m-%d)" >> $GITHUB_OUTPUT
           echo "week=$(date -u +%Y-W%V)"   >> $GITHUB_OUTPUT
+
+          # Determine the artifact collection cutoff using the ACTUAL completion time of the
+          # last successful run of this workflow (not a hardcoded schedule time).
+          # This correctly handles:
+          #   - Cron delays (15 min, 1 hr, or any amount)
+          #   - Both directions: Wed→Fri and Fri→next Wed
+          #   - Manual triggers: also start from where the last run left off
+          # The current run is still "in_progress" so querying status=success returns
+          # the previous successful run — exactly the cutoff we need.
+          LAST_RUN=$(gh api \
+            "/repos/$REPO/actions/workflows/weekly-workflow-collector.yml/runs?status=success&per_page=1" \
+            --jq '.workflow_runs[0] | {id: .id, completed_at: .updated_at, event: .event}')
+
+          if [ -n "$LAST_RUN" ] && [ "$(echo "$LAST_RUN" | jq -r '.id')" != "null" ]; then
+            SINCE=$(echo "$LAST_RUN"          | jq -r '.completed_at')
+            SINCE_RUN_ID=$(echo "$LAST_RUN"   | jq -r '.id')
+            SINCE_RUN_EVENT=$(echo "$LAST_RUN"| jq -r '.event')
+            SINCE_FALLBACK="false"
+            echo "Cutoff: artifacts created after run #$SINCE_RUN_ID (trigger: $SINCE_RUN_EVENT) completed at $SINCE"
+          else
+            SINCE=$(date -u -d "7 days ago" +%Y-%m-%dT%H:%M:%SZ)
+            SINCE_RUN_ID="none"
+            SINCE_RUN_EVENT="none"
+            SINCE_FALLBACK="true"
+            echo "No previous successful run found — falling back to 7 days ago: $SINCE"
+          fi
+
+          echo "since=$SINCE"                       >> $GITHUB_OUTPUT
+          echo "since_run_id=$SINCE_RUN_ID"         >> $GITHUB_OUTPUT
+          echo "since_run_event=$SINCE_RUN_EVENT"   >> $GITHUB_OUTPUT
+          echo "since_fallback=$SINCE_FALLBACK"     >> $GITHUB_OUTPUT
 
       # ── Step 2: Download DocSync artifacts ──────────────────────────────
       # Artifact name: docsync-event-log-<run_id>
@@ -36,13 +71,15 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
+          SINCE: ${{ steps.meta.outputs.since }}
         run: |
           mkdir -p downloads/docsync
 
           artifact_ids=$(gh api "/repos/$REPO/actions/artifacts?per_page=100" \
             --jq "[.artifacts[]
                     | select(.name | startswith(\"$DOCSYNC_PREFIX\"))
-                    | select(.expired == false)]
+                    | select(.expired == false)
+                    | select(.created_at >= \"$SINCE\")]
                   | sort_by(.created_at) | reverse | .[:$MAX_RUNS] | .[].id")
 
           if [ -z "$artifact_ids" ]; then
@@ -71,13 +108,15 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
+          SINCE: ${{ steps.meta.outputs.since }}
         run: |
           mkdir -p downloads/claude
 
           artifact_ids=$(gh api "/repos/$REPO/actions/artifacts?per_page=100" \
             --jq "[.artifacts[]
                     | select(.name | startswith(\"$CLAUDE_PREFIX\"))
-                    | select(.expired == false)]
+                    | select(.expired == false)
+                    | select(.created_at >= \"$SINCE\")]
                   | sort_by(.created_at) | reverse | .[:$MAX_RUNS] | .[].id")
 
           if [ -z "$artifact_ids" ]; then
@@ -228,13 +267,21 @@ jobs:
             echo "| **Week** | \`${{ steps.meta.outputs.week }}\` |"
             echo "| **Date** | \`${{ steps.meta.outputs.date }}\` |"
             echo "| **Repo** | \`${{ github.repository }}\` |"
+            echo "| **Triggered by** | \`${{ github.event_name }}\` |"
+            echo "| **Collecting artifacts from** | \`${{ steps.meta.outputs.since }}\` UTC onwards |"
+            if [ "${{ steps.meta.outputs.since_fallback }}" = "true" ]; then
+              echo "| **Cutoff basis** | ⚠️ No previous successful run found — used 7-day fallback |"
+            else
+              echo "| **Cutoff basis** | Last successful run [#${{ steps.meta.outputs.since_run_id }}](https://github.com/${{ github.repository }}/actions/runs/${{ steps.meta.outputs.since_run_id }}) (triggered by: \`${{ steps.meta.outputs.since_run_event }}\`) |"
+            fi
             echo ""
             jq -r '
               .workflows | to_entries[] |
               "### \(.key)\n" +
               "- **Runs collected**: \(.value.total_runs_collected)\n" +
               "- **Total events**: \([.value.runs[].event_count] | add // 0)\n" +
-              (if .value.retention_note then "- Note: \(.value.retention_note)\n" else "" end)
+              (if .value.warning then "- ⚠️ Warning: \(.value.warning)\n" else "" end) +
+              (if .value.retention_note then "- ℹ️ Note: \(.value.retention_note)\n" else "" end)
             ' workflow-summaries.json
           } >> $GITHUB_STEP_SUMMARY
 
