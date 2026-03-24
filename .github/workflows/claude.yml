@@ -1,90 +1,19 @@
-# This GitHub Actions workflow uses the Claude Code Action to review pull requests.
-name: Claude Code Assistant
+name: Claude PR Review
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, synchronize, reopened, ready_for_review]
 
 jobs:
-  claude-assistant:
-    # Only run on PR-related events that contain @claude
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-
+  claude-review:
+    uses: deriv-com/shared-actions/.github/workflows/claude-pr-review.yml@master
     permissions:
       contents: read
       pull-requests: write
       issues: write
       id-token: write
-      actions: read
-
-    # Cancel older runs when new commits arrive on the same PR
-    concurrency:
-      group: pr-${{ github.event.pull_request.number }}
-      cancel-in-progress: true
-
-    steps:
-      # Ensure we have a real git repo at the PR HEAD (works for forks)
-      - name: Checkout PR head
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
-          ref: ${{ github.event.pull_request.head.ref }}
-          fetch-depth: 20
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      # Sanity check (helps diagnose if anything goes wrong)
-      - name: Verify git workspace
-        run: |
-          pwd
-          git rev-parse --is-inside-work-tree
-          git log -1 --oneline
-
-      - name: Run Claude Code Action
-        uses: anthropics/claude-code-action@v1
-        timeout-minutes: 60
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          track_progress: true
-          claude_args: "--model claude-opus-4-5-20251101"
-          prompt: |
-            REPO: ${{ github.repository }}
-            PR NUMBER: ${{ github.event.pull_request.number }}
-
-            Review this Next.js/React/TypeScript pull request focusing on:
-
-            **Code Quality & Correctness**
-            - TypeScript type safety and proper type definitions
-            - React best practices (hooks, component patterns, performance)
-            - Next.js specific patterns (SSR, SSG, API routes, routing)
-
-            **Performance & Optimization**
-            - Bundle size impact and code splitting
-            - React rendering optimizations (memo, useMemo, useCallback)
-            - Next.js Image and Script optimization usage
-            - Unnecessary re-renders or expensive computations
-
-            **Security**
-            - XSS vulnerabilities in React components
-            - API route security and validation
-            - Environment variable handling
-            - Third-party dependency risks
-
-            **Testing & Maintainability**
-            - Test coverage for new/changed functionality
-            - Component testability and mocking patterns
-            - Code readability and maintainability
-            - Proper error handling and edge cases
-
-            **UI/UX & Accessibility**
-            - Radix UI component usage and patterns
-            - Tailwind CSS best practices
-            - Responsive design considerations
-            - Accessibility (ARIA labels, keyboard navigation, semantic HTML)
-
-            **Architecture & Patterns**
-            - Component structure and reusability
-            - State management patterns
-            - API integration patterns
-            - File and folder organization
+      actions: write
+    secrets:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      AGENT_METRICS_API_URL: ${{ secrets.AGENT_METRICS_API_URL }}
+      AGENT_METRICS_API_KEY: ${{ secrets.AGENT_METRICS_API_KEY }}
