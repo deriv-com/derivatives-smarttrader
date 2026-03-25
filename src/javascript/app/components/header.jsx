@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Skeleton, Button } from '@deriv-com/quill-ui';
 import { localize } from '@deriv-com/translations';
-import { StandaloneChevronDownRegularIcon } from '@deriv/quill-icons';
+import { StandaloneChevronDownRegularIcon, PartnersProductSmarttraderBrandLightLogoIcon } from '@deriv/quill-icons';
 import AccountDropdown from './account-dropdown';
 import AccountSwitcherTooltip, {
     TOOLTIP_SHOWN_KEY,
 } from './account-switcher-tooltip';
 import MobileMenuComponent from './mobile_menu';
+import BottomNavComponent from './bottom_nav';
 import LanguageMenuModal from '../../../templates/_common/components/language-menu-modal';
 import CompleteProfileModalModule from '../../../templates/_common/components/complete-profile-modal';
 import { renderReactComponent } from '../../_common/react_root_manager';
@@ -29,7 +30,7 @@ const BUILD_HASH = process.env.BUILD_HASH || '';
  * HeaderLeft - Left section of header with logo and reports link
  */
 const HeaderLeft = () => {
-    const { isLoggedIn, toggleMobileMenu } = useApp();
+    const { isLoggedIn } = useApp();
 
     // Get URL parameters for Reports link
     const account_type = getAccountType();
@@ -37,17 +38,8 @@ const HeaderLeft = () => {
 
     return (
         <div className='header__menu-left'>
-            <span className='header__hamburger--container'>
-                <img
-                    id='header__hamburger'
-                    className='header__hamburger mobile-show'
-                    src={Url.urlForStatic(
-                        `images/pages/header/ic-hamburger.svg?${BUILD_HASH}`,
-                    )}
-                    alt='Menu'
-                    onClick={toggleMobileMenu}
-                    style={{ cursor: 'pointer' }}
-                />
+            <span className='header__logo mobile-show'>
+                <PartnersProductSmarttraderBrandLightLogoIcon height='32px' width='32px' />
             </span>
             {isLoggedIn && (
                 <div className='mobile-show'>
@@ -269,12 +261,7 @@ const LoginButtons = () => {
         Login.redirectToLogin();
     };
 
-    const handleSignup = (e) => {
-        e.preventDefault();
-        Login.redirectToSignup();
-    };
-
-    // Show skeleton loaders during token exchange
+    // Show skeleton loader during token exchange
     if (isLoading || window.tokenExchangeInProgress) {
         return (
             <div className='header__btn'>
@@ -284,11 +271,6 @@ const LoginButtons = () => {
                         height={32}
                         className='btn header__btn-login skeleton-btn-login'
                     />
-                    <Skeleton.Square
-                        width={72}
-                        height={32}
-                        className='btn header__btn-login skeleton-btn-signup'
-                    />
                 </div>
             </div>
         );
@@ -296,22 +278,14 @@ const LoginButtons = () => {
 
     return (
         <div className='header__btn'>
-            <a
+            <Button
                 id='btn__login'
-                className='btn btn--tertiary header__btn-login'
+                className='header__btn-login'
+                variant='primary'
+                size='md'
+                label={localize('Log in')}
                 onClick={handleLogin}
-                href='#'
-            >
-                {localize('Log in')}
-            </a>
-            <a
-                id='btn__signup'
-                className='btn btn--primary header__btn-signup'
-                onClick={handleSignup}
-                href='#'
-            >
-                {localize('Sign up')}
-            </a>
+            />
         </div>
     );
 };
@@ -402,7 +376,6 @@ const HeaderComponent = () => (
             <HeaderLeft />
             <HeaderRight />
         </div>
-        <MobileMenuComponent />
     </div>
 );
 
@@ -414,6 +387,8 @@ export const init = () => {
                 <>
                     <HeaderComponent />
                     <LanguageMenuModal />
+                    <MobileMenuComponent />
+                    <BottomNavComponent />
                 </>
             </AppProvider>,
             container,
