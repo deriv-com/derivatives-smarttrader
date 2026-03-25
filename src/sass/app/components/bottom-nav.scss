@@ -30,6 +30,19 @@
         color: inherit;
         gap: 4px;
 
+        &:first-child {
+            position: relative;
+
+            &::after {
+                content: "";
+                background-color: var(--general-section-1);
+                width: 1px;
+                position: absolute;
+                top: 12px;
+                bottom: 12px;
+                right: 0;
+            }
+        }
         &--active {
             color: var(--brand-red-coral);
 
@@ -37,12 +50,10 @@
                 color: var(--brand-red-coral);
             }
         }
-
         svg {
             fill: currentColor;
         }
     }
-
     &__label {
         font-size: 12px;
         font-weight: 400;

@@ -1154,9 +1154,6 @@ body .mobile {
     height: 56px !important;
     z-index: 4 !important;
 
-    &__logo {
-      padding: 0 16px;
-    }
     &__menu {
       &-acc {
         position: unset;
@@ -1204,6 +1201,7 @@ body .mobile {
     }
     &__logo {
       height: 32px;
+      padding: 0 16px;
     }
     .account {
       &__switcher {

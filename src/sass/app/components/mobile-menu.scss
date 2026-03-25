@@ -22,7 +22,6 @@
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
     }
-
     &__section {
         padding: 8px 0;
 
@@ -33,12 +32,11 @@
             padding: 16px 0 8px;
         }
     }
-
     &__item {
         display: flex;
         align-items: center;
         padding: 12px 0;
-        border-bottom: 1px solid #f1f1f2;
+        border-bottom: 1px solid var(--general-section-1);
         cursor: pointer;
         text-decoration: none;
         color: var(--text-general);
@@ -46,14 +44,12 @@
         &-icon {
             margin-right: 12px;
         }
-
         &-label {
             flex: 1;
             font-size: 16px;
             font-weight: 400;
             color: var(--text-general);
         }
-
         &--logout {
             color: var(--brand-red-coral);
             border-bottom: none;
@@ -61,14 +57,12 @@
             .mobile-menu__item-label {
                 color: var(--brand-red-coral);
             }
-
             svg {
                 fill: var(--brand-red-coral);
             }
         }
     }
-
-    // Submenu pages (Language, Reports)
+    // Submenu pages (Language)
     &__submenu {
         padding: 0 16px;
         flex: 1;
@@ -91,14 +85,12 @@
             }
         }
     }
-
     &__language-list {
         display: flex;
         flex-direction: column;
         gap: 8px;
         padding: 8px;
     }
-
     &__language-item {
         display: flex;
         align-items: center;
@@ -110,14 +102,12 @@
         &:hover:not(&--active) {
             background-color: var(--general-section-1);
         }
-
         &--active {
             border: 1px solid var(--text-general);
             background-color: var(--general-section-1);
             cursor: default;
         }
     }
-
     &__language-text {
         font-size: 16px;
         color: var(--text-general);

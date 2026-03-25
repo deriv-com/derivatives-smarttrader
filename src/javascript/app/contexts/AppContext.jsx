@@ -126,7 +126,6 @@ const AppProvider = ({ children }) => {
         } account`;
     };
 
-
     // Handle language change
     const handleLanguageChange = async (langCode) => {
         try {
