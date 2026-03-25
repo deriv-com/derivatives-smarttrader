@@ -206,6 +206,10 @@ body .header,
   .is-login {
     display: none;
   }
+  .header__btn-login {
+    border-radius: 16px;
+    padding: 16px;
+  }
   .is-logout {
     display: inline-flex; // Show initially to display skeleton loaders
   }
@@ -357,7 +361,6 @@ body .header,
     height: min-content;
   }
   &__logo {
-    width: 120px;
     height: 25px;
   }
   &__icon {
@@ -1149,7 +1152,11 @@ body .mobile {
   }
   body .header {
     height: 56px !important;
+    z-index: 4 !important;
 
+    &__logo {
+      padding: 0 16px;
+    }
     &__menu {
       &-acc {
         position: unset;
@@ -1197,7 +1204,6 @@ body .mobile {
     }
     &__logo {
       height: 32px;
-      width: 148px;
     }
     .account {
       &__switcher {

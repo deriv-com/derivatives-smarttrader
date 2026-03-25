@@ -15,6 +15,7 @@ const brand_config_data = {
             staging   : 'staging-dsmarttrader.deriv.com',
             production: 'dsmarttrader.deriv.com',
         },
+        help_centre_url: 'https://trade.deriv.com/help-centre',
     },
     api_core: {
         staging   : 'staging-api-core.deriv.com',
@@ -102,6 +103,8 @@ const getApiCoreUrl = (isProd) => substituteDerivDomain(
         : brand_config_data.api_core.staging
 );
 
+const getHelpCentreUrl = () => brand_config_data.platform.help_centre_url;
+
 const getLogoutURL = () => `https://${substituteDerivDomain(
     isProduction
         ? brand_config_data.auth.production
@@ -136,4 +139,5 @@ module.exports = {
     getLogoutURL,
     getDomainName,
     substituteDerivDomain,
+    getHelpCentreUrl,
 };

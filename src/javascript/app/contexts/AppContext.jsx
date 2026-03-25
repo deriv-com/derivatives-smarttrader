@@ -17,14 +17,14 @@ const AppContext = createContext(null);
  * - Authentication state (isLoggedIn)
  * - Account information (currency, balance, loginid, accountType)
  * - Language configuration (currentLanguage, availableLanguages)
- * - Mobile menu state (isMobileMenuOpen)
+ * - Active tab state (activeTab)
  * - Loading states
  * - Helper functions (getFormattedBalance, handleLanguageChange, etc.)
  */
 const AppProvider = ({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(Client.isLoggedIn());
     const [isLoading, setIsLoading] = useState(false);
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [activeTab, setActiveTab] = useState('trade');
     const [accountInfo, setAccountInfo] = useState({
         currency   : '',
         balance    : undefined,
@@ -126,15 +126,6 @@ const AppProvider = ({ children }) => {
         } account`;
     };
 
-    // Toggle mobile menu
-    const toggleMobileMenu = () => {
-        setIsMobileMenuOpen((prev) => !prev);
-    };
-
-    // Close mobile menu
-    const closeMobileMenu = () => {
-        setIsMobileMenuOpen(false);
-    };
 
     // Handle language change
     const handleLanguageChange = async (langCode) => {
@@ -216,14 +207,13 @@ const AppProvider = ({ children }) => {
         isLoggedIn,
         isLoading,
         accountInfo,
-        isMobileMenuOpen,
+        activeTab,
+        setActiveTab,
         currentLanguage,
         availableLanguages,
         getFormattedBalance,
         getAccountTypeDisplay,
         setIsLoading,
-        toggleMobileMenu,
-        closeMobileMenu,
         handleLanguageChange,
         setAccountInfo,
         // Derivatives account functionality

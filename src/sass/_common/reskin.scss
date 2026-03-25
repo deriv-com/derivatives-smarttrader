@@ -508,8 +508,8 @@ div#contract-injection-container {
     transition: all var(--core-motion-ease-100) var(--core-motion-duration-200);
     border-top: solid 1px var(--core-color-opacity-black-100);
     
-    @media(max-width: 768px) {
-        bottom: 0px;
+    @media(max-width: 879px) {
+        bottom: 56px;
     }
 
     &.hide {
