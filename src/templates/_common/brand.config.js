@@ -103,7 +103,7 @@ const getApiCoreUrl = (isProd) => substituteDerivDomain(
         : brand_config_data.api_core.staging
 );
 
-const getHelpCentreUrl = () => brand_config_data.platform.help_centre_url;
+const getHelpCentreUrl = () => substituteDerivDomain(brand_config_data.platform.help_centre_url);
 
 const getLogoutURL = () => `https://${substituteDerivDomain(
     isProduction
