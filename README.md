@@ -90,6 +90,13 @@ Before running or contribute to this project, you need to have the setup of the 
   - `grunt shell:compile_dev --path=about-us` to re-compile only template(s) which serve about-us path in URL.
 - To fix eslint errors run `npm run eslint`
 
+## Mobile Navigation
+
+SmartTrader includes a mobile-optimized navigation experience with:
+
+- **Bottom Navigation Bar** - Persistent navigation on mobile devices with Home, Trade, and Menu tabs
+- **Full-Page Mobile Menu** - Redesigned overlay menu with organized sections for Reports, Settings, and Support
+
 ## Test link deployment
 ### Deploy your changes on Vercel (Recommended Option)
 

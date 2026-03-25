@@ -49,6 +49,9 @@ SmartTrader is a web-based trading application for binary options and derivative
 - [src/javascript/_common/base/socket_cache.js](src/javascript/_common/base/socket_cache.js) - API response caching layer
 - [src/javascript/app/pages/trade/get_ticks.js](src/javascript/app/pages/trade/get_ticks.js) - Market data request handler for real-time ticks
 - [src/javascript/app/base/binary_pages.js](src/javascript/app/base/binary_pages.js) - SPA routing configuration
+- [src/javascript/app/components/bottom_nav.jsx](src/javascript/app/components/bottom_nav.jsx) - Mobile bottom navigation bar component
+- [src/javascript/app/components/mobile_menu.jsx](src/javascript/app/components/mobile_menu.jsx) - Full-page mobile menu overlay
+- [src/javascript/app/contexts/AppContext.jsx](src/javascript/app/contexts/AppContext.jsx) - React context for global app state (authentication, account info, language, active tab)
 
 ### Key Modules (IIFE Pattern)
 - **BinaryLoader**: App initialization, page lifecycle, handles SPA navigation
@@ -66,13 +69,46 @@ src/
 │   │   └── base/         # Socket, cache, client, currency base classes
 │   ├── app/
 │   │   ├── base/         # Core app infrastructure (loader, pages, socket)
+│   │   ├── components/   # React components (header, mobile nav, account dropdown)
+│   │   ├── contexts/     # React contexts (AppContext for global state)
 │   │   └── pages/        # Page-specific modules (trade, user, etc.)
 │   ├── config.js         # API endpoints, app configuration
 │   └── index.js          # Application entry point
 ├── sass/                 # SCSS stylesheets
+│   ├── app/components/   # Component-specific styles (bottom-nav, mobile-menu)
+│   └── _common/          # Shared styles (header, common utilities)
 ├── templates/            # JSX templates
 └── root_files/          # Static assets for root
 ```
+
+## Mobile Navigation Architecture
+
+### Bottom Navigation (Mobile)
+- **Component**: `BottomNavComponent` in `src/javascript/app/components/bottom_nav.jsx`
+- **Purpose**: Persistent bottom navigation bar for mobile devices (< 880px)
+- **Tabs**: Home (external link), Trade, Menu
+- **State Management**: Uses `activeTab` from AppContext to control Trade/Menu views
+- **Styling**: `src/sass/app/components/bottom-nav.scss` - Fixed positioning at bottom with 56px height
+
+### Mobile Menu System
+- **Component**: `MobileMenuComponent` in `src/javascript/app/components/mobile_menu.jsx`
+- **Design**: Full-page overlay menu with submenus (language selection)
+- **Sections**: Reports (logged-in only), Settings, Support
+- **Features**: 
+  - Reusable `MenuItem` component with icons from @deriv/quill-icons
+  - Language submenu with full-page navigation
+  - Logout functionality (logged-in users)
+  - Help Centre link to external support
+- **Styling**: `src/sass/app/components/mobile-menu.scss` - Fixed overlay below header, above bottom nav
+
+### AppContext Updates
+- **Active Tab State**: `activeTab` and `setActiveTab` control mobile navigation ('trade' or 'menu')
+- **Removed**: `isMobileMenuOpen`, `toggleMobileMenu`, `closeMobileMenu` (replaced by tab-based system)
+
+### Header Changes (Mobile)
+- **Logo**: Replaced hamburger icon with `PartnersProductSmarttraderBrandLightLogoIcon` on mobile
+- **Login Button**: Simplified to single primary button (removed signup button from header)
+- **Menu Rendering**: Mobile menu now renders outside header for proper layering with bottom nav
 
 ## Code Style Guidelines
 
@@ -89,6 +125,7 @@ src/
 - **Props Validation**: Use PropTypes for component props
 - **HTML Parsing**: Use `html-react-parser` for HTML to React conversion
 - **4-space indentation** for JSX (enforced by ESLint)
+- **Icons**: Use `@deriv/quill-icons` for UI icons (Standalone* prefixed components)
 
 ### WebSocket Patterns
 - **Request Deduplication**: Automatic for `authorize`, `get_settings`, `residence_list`, etc.
@@ -117,6 +154,7 @@ src/
 - Chart rendering and real-time updates
 - Authentication flows
 - Localization and language switching
+- Mobile navigation state management
 - Cross-browser compatibility (last 2 versions, iOS Safari, last 3 Safari versions)
 
 ## Development Workflow
@@ -237,6 +275,13 @@ BinarySocket.send({
 - To recompile specific template: `grunt shell:compile_dev --path=about-us`
 - Templates are JSX files in `src/templates/`
 
+### Adding Mobile Components
+1. Create component in `src/javascript/app/components/`
+2. Add styles in `src/sass/app/components/`
+3. Import stylesheet in `src/sass/app.scss`
+4. Use AppContext for global state (activeTab, language, auth)
+5. Test responsive behavior (breakpoint: 880px for mobile)
+
 ## Important Warnings & Requirements
 
 ### Critical Requirements
@@ -245,6 +290,12 @@ BinarySocket.send({
 - **HTTPS Only** - Development server runs on https://localhost
 - **jQuery Global** - Available as `$` globally, don't import separately
 - **Master branch** - Main branch is "master", not "main"
+
+### Mobile-Specific Requirements
+- **Bottom navigation**: Fixed at bottom, 56px height, z-index 3
+- **Mobile menu**: Full-page overlay, positioned between header (z-index 4) and bottom nav (z-index 3)
+- **Content padding**: Add 56px bottom padding on mobile to account for bottom nav
+- **Breakpoint**: Mobile navigation activates at max-width 879px
 
 ### Performance Considerations
 - **Request Deduplication**: Automatic for common API calls via SocketCache
@@ -260,6 +311,7 @@ BinarySocket.send({
 - **Subscription Cleanup**: Must `forget_all` before new subscriptions
 - **React Version**: Now on React 18.3.1, not 16.14.0
 - **Branch Name**: Use "master", not "main"
+- **Mobile State Management**: Use `activeTab` from AppContext, not local menu open/close state
 
 ### Error Handling Patterns
 - **WebSocket Errors**: Implement auto-reconnection with request buffering
@@ -272,9 +324,19 @@ BinarySocket.send({
 - jQuery 3.5.1
 - Grunt (build system)
 - @deriv-com/webtrader-charts ^0.6.5
+- @deriv/quill-icons (UI icon library)
 - highstock-release 5.0.14
 - Mocha + Chai + Enzyme + Sinon (testing)
 - @deriv-com/analytics, @deriv-com/auth-client, @deriv-com/translations
+- webpack 5.105.4
+- js-yaml 4.1.1
+- qs 6.15.0
+
+### Security Dependencies (Pinned)
+- diff 8.0.3
+- micromatch 4.0.8
+- undici 6.24.1
+- minimatch 3.1.5 (for grunt and globule)
 
 ---
 
