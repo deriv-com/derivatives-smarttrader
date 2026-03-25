@@ -33,7 +33,7 @@
         &:first-child {
             position: relative;
 
-            &::after {
+            &:after {
                 content: "";
                 background-color: var(--general-section-1);
                 width: 1px;
