@@ -206,32 +206,6 @@ body .header,
   .is-login {
     display: none;
   }
-  .header__btn-login {
-    border-radius: 16px;
-    padding: 16px;
-  }
-  .is-logout {
-    display: inline-flex; // Show initially to display skeleton loaders
-  }
-  &__btn {
-    display: flex;
-    align-items: center;
-    height: 100;
-
-    &-login,
-    &-signup {
-      margin-right: 17px;
-    }
-    &-logout {
-      padding: 16px;
-      margin: 0 8px;
-      color: var(--text-prominent) !important;
-    }
-    &-transfer {
-      margin: 0 16px;
-      border-radius: 16px;
-    }
-  }
   &__menu {
     &-acc {
       position: relative;
@@ -243,6 +217,7 @@ body .header,
       height: 100%;
       align-self: center;
       border-bottom: 1px solid var(--general-section-1);
+      padding: 0 16px;
 
       > * {
         display: inline-flex;
@@ -929,6 +904,35 @@ body .header,
   }
 }
 
+// Shared header-right styles (used in both .header and #desktop-account-info-container)
+.header__menu-right {
+  display: flex;
+  align-items: center;
+}
+
+.header__btn-login {
+  border-radius: 16px !important;
+  padding: 16px !important;
+}
+
+.is-logout {
+  display: inline-flex;
+}
+
+.header__btn {
+  display: flex;
+  align-items: center;
+
+  &-logout {
+    padding: 16px;
+    margin: 0 8px;
+    color: var(--text-prominent) !important;
+  }
+  &-transfer {
+    border-radius: 16px !important;
+  }
+}
+
 #cfd-link-seperator {
   display: none;
 }
@@ -1201,7 +1205,7 @@ body .mobile {
     }
     &__logo {
       height: 32px;
-      padding: 0 16px;
+      padding-right: 16px;
     }
     .account {
       &__switcher {

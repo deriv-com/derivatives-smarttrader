@@ -1,0 +1,42 @@
+/** @define flyout-selector */
+.flyout-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px;
+
+    &__option {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        color: var(--text-prominent);
+        background-color: transparent;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 14px;
+        font-family: inherit;
+        width: 100%;
+        height: 56px;
+        text-align: left;
+
+        &:hover:not(:disabled) {
+            background-color: var(--general-hover);
+        }
+        &--active {
+            border-color: var(--text-prominent);
+            background-color: var(--general-hover);
+        }
+        &:disabled {
+            cursor: default;
+        }
+        svg {
+            flex-shrink: 0;
+        }
+        span {
+            flex: 1;
+        }
+    }
+}

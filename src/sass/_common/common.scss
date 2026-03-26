@@ -435,10 +435,12 @@ label {
 
 #content-holder {
     flex: 1 1 auto;
-    margin-top: 48px;
+    margin-top: 0;
+    margin-left: 72px;
 
-    @media(max-width: 880px) {
+    @media(max-width: 879px) {
         margin-top: 40px;
+        margin-left: 0;
         padding-bottom: 56px;
     }
 }

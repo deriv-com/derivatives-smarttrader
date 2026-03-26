@@ -73,6 +73,28 @@ const commonTrading = (() => {
         TabsElement.init();
         MarketSelectorElement.init();
         GuideElement.init();
+
+        // Render HeaderRight (account info + deposit button) into desktop container
+        // Uses dynamic import to avoid circular dependency chain
+        const accountInfoContainer = getElementById('desktop-account-info-container');
+        if (accountInfoContainer) {
+            Promise.all([
+                import('../../components/header-right'),
+                import('../../contexts/AppContext'),
+                import('../../../_common/react_root_manager'),
+                import('react'),
+            ]).then(([HeaderRightModule, AppContextModule, ReactRootModule, ReactModule]) => {
+                const HeaderRight = HeaderRightModule.default;
+                const { AppProvider } = AppContextModule;
+                const { renderReactComponent } = ReactRootModule;
+                const React = ReactModule.default;
+                renderReactComponent(
+                    React.createElement(AppProvider, null, React.createElement(HeaderRight)),
+                    accountInfoContainer
+                );
+            });
+        }
+
         PurchaseElement.init();
     };
 

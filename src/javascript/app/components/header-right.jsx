@@ -1,91 +1,14 @@
 import React from 'react';
 import { Skeleton, Button } from '@deriv-com/quill-ui';
 import { localize } from '@deriv-com/translations';
-import { PartnersProductSmarttraderBrandLightLogoIcon } from '@deriv/quill-icons';
 import AccountInfo from './account-info';
-import MobileMenuComponent from './mobile_menu';
-import BottomNavComponent from './bottom_nav';
-import SidebarComponent from './sidebar';
-import LanguageMenuModal from '../../../templates/_common/components/language-menu-modal';
 import CompleteProfileModalModule from '../../../templates/_common/components/complete-profile-modal';
-import { renderReactComponent } from '../../_common/react_root_manager';
-import { getElementById } from '../../_common/common_functions';
-import Url from '../../_common/url';
-import Login from '../../_common/base/login';
 import Language from '../../_common/language';
-import { AppProvider, useApp } from '../contexts/AppContext';
+import { useApp } from '../contexts/AppContext';
 import {
-    getBrandHomeUrl,
     getBrandUrl,
-    getPlatformHostname,
 } from '../../../templates/_common/brand.config';
-import { getAccountType } from '../../config';
-
-const BUILD_HASH = process.env.BUILD_HASH || '';
-
-/**
- * HeaderLeft - Left section of header with logo and reports link
- */
-const HeaderLeft = () => {
-    const { isLoggedIn } = useApp();
-
-    // Get URL parameters for Reports link
-    const account_type = getAccountType();
-    const redirect_url = getPlatformHostname();
-
-    return (
-        <div className='header__menu-left'>
-            <span className='header__logo mobile-show'>
-                <PartnersProductSmarttraderBrandLightLogoIcon height='32px' width='32px' />
-            </span>
-            {isLoggedIn && (
-                <div className='mobile-show'>
-                    <AccountInfo />
-                </div>
-            )}
-            <div className='header__menu-item header__menu-links  client_logged_in mobile-hide'>
-                <a
-                    className='url-reports-positions header__menu-links-item home-icon'
-                    href={`${getBrandHomeUrl()}?lang=${Language.get()}`}
-                >
-                    <span className='header__menu-item--label'>
-                        <img
-                            className='header__icon-text reports-icon'
-                            src={Url.urlForStatic(
-                                `images/pages/header/deriv-com-logo.svg?${BUILD_HASH}`,
-                            )}
-                            alt='Deriv Home'
-                        />
-                        <span>{localize('Home')}</span>
-                    </span>
-                </a>
-            </div>
-            {isLoggedIn && (
-                <div className='header__menu-item header__menu-links  client_logged_in mobile-hide'>
-                    <a
-                        className='url-reports-positions header__menu-links-item'
-                        href={Url.urlForReports(
-                            'reports/positions',
-                            redirect_url,
-                            account_type,
-                        )}
-                    >
-                        <span className='header__menu-item--label'>
-                            <img
-                                className='header__icon-text reports-icon'
-                                src={Url.urlForStatic(
-                                    `images/pages/header/ic-reports.svg?${BUILD_HASH}`,
-                                )}
-                                alt=''
-                            />
-                            <span>{localize('Reports')}</span>
-                        </span>
-                    </a>
-                </div>
-            )}
-        </div>
-    );
-};
+import Login from '../../_common/base/login';
 
 /**
  * LoginButtons - Login and signup buttons with skeleton loaders
@@ -165,9 +88,7 @@ const HeaderRight = () => {
 
         return (
             <div className='header__menu-right client_logged_in'>
-                <div className='mobile-hide'>
-                    <AccountInfo />
-                </div>
+                <AccountInfo />
                 {!hasCurrency || derivativesAccountInfo.loading ? (
                     <Skeleton.Square
                         width={100}
@@ -204,35 +125,4 @@ const HeaderRight = () => {
     );
 };
 
-/**
- * HeaderComponent - Main header component
- */
-// eslint-disable-next-line no-unused-vars
-const HeaderComponent = () => (
-    <div className='header' id='regular__header'>
-        <div id='deriv__header' className='header__menu-items'>
-            <HeaderLeft />
-            <HeaderRight />
-        </div>
-    </div>
-);
-
-export const init = () => {
-    const container = getElementById('header-container');
-    if (container) {
-        renderReactComponent(
-            <AppProvider>
-                <>
-                    <SidebarComponent />
-                    <LanguageMenuModal />
-                    <MobileMenuComponent />
-                    <BottomNavComponent />
-                </>
-            </AppProvider>,
-            container,
-        );
-    }
-
-};
-
-export default init;
+export default HeaderRight;
