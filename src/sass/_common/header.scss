@@ -197,6 +197,10 @@ body .header,
   border: none;
   z-index: 1;
 
+  @media (min-width: 880px) {
+    display: none;
+  }
+
   &-divider {
     background: var(--general-section-2);
     height: 30px;

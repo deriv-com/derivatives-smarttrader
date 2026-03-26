@@ -224,6 +224,7 @@ export const init = () => {
             <AppProvider>
                 <>
                     <SidebarComponent />
+                    <HeaderComponent />
                     <LanguageMenuModal />
                     <MobileMenuComponent />
                     <BottomNavComponent />
