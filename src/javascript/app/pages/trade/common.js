@@ -92,6 +92,9 @@ const commonTrading = (() => {
                     React.createElement(AppProvider, null, React.createElement(HeaderRight)),
                     accountInfoContainer
                 );
+            }).catch((err) => {
+                // eslint-disable-next-line no-console
+                console.error('[HeaderRight] Failed to load account info component:', err);
             });
         }
 

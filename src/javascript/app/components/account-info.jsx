@@ -114,7 +114,7 @@ const AccountInfo = () => {
                                                 className={`acc-info__select-arrow ${isDropdownOpen ? 'acc-info__select-arrow--active' : ''}`}
                                             >
                                                 <StandaloneChevronDownRegularIcon
-                                                    fill='#000000'
+                                                    fill='currentColor'
                                                     width={20}
                                                     height={20}
                                                 />
