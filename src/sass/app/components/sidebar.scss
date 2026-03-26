@@ -1,0 +1,116 @@
+/** @define sidebar */
+.sidebar {
+    height: 100vh;
+    width: 72px;
+    min-width: 72px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--general-main-1);
+    border-right: 1px solid var(--general-section-1);
+    transition: opacity 0.3s;
+    backface-visibility: hidden;
+
+    @media (max-width: 879px) {
+        display: none;
+    }
+
+    &__header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 64px;
+        padding: 16px;
+    }
+    &__nav {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        padding: 0 0 16px;
+        justify-content: space-between;
+    }
+    &__nav-main {
+        display: flex;
+        flex-direction: column;
+    }
+    &__separator {
+        height: 1px;
+        margin: 0 8px 8px;
+        background-color: var(--general-section-1);
+    }
+    &__nav-utility {
+        display: flex;
+        flex-direction: column;
+    }
+    &__item {
+        height: 72px;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 0;
+        margin: 0 8px;
+        border: none;
+        border-radius: 8px;
+        background-color: transparent;
+        color: var(--text-prominent);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        outline: none;
+        font-family: inherit;
+
+        &:hover {
+            .sidebar__item-icon {
+                background-color: var(--general-hover);
+                border-radius: 8px;
+            }
+        }
+        &--active {
+            color: var(--brand-red-coral);
+
+            .sidebar__item-label {
+                color: var(--brand-red-coral);
+            }
+        }
+        svg {
+            fill: currentColor;
+        }
+    }
+    &__item-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 40px;
+        width: 40px;
+    }
+    &__item-badge {
+        position: absolute;
+        top: 4px;
+        right: 0;
+        width: 20px;
+        height: 20px;
+        padding: 0 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 96px;
+        background-color: var(--status-danger);
+        color: var(--text-colored-background);
+        font-size: 10px;
+        font-weight: bold;
+        line-height: 1;
+    }
+    &__item-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+    }
+    &__hidden {
+        display: none;
+    }
+}

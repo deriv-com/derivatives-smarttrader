@@ -18,7 +18,8 @@ const Trading = () => (
                                 <span id='trading_worm_chart' />
                                 <span id='spot' />
                             </div>
-                            <div id='onboarding-container' />
+                            {/* <div id='onboarding-container' /> */}
+                            <div id='desktop-account-info-container' className='mobile-hide' />
                         </div>
                     </div>
                     <div className='trade-container'>
