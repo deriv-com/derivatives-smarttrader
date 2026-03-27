@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Skeleton } from '@deriv-com/quill-ui';
-import { StandaloneChevronDownRegularIcon } from '@deriv/quill-icons';
+import { LegacyChevronDown1pxIcon } from '@deriv/quill-icons';
 import AccountDropdown from './account-dropdown';
 // import AccountSwitcherTooltip, { TOOLTIP_SHOWN_KEY } from './account-switcher-tooltip';
 import { useApp } from '../contexts/AppContext';
@@ -113,11 +113,7 @@ const AccountInfo = () => {
                                             <span
                                                 className={`acc-info__select-arrow ${isDropdownOpen ? 'acc-info__select-arrow--active' : ''}`}
                                             >
-                                                <StandaloneChevronDownRegularIcon
-                                                    fill='currentColor'
-                                                    width={20}
-                                                    height={20}
-                                                />
+                                                <LegacyChevronDown1pxIcon iconSize='xs' />
                                             </span>
                                         )}
                                     </p>
