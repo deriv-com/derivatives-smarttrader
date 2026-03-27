@@ -66,6 +66,8 @@ src/
 │   │   └── base/         # Socket, cache, client, currency base classes
 │   ├── app/
 │   │   ├── base/         # Core app infrastructure (loader, pages, socket)
+│   │   ├── components/   # React components (header, mobile menu, sidebar)
+│   │   ├── contexts/     # React contexts (AppContext)
 │   │   └── pages/        # Page-specific modules (trade, user, etc.)
 │   ├── config.js         # API endpoints, app configuration
 │   └── index.js          # Application entry point
@@ -201,6 +203,32 @@ BinarySocket.send({
 - Use **WebtraderChart** for general trading and market analysis
 - Both can run simultaneously with separate WebSocket connections
 
+## UI Components
+
+### Navigation & Layout
+- **Desktop**: Sidebar navigation (72px wide) with flyout panels
+- **Mobile**: Bottom navigation bar (56px high) + full-screen mobile menu
+- **Header**: Desktop header hidden on mobile (below 880px)
+- **Responsive breakpoint**: 880px (879px and below = mobile)
+
+### React Components
+- **Sidebar** (`src/javascript/app/components/sidebar.jsx`) - Desktop left navigation with Home, Reports, Help, Language, Account
+- **Flyout** (`src/javascript/app/components/flyout.jsx`) - Reusable modal-like panel component
+- **MobileMenu** (`src/javascript/app/components/mobile_menu.jsx`) - Full-screen mobile menu overlay
+- **BottomNav** (`src/javascript/app/components/bottom_nav.jsx`) - Mobile bottom navigation (Home, Trade, Menu)
+- **AccountInfo** (`src/javascript/app/components/account-info.jsx`) - Account switcher with dropdown
+- **HeaderRight** (`src/javascript/app/components/header-right.jsx`) - Login/deposit buttons and account info
+
+### AppContext
+- Central state management via `src/javascript/app/contexts/AppContext.jsx`
+- Provides: `isLoggedIn`, `accountInfo`, `activeTab`, `currentLanguage`, `availableLanguages`
+- Helper functions: `getFormattedBalance()`, `handleLanguageChange()`, `setActiveTab()`
+
+### Icons
+- Uses `@deriv/quill-icons` and `@deriv-com/quill-ui`
+- `LegacyChevronDown1pxIcon` for dropdowns
+- `PartnersProductSmarttraderBrandLightLogoIcon` for branding
+
 ## Common Tasks
 
 ### Adding a New Page
@@ -260,6 +288,7 @@ BinarySocket.send({
 - **Subscription Cleanup**: Must `forget_all` before new subscriptions
 - **React Version**: Now on React 18.3.1, not 16.14.0
 - **Branch Name**: Use "master", not "main"
+- **Mobile Layout**: Content has `margin-left: 72px` on desktop (sidebar width), `padding-bottom: 56px` on mobile (bottom nav height)
 
 ### Error Handling Patterns
 - **WebSocket Errors**: Implement auto-reconnection with request buffering
@@ -275,6 +304,7 @@ BinarySocket.send({
 - highstock-release 5.0.14
 - Mocha + Chai + Enzyme + Sinon (testing)
 - @deriv-com/analytics, @deriv-com/auth-client, @deriv-com/translations
+- @deriv/quill-icons, @deriv-com/quill-ui
 
 ---
 
