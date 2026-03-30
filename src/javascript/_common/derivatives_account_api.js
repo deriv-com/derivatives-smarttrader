@@ -13,7 +13,6 @@ const sleep = (ms) => new Promise(resolve => {
     setTimeout(resolve, ms);
 });
 
-const { isProduction } = require('../config');
 const { getApiCoreUrl } = require('../../templates/_common/brand.config');
 const Client = require('../app/base/client');
 
@@ -40,8 +39,8 @@ const fetchREST = async (endpoint, options, retryConfig = {}) => {
     while (attempts < maxAttempts) {
         try {
             // Use existing function to get the API Core URL
-            const apiCoreUrl = getApiCoreUrl(isProduction());
-            const url = `https://${apiCoreUrl}${endpoint}`;
+            const apiCoreUrl = getApiCoreUrl();
+            const url = `${apiCoreUrl}${endpoint}`;
 
             // Determine the method (default to GET if not specified)
             const method = options?.method || 'GET';
