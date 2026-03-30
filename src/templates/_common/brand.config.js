@@ -97,11 +97,11 @@ const getWhoAmIURL = () => `https://${substituteDerivDomain(
         : brand_config_data.auth.staging
 )}/sessions/whoami`;
 
-const getApiCoreUrl = (isProd) => substituteDerivDomain(
-    isProd
+const getApiCoreUrl = () => `https://${substituteDerivDomain(
+    isProduction
         ? brand_config_data.api_core.production
         : brand_config_data.api_core.staging
-);
+)}`;
 
 const getHelpCentreUrl = () => substituteDerivDomain(brand_config_data.platform.help_centre_url);
 
