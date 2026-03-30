@@ -589,18 +589,20 @@ div#contract-injection-container {
 .quill-purchase-popup,
 .quill-generic-popup {
     position: fixed;
-    top: 48px;
-    left: 0;
-    width: 100%;
-    height: calc(100% - 84px);
+    top: 0;
+    left: 72px;
+    width: calc(100% - 72px);
+    height: calc(100% - 36px);
     background: var(--core-color-solid-slate-75);
     display: flex;
     flex-direction: column;
     align-items: center;
 
-    @media (max-width: 940px) {
-        top: 40px;   
-        height: calc(100% - 40px);   
+    @media (max-width: 879px) {
+        top: 56px;
+        left: 0;
+        width: 100%;
+        height: calc(100% - 56px);
     }
  
     .popup-scroller {
@@ -610,6 +612,10 @@ div#contract-injection-container {
         overflow-y: auto;
         height: calc(100% - 48px);
         width: 100%;
+
+        @media (max-width: 879px) {
+        height: calc(100% - 56px);
+    }
     }
     .header-box {
         display: flex;
