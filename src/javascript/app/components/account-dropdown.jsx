@@ -145,7 +145,7 @@ AccountDropdown.propTypes = {
     activeAccountId  : PropTypes.string.isRequired,
     isVisible        : PropTypes.bool.isRequired,
     onAccountSelect  : PropTypes.func.isRequired,
-    setIsDropdownOpen: PropTypes.func,
+    setIsDropdownOpen: PropTypes.func.isRequired,
 };
 
 export default AccountDropdown;

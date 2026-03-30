@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Skeleton } from '@deriv-com/quill-ui';
 import { LegacyChevronDown1pxIcon } from '@deriv/quill-icons';
 import AccountDropdown from './account-dropdown';
 import { useApp } from '../contexts/AppContext';
+import useOutsideClick from '../hooks/useOutsideClick';
 
 /**
  * AccountInfo - Displays account icon, type, and balance
@@ -16,6 +17,14 @@ const AccountInfo = () => {
         refetchDerivativesAccountSilently,
     } = useApp();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const dropdownRef = useRef(null);
+    const isDesktop = window.innerWidth > 879;
+
+    useOutsideClick(dropdownRef, () => {
+        if (isDropdownOpen) {
+            setIsDropdownOpen(false);
+        }
+    }, isDesktop);
 
     // Show loading skeleton for entire account info until we have data from authorize
     const isLoading =
@@ -35,7 +44,7 @@ const AccountInfo = () => {
 
     return (
         <>
-            <div className='acc-info__wrapper'>
+            <div className='acc-info__wrapper' ref={dropdownRef}>
                 <div className='account-info-wrapper'>
                     {isLoading ? (
                         <div
