@@ -180,7 +180,7 @@ const HeaderRight = () => {
                         className='btn header__btn-transfer'
                         variant='primary'
                         size='md'
-                        label={localize(hasOnlyDemo ? 'Try Real' : 'Deposit')}
+                        label={hasOnlyDemo ? localize('Try Real') : localize('Deposit')}
                         onClick={() => {
                             if (hasOnlyDemo) {
                                 showCompleteProfileModal();
