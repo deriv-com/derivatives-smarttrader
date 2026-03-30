@@ -3,7 +3,7 @@ import {
     PartnersProductSmarttraderBrandLightLogoIcon,
     LegacyHomeNewIcon,
     StandaloneFileRegularIcon,
-    StandaloneCircleQuestionRegularIcon,
+    StandaloneLifeRingRegularIcon,
     StandaloneGlobeRegularIcon,
     StandaloneGlobeFillIcon,
     StandaloneCircleUserRegularIcon,
@@ -78,7 +78,7 @@ const SidebarComponent = () => {
     const utilityItems = [
         {
             id      : 'help',
-            icon    : <StandaloneCircleQuestionRegularIcon iconSize='sm' />,
+            icon    : <StandaloneLifeRingRegularIcon iconSize='sm' />,
             label   : localize('Help'),
             onClick : handleHelpClick,
             isActive: false,

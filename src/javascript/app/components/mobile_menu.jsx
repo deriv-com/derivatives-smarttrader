@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
     StandaloneGlobeRegularIcon,
-    StandaloneCircleQuestionRegularIcon,
+    StandaloneLifeRingRegularIcon,
     StandaloneChevronRightRegularIcon,
     StandaloneChevronLeftRegularIcon,
     StandaloneRightFromBracketRegularIcon,
@@ -118,7 +118,7 @@ const MainMenuContent = ({ onLanguageClick, onLogoutClick }) => {
             <div className='mobile-menu__section'>
                 <div className='mobile-menu__section-title'>{localize('Support')}</div>
                 <MenuItem
-                    icon={<StandaloneCircleQuestionRegularIcon iconSize='sm' />}
+                    icon={<StandaloneLifeRingRegularIcon iconSize='sm' />}
                     label={localize('Help centre')}
                     onClick={handleHelpCentreClick}
                 />
