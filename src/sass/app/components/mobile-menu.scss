@@ -35,13 +35,15 @@
     &__item {
         display: flex;
         align-items: center;
-        padding: 12px 0;
+        padding: 16px 0;
         border-bottom: 1px solid var(--general-section-1);
         cursor: pointer;
         text-decoration: none;
         color: var(--text-general);
 
         &-icon {
+            display: flex;
+            align-items: center;
             margin-right: 12px;
         }
         &-label {

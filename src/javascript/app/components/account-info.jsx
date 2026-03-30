@@ -2,7 +2,6 @@ import React, { useState, useRef } from 'react';
 import { Skeleton } from '@deriv-com/quill-ui';
 import { LegacyChevronDown1pxIcon } from '@deriv/quill-icons';
 import AccountDropdown from './account-dropdown';
-// import AccountSwitcherTooltip, { TOOLTIP_SHOWN_KEY } from './account-switcher-tooltip';
 import { useApp } from '../contexts/AppContext';
 import useOutsideClick from '../hooks/useOutsideClick';
 
@@ -18,30 +17,14 @@ const AccountInfo = () => {
         refetchDerivativesAccountSilently,
     } = useApp();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    // const [showTooltip, setShowTooltip] = useState(false);
     const dropdownRef = useRef(null);
+    const isDesktop = window.innerWidth > 879;
 
-    // // Check if tooltip should be shown
-    // useEffect(() => {
-    // // Check if tooltip has been shown before
-    //     const hasBeenShownBefore =
-    //   localStorage.getItem(TOOLTIP_SHOWN_KEY) === 'true';
-
-    //     // Only show tooltip if it hasn't been shown before AND there are at least 2 accounts
-    //     const shouldShow =
-    //   !hasBeenShownBefore &&
-    //   derivativesAccountInfo?.data &&
-    //   Array.isArray(derivativesAccountInfo.data) &&
-    //   derivativesAccountInfo.data.length >= 2;
-
-    //     setShowTooltip(shouldShow);
-    // }, [derivativesAccountInfo?.data]);
-
-    // // Handler to close the tooltip and save to localStorage
-    // const handleCloseTooltip = () => {
-    //     localStorage.setItem(TOOLTIP_SHOWN_KEY, 'true');
-    //     setShowTooltip(false);
-    // };
+    useOutsideClick(dropdownRef, () => {
+        if (isDropdownOpen) {
+            setIsDropdownOpen(false);
+        }
+    }, isDesktop);
 
     // Show loading skeleton for entire account info until we have data from authorize
     const isLoading =
@@ -58,13 +41,6 @@ const AccountInfo = () => {
             refetchDerivativesAccountSilently();
         }
     };
-
-    // Handle outside clicks to close the dropdown
-    useOutsideClick(dropdownRef, () => {
-        if (isDropdownOpen) {
-            setIsDropdownOpen(false);
-        }
-    });
 
     return (
         <>
@@ -154,10 +130,6 @@ const AccountInfo = () => {
                     )}
                 </div>
             </div>
-            {/* <AccountSwitcherTooltip
-                isVisible={showTooltip}
-                onClose={handleCloseTooltip}
-            /> */}
         </>
     );
 };

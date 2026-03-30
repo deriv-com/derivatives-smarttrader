@@ -1,6 +1,4 @@
 import React from 'react';
-import { LabelPairedGlobeSmRegularIcon } from '@deriv/quill-icons';
-import { localize } from '@deriv-com/translations';
 import Head from './head.jsx';
 // import Elevio from '../includes/elevio.jsx';
 import Gtm from '../includes/gtm.jsx';
@@ -40,10 +38,10 @@ const Topbar = () => (
             >
                 <div className='network_status' />
             </div>
-            <div id='language-select'>
+            {/* <div id='language-select'>
                 <LabelPairedGlobeSmRegularIcon />
                 <span id='language-select__text' />
-            </div>
+            </div> */}
             <span className='no-underline nowrap gmt-clock' data-balloon-pos='up' />
             {/* <div id='topbar-whatsapp'>
                 <img src={it.url_for('images/pages/footer/ic-whatsapp.svg')} />
@@ -52,16 +50,16 @@ const Topbar = () => (
             <div id='topbar-help-centre'>
                 <img src={it.url_for('images/pages/footer/ic-help-centre.svg')} />
             </div> */}
-            <div
+            {/* <div
                 id='topbar-logout'
                 className='logout no-underline'
                 data-balloon-pos='up'
-                data-balloon-id='logout-tooltip' // Add a unique ID for the tooltip
+                data-balloon-id='logout-tooltip'
                 data-balloon={localize('Log out')}
-                style={{ display: 'none' }} // Initially hidden, will be shown via JS when logged in
+                style={{ display: 'none' }}
             >
                 <img src={it.url_for('images/pages/header/ic-logout.svg')} />
-            </div>
+            </div> */}
             <div id='topbar-fullscreen'>
                 <img src={it.url_for('images/pages/footer/ic-fullscreen.svg')} />
             </div>
