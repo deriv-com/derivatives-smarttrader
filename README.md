@@ -180,6 +180,21 @@ git push origin staging_v20191010_0
 
 To add translation manually use [manual translation doc](scripts/README.md#Updating-the-translations)
 
+## Mobile Navigation
+
+SmartTrader features a responsive mobile interface with:
+
+- **Bottom Navigation Bar**: Persistent navigation for Home, Trade, and Menu on mobile devices
+- **Mobile Menu**: Full-page overlay menu with sections for Reports, Settings, and Support
+- **Language Selection**: Mobile-optimized language selector accessible from the menu
+
+## Desktop Navigation
+
+On desktop devices (screen widths above 880px), SmartTrader uses a sidebar navigation system:
+
+- **Sidebar**: Fixed left-side navigation with icons for Home, Reports, Language, and Account
+- **Flyout Panels**: Reusable overlay panels for language selection and account management
+
 ## Disaster Recovery
 
 Each release, whether to staging or production is backed up and deployed to Vercel
