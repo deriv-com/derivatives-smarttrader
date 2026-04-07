@@ -2,8 +2,7 @@ name: Weekly Workflow Summary Collector
 
 on:
   schedule:
-    - cron: "0 10 * * 3" # Every Wednesday at 10:00 UTC (14:00 GST)
-    - cron: "0 10 * * 5" # Every Friday at 10:00 UTC (14:00 GST)
+    - cron: "0 10 * * *" # Every day at 10:00 UTC (14:00 GST)
   workflow_dispatch:
 
 permissions:
