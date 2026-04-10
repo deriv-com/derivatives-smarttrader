@@ -90,6 +90,12 @@ Before running or contribute to this project, you need to have the setup of the 
   - `grunt shell:compile_dev --path=about-us` to re-compile only template(s) which serve about-us path in URL.
 - To fix eslint errors run `npm run eslint`
 
+## Build Process
+
+The project uses a custom PostCSS 8-compatible build pipeline:
+- CSS processing with Autoprefixer for vendor prefixing
+- Custom cachebuster plugin for asset versioning (appends file modification timestamps to background image URLs)
+
 ## Test link deployment
 ### Deploy your changes on Vercel (Recommended Option)
 
