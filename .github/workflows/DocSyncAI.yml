@@ -7,6 +7,16 @@ on:
   issue_comment:
     types: [created]
 
+  workflow_dispatch:
+    inputs:
+      trigger_type:
+        description: "Trigger type"
+        required: true
+        default: "claude_md_refresh"
+        type: choice
+        options:
+          - claude_md_refresh
+
 jobs:
   docsync-scheduled:
     if: github.event_name == 'schedule'
@@ -38,6 +48,22 @@ jobs:
       comment_body: ${{ github.event.comment.body }}
       comment_pr_number: ${{ github.event.issue.number }}
       comment_id: ${{ github.event.comment.id }}
+      base_branch: "master"
+    secrets:
+      DOCSYNC_GITHUB_TOKEN: ${{ secrets.DOCSYNC_GITHUB_TOKEN }}
+      DOCSYNC_ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      DOCSYNC_SLACK_TOKEN: ${{ secrets.DOCSYNC_SLACK_TOKEN }}
+      DOCSYNC_SLACK_CHANNEL_ID: ${{ secrets.DOCSYNC_SLACK_CHANNEL_ID }}
+      DOCSYNC_SLACK_MENTION_USER_IDS: ${{ secrets.DOCSYNC_SLACK_MENTION_USER_IDS }}
+
+  docsync-claude-md-refresh:
+    if: github.event_name == 'workflow_dispatch' && inputs.trigger_type == 'claude_md_refresh'
+    permissions:
+      contents: write
+      pull-requests: write
+    uses: deriv-com/shared-actions/.github/workflows/docsync-ai.yml@master
+    with:
+      trigger_type: "claude_md_refresh"
       base_branch: "master"
     secrets:
       DOCSYNC_GITHUB_TOKEN: ${{ secrets.DOCSYNC_GITHUB_TOKEN }}
