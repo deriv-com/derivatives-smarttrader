@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 import { Button } from '@deriv-com/quill-ui';
 import { LabelPairedXmarkSmRegularIcon } from '@deriv/quill-icons';
 import { localize } from '@deriv-com/translations';
-import { isMobile } from '../../../_common/os_detect';
 import StepContent from './step_content';
 import StepProgressBar from './step_progress_bar';
 import { getMobileSteps, getDesktopSteps } from './steps_config';
+import { isMobile } from '../../../_common/os_detect';
 import {
     renderReactComponent,
     unmountReactComponent,
@@ -58,6 +58,8 @@ const MigrationOnboarding = ({ is_dark_mode_on }) => {
 
     if (!is_open) return null;
 
+    const footer_class = `migration-onboarding__footer${is_first_step ? ' migration-onboarding__footer--single' : ''}`;
+
     return (
         <div className='migration-onboarding__overlay'>
             <div className='migration-onboarding__modal'>
@@ -78,9 +80,7 @@ const MigrationOnboarding = ({ is_dark_mode_on }) => {
                     <StepProgressBar total_steps={total_steps} current_step={current_step} />
                 </div>
                 <StepContent step={steps[current_step]} is_dark_mode_on={is_dark_mode_on} />
-                <div className={`migration-onboarding__footer${
-                    is_first_step ? ' migration-onboarding__footer--single' : ''
-                }`}>
+                <div className={footer_class}>
                     {!is_first_step && (
                         <Button
                             onClick={onBack}

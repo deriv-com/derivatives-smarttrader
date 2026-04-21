@@ -15,7 +15,6 @@
 
         animation: migration-fade-in 300ms ease-out;
     }
-
     &__modal {
         background-color: var(--component-modal-bg);
         border-radius: var(--core-borderRadius-800);
@@ -39,11 +38,9 @@
             .migration-onboarding__title {
                 color: var(--core-color-solid-slate-50);
             }
-
             .migration-onboarding__description {
                 color: var(--core-color-solid-slate-200);
             }
-
             .migration-onboarding__progress-segment {
                 background-color: var(--core-color-opacity-white-100);
 
@@ -51,7 +48,6 @@
                     background-color: var(--core-color-solid-slate-50);
                 }
             }
-
             .migration-onboarding__close {
                 background-color: var(--core-color-opacity-white-100);
 
@@ -59,30 +55,25 @@
                     fill: var(--core-color-solid-slate-50);
                 }
             }
-
             .migration-onboarding__back-button {
                 color: var(--core-color-solid-slate-50);
                 border-color: var(--core-color-solid-slate-50);
             }
         }
     }
-
     &__close-wrapper {
         display: flex;
         justify-content: flex-end;
         padding: var(--core-spacing-400) var(--core-spacing-800) 0;
     }
-
     &__header {
         padding: var(--core-spacing-400) var(--core-spacing-800) 0;
     }
-
     &__progress {
         display: flex;
         gap: var(--core-spacing-200);
         flex: 1;
     }
-
     &__progress-segment {
         height: 4px;
         flex: 1;
@@ -93,13 +84,11 @@
         .theme--dark & {
             background-color: var(--core-color-opacity-white-100);
         }
-
         &--active,
         .theme--dark &--active {
             background-color: var(--component-textIcon-normal-prominent);
         }
     }
-
     &__close {
         cursor: pointer;
         display: flex;
@@ -114,7 +103,6 @@
             background-color: var(--core-color-opacity-white-100);
         }
     }
-
     &__content {
         display: flex;
         flex-direction: column;
@@ -122,7 +110,6 @@
         overflow-y: auto;
         flex: 1;
     }
-
     &__title {
         font-size: 24px;
         font-weight: 700;
@@ -130,7 +117,6 @@
         margin: 0 0 var(--core-spacing-400);
         color: var(--component-textIcon-normal-prominent);
     }
-
     &__description {
         font-size: 16px;
         font-weight: 400;
@@ -138,17 +124,14 @@
         margin: 0 0 var(--core-spacing-800);
         color: var(--component-textIcon-normal-default);
     }
-
     &__image-wrapper {
         display: flex;
         justify-content: center;
     }
-
     &__image {
         max-width: 100%;
         height: auto;
     }
-
     &__footer {
         display: flex;
         justify-content: space-between;
@@ -158,23 +141,21 @@
             justify-content: flex-end;
         }
     }
-
     &__back-button {
         border-radius: 24px;
         min-width: 96px;
         height: 48px;
     }
-
     &__next-button {
         border-radius: 24px;
         min-width: 96px;
         height: 48px;
-        background-color: #ff444f !important;
-        color: #ffffff !important;
+        background-color: $COLOR_DRIV_RED !important;
+        color: $COLOR_WHITE !important;
         border: none !important;
 
         &:hover:not(:disabled) {
-            background-color: #eb3e48 !important;
+            background-color: $color-red-5 !important;
         }
     }
 }
