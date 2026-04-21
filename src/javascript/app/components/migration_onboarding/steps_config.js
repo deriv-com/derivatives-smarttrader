@@ -1,0 +1,43 @@
+import { localize } from '@deriv-com/translations';
+import Url from '../../../_common/url';
+
+const img = name => Url.urlForStatic(`images/migration-onboarding/migration-onboarding-${name}.png`);
+
+export const getMobileSteps = () => [
+    {
+        title      : localize('Welcome to new SmartTrader'),
+        description: localize('A refreshed look for classic trading.'),
+        image      : img('step-1-mobile'),
+    },
+    {
+        title      : localize('Options account now in USD'),
+        description: localize('If you have funds, they are in your Wallet. Transfer them to your Options account to trade.'),
+        image      : img('step-2-mobile'),
+    },
+    {
+        title      : localize('Find everything faster'),
+        description: localize('The new navigation gives you instant access to the features you use most.'),
+        image      : img('step-3-mobile'),
+    },
+];
+
+export const getDesktopSteps = () => [
+    {
+        title      : localize('Welcome to new SmartTrader'),
+        description: localize('A refreshed look for classic trading.'),
+        image_light: img('step-1-light'),
+        image_dark : img('step-1-dark'),
+    },
+    {
+        title      : localize('Options account now in USD'),
+        description: localize('If you have funds, they are in your Wallet. Transfer them to your Options account to trade.'),
+        image_light: img('step-2-light'),
+        image_dark : img('step-2-dark'),
+    },
+    {
+        title      : localize('Find everything faster'),
+        description: localize('The new navigation gives you instant access to the features you use most.'),
+        image_light: img('step-3-light'),
+        image_dark : img('step-3-dark'),
+    },
+];
