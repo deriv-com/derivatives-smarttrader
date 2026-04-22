@@ -20,6 +20,7 @@ const createElement = require('../../_common/utility').createElement;
 const DevShortcuts = require('../../_common/dev_shortcuts');
 const { getI18nInstance, isTranslationsInitialized } = require('../../_common/translation-init');
 const { checkWhoAmI } = require('../../_common/whoami');
+const { fetchOnboardingStatus } = require('../../_common/onboarding_status');
 const { getAccountId } = require('../../config');
 
 const BinaryLoader = (() => {
@@ -59,6 +60,16 @@ const BinaryLoader = (() => {
                 localStorage.removeItem('active_loginid');
                 sessionStorage.removeItem('active_loginid');
                 localStorage.removeItem('current_account');
+            } else if (whoami_result.success) {
+                try {
+                    const onboarding_result = await fetchOnboardingStatus();
+                    if (onboarding_result?.data?.migration?.status === 'fully_migrated') {
+                        localStorage.setItem('is_migrated_user', 'true');
+                    }
+                } catch (e) {
+                    // eslint-disable-next-line no-console
+                    console.error('Failed to fetch onboarding status:', e);
+                }
             }
         }
 

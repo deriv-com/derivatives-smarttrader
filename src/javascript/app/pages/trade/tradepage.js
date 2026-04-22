@@ -8,8 +8,10 @@ const TradingEvents     = require('./event');
 const Price             = require('./price');
 const Process           = require('./process');
 const InitializationManager = require('./initialization-manager');
-const ViewPopup         = require('../user/view_popup/view_popup');
-const Client            = require('../../base/client');
+const ViewPopup              = require('../user/view_popup/view_popup');
+const Client                 = require('../../base/client');
+const { getIsMigratedUser }  = require('../../../_common/onboarding_status');
+const MigrationOnboarding    = require('../../components/migration_onboarding/migration_onboarding').default;
 const Header            = require('../../base/header');
 const BinarySocket      = require('../../base/socket');
 const DerivBanner       = require('../../common/deriv_banner');
@@ -45,6 +47,10 @@ const TradePage = (() => {
         }
         TradingAnalysis.bindAnalysisTabEvent();
         ViewPopup.viewButtonOnClick('#contract_confirmation_container');
+
+        if (getIsMigratedUser()) {
+            MigrationOnboarding.init();
+        }
 
         // Use robust initialization manager for API-dependent initialization
         BinarySocket.wait('balance').then(() => {
@@ -89,6 +95,7 @@ const TradePage = (() => {
     const onUnload = () => {
         State.remove('is_trading');
         events_initialized = 0;
+        MigrationOnboarding.remove();
         Process.forgetTradingStreams();
         BinarySocket.clear();
         Defaults.clear();
