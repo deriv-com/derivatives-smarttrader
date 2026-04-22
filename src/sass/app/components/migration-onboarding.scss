@@ -142,12 +142,12 @@
         }
     }
     &__back-button {
-        border-radius: 24px;
+        border-radius: 24px !important;
         min-width: 96px;
         height: 48px;
     }
     &__next-button {
-        border-radius: 24px;
+        border-radius: 24px !important;
         min-width: 96px;
         height: 48px;
         background-color: $COLOR_DRIV_RED !important;
