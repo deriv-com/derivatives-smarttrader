@@ -6,7 +6,7 @@ const img = name => Url.urlForStatic(`images/migration-onboarding/migration-onbo
 export const getMobileSteps = () => [
     {
         title      : localize('Welcome to new SmartTrader'),
-        description: localize('A refreshed look for classic trading.'),
+        description: localize('A refined look, simpler trading and easier navigation, all in one place.'),
         image      : img('step-1-mobile'),
     },
     {
@@ -24,7 +24,7 @@ export const getMobileSteps = () => [
 export const getDesktopSteps = () => [
     {
         title      : localize('Welcome to new SmartTrader'),
-        description: localize('A refreshed look for classic trading.'),
+        description: localize('A refined look, simpler trading and easier navigation, all in one place.'),
         image      : img('step-1-light'),
     },
     {
