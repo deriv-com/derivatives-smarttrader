@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Button } from '@deriv-com/quill-ui';
 import { LabelPairedXmarkSmRegularIcon } from '@deriv/quill-icons';
 import { localize } from '@deriv-com/translations';
@@ -12,7 +11,7 @@ import {
     unmountReactComponent,
 } from '../../../_common/react_root_manager';
 
-const MigrationOnboarding = ({ is_dark_mode_on }) => {
+const MigrationOnboarding = () => {
     const is_mobile = isMobile();
     const [current_step, setCurrentStep] = React.useState(0);
     const [is_open, setIsOpen] = React.useState(false);
@@ -79,7 +78,7 @@ const MigrationOnboarding = ({ is_dark_mode_on }) => {
                 <div className='migration-onboarding__header'>
                     <StepProgressBar total_steps={total_steps} current_step={current_step} />
                 </div>
-                <StepContent step={steps[current_step]} is_dark_mode_on={is_dark_mode_on} />
+                <StepContent step={steps[current_step]} />
                 <div className={footer_class}>
                     {!is_first_step && (
                         <Button
@@ -104,14 +103,6 @@ const MigrationOnboarding = ({ is_dark_mode_on }) => {
     );
 };
 
-MigrationOnboarding.propTypes = {
-    is_dark_mode_on: PropTypes.bool,
-};
-
-MigrationOnboarding.defaultProps = {
-    is_dark_mode_on: false,
-};
-
 const MemoizedMigrationOnboarding = React.memo(MigrationOnboarding);
 
 const MigrationOnboardingModule = (() => {
@@ -124,11 +115,7 @@ const MigrationOnboardingModule = (() => {
         container.id = 'migration_onboarding_container';
         document.body.appendChild(container);
 
-        const is_dark = document.body.classList.contains('theme--dark');
-        renderReactComponent(
-            <MemoizedMigrationOnboarding is_dark_mode_on={is_dark} />,
-            container
-        );
+        renderReactComponent(<MemoizedMigrationOnboarding />, container);
     };
 
     const remove = () => {

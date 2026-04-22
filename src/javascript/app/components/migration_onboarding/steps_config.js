@@ -25,19 +25,16 @@ export const getDesktopSteps = () => [
     {
         title      : localize('Welcome to new SmartTrader'),
         description: localize('A refreshed look for classic trading.'),
-        image_light: img('step-1-light'),
-        image_dark : img('step-1-dark'),
+        image      : img('step-1-light'),
     },
     {
         title      : localize('Options account now in USD'),
         description: localize('If you have funds, they are in your Wallet. Transfer them to your Options account to trade.'),
-        image_light: img('step-2-light'),
-        image_dark : img('step-2-dark'),
+        image      : img('step-2-light'),
     },
     {
         title      : localize('Find everything faster'),
         description: localize('The new navigation gives you instant access to the features you use most.'),
-        image_light: img('step-3-light'),
-        image_dark : img('step-3-dark'),
+        image      : img('step-3-light'),
     },
 ];
