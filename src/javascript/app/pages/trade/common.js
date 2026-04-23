@@ -175,6 +175,7 @@ const commonTrading = (() => {
         $('.purchase_button').text(localize('Purchase'));
         dataManager.setPurchase({
             show_purchase_results: false,
+            error                : null,
         });
     };
 

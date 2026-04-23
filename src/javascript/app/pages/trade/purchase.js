@@ -88,25 +88,19 @@ const Purchase = (() => {
                 // Show insufficient balance error without top-up popup
                 contracts_list.style.display = 'none';
                 container.style.display = 'block';
-                dataManager.setPurchase({
-                    show_purchase_results: true,
-                });
-
                 message_container.hide();
                 confirmation_error.setVisibility(1);
                 CommonFunctions.elementInnerHtml(confirmation_error, mapErrorMessage(error));
-                
+
                 dataManager.setPurchase({
-                    error: { ...error },
+                    show_purchase_results: true,
+                    error                : { ...error },
                 });
             } else {
                 contracts_list.style.display = 'none';
                 container.style.display = 'block';
-                dataManager.setPurchase({
-                    show_purchase_results: true,
-                });
-
                 message_container.hide();
+
                 if (/AuthorizationRequired/.test(error.code)) {
                     authorization_error.setVisibility(1);
                     const authorization_error_btn_login = CommonFunctions.getElementById('authorization_error_btn_login');
@@ -117,7 +111,8 @@ const Purchase = (() => {
                     const signup_url = getBrandSignupUrl();
 
                     dataManager.setPurchase({
-                        error: {
+                        show_purchase_results: true,
+                        error                : {
                             ...error,
                             signup_url,
                             title    : localize('Ready to trade?'),
@@ -126,10 +121,17 @@ const Purchase = (() => {
                     });
 
                 } else {
+                    const basic_message = mapErrorMessage(error);
+                    dataManager.setPurchase({
+                        show_purchase_results: true,
+                        error                : { ...error, message: basic_message },
+                    });
+                    confirmation_error.setVisibility(1);
+                    CommonFunctions.elementInnerHtml(confirmation_error, basic_message);
+
                     BinarySocket.wait('get_account_status').then(response => {
-                        confirmation_error.setVisibility(1);
-                        let message = mapErrorMessage(error);
-                      
+                        let message = basic_message;
+
                         if (/NoMFProfessionalClient/.test(error.code)) {
                             const account_status = getPropertyValue(response, ['get_account_status', 'status']) || [];
                             const has_professional_requested = account_status.includes('professional_requested');
@@ -167,11 +169,12 @@ const Purchase = (() => {
                             }
                         }
 
-                        dataManager.setPurchase({
-                            error: { ...error,message },
-                        });
-
-                        CommonFunctions.elementInnerHtml(confirmation_error, message);
+                        if (message !== basic_message) {
+                            dataManager.setPurchase({
+                                error: { ...error, message },
+                            });
+                            CommonFunctions.elementInnerHtml(confirmation_error, message);
+                        }
                     });
                 }
             }
