@@ -49,14 +49,16 @@ SmartTrader is a web-based trading application for binary options and derivative
 - [src/javascript/_common/base/socket_cache.js](src/javascript/_common/base/socket_cache.js) - API response caching layer
 - [src/javascript/app/pages/trade/get_ticks.js](src/javascript/app/pages/trade/get_ticks.js) - Market data request handler for real-time ticks
 - [src/javascript/app/base/binary_pages.js](src/javascript/app/base/binary_pages.js) - SPA routing configuration
+- [src/javascript/_common/onboarding_status.js](src/javascript/_common/onboarding_status.js) - Migration and onboarding status utilities
 
 ### Key Modules (IIFE Pattern)
-- **BinaryLoader**: App initialization, page lifecycle, handles SPA navigation
+- **BinaryLoader**: App initialization, page lifecycle, handles SPA navigation, fetches onboarding status for migrated users
 - **BinarySocket**: WebSocket wrapper with auto-reconnection, request buffering, promise-based API
 - **SocketCache**: Response caching with configurable expiry (10min for symbols, 60min for exchange rates)
 - **GetTicks**: Real-time tick data processing and chart updates
 - **Highchart** (Highstock): Contract analysis charts with barriers and zones
 - **WebtraderChart**: Independent trading charts via @deriv-com/webtrader-charts
+- **MigrationOnboarding**: React-based onboarding modal for migrated users with persistent completion state
 
 ### Directory Structure
 ```
@@ -66,7 +68,7 @@ src/
 │   │   └── base/         # Socket, cache, client, currency base classes
 │   ├── app/
 │   │   ├── base/         # Core app infrastructure (loader, pages, socket)
-│   │   ├── components/   # React components (header, mobile menu, sidebar)
+│   │   ├── components/   # React components (header, mobile menu, sidebar, migration_onboarding)
 │   │   ├── contexts/     # React contexts (AppContext)
 │   │   └── pages/        # Page-specific modules (trade, user, etc.)
 │   ├── config.js         # API endpoints, app configuration
@@ -218,6 +220,7 @@ BinarySocket.send({
 - **BottomNav** (`src/javascript/app/components/bottom_nav.jsx`) - Mobile bottom navigation (Home, Trade, Menu)
 - **AccountInfo** (`src/javascript/app/components/account-info.jsx`) - Account switcher with dropdown
 - **HeaderRight** (`src/javascript/app/components/header-right.jsx`) - Login/deposit buttons and account info
+- **MigrationOnboarding** (`src/javascript/app/components/migration_onboarding/migration_onboarding.jsx`) - Multi-step onboarding modal for migrated users
 
 ### AppContext
 - Central state management via `src/javascript/app/contexts/AppContext.jsx`
@@ -228,6 +231,37 @@ BinarySocket.send({
 - Uses `@deriv/quill-icons` and `@deriv-com/quill-ui`
 - `LegacyChevronDown1pxIcon` for dropdowns
 - `PartnersProductSmarttraderBrandLightLogoIcon` for branding
+
+## Migration Onboarding
+
+### Feature Overview
+- Auto-displays for users with `migration.status === 'fully_migrated'` (detected via `/v1/client/onboarding-status`)
+- Completion state persisted in `localStorage` (`migration_onboarding_completed`)
+- Multi-step modal with progress bar, supports both desktop and mobile layouts
+
+### Key Files
+- `src/javascript/_common/onboarding_status.js` - Fetches onboarding status, checks migration flag
+- `src/javascript/app/components/migration_onboarding/migration_onboarding.jsx` - Main modal component
+- `src/javascript/app/components/migration_onboarding/steps_config.js` - Step definitions (mobile/desktop)
+- `src/sass/app/components/migration-onboarding.scss` - Responsive styles with theme support
+
+### Initialization
+- Initialized in `tradepage.js` if `getIsMigratedUser()` returns true
+- Cleaned up on page unload with `MigrationOnboarding.remove()`
+
+## Error Handling Patterns
+
+### Purchase Errors
+- **Always include error object**: All `dataManager.setPurchase()` calls must include the `error` property for consistency
+- **Authorization errors**: Include `signup_url` in error object for AuthorizationRequired errors
+- **Professional client errors**: Fetch `get_account_status` and update error message dynamically if account status changes the error context
+- **Error reset**: Set `error: null` when resetting purchase state to avoid stale error data
+
+### General Error Handling
+- **WebSocket Errors**: Implement auto-reconnection with request buffering
+- **Cache Errors**: Clear cache and reload page on corruption
+- **Authentication Errors**: Redirect to login or show appropriate messages
+- **Chart Errors**: Graceful fallback and error display
 
 ## Common Tasks
 
@@ -289,12 +323,7 @@ BinarySocket.send({
 - **React Version**: Now on React 18.3.1, not 16.14.0
 - **Branch Name**: Use "master", not "main"
 - **Mobile Layout**: Content has `margin-left: 72px` on desktop (sidebar width), `padding-bottom: 56px` on mobile (bottom nav height)
-
-### Error Handling Patterns
-- **WebSocket Errors**: Implement auto-reconnection with request buffering
-- **Cache Errors**: Clear cache and reload page on corruption
-- **Authentication Errors**: Redirect to login or show appropriate messages
-- **Chart Errors**: Graceful fallback and error display
+- **Purchase Error State**: Always reset `error` property to `null` when clearing purchase state
 
 ## Key Dependencies
 - React 18.3.1 (upgraded from 16.x)
