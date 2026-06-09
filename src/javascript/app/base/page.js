@@ -210,7 +210,14 @@ const Page = (() => {
         const token_length  = token.length;
         const is_subsidiary = /\w{1}/.test(Url.param('s'));
 
-        const cookie_token = Cookies.getJSON('affiliate_tracking');
+        // js-cookie v3 removed getJSON() (v3.0.0 breaking API change); parse the stored JSON string manually.
+        const affiliate_cookie = Cookies.get('affiliate_tracking');
+        let cookie_token;
+        try {
+            cookie_token = affiliate_cookie ? JSON.parse(affiliate_cookie) : undefined;
+        } catch (e) {
+            cookie_token = undefined;
+        }
         if (cookie_token) {
             // Already exposed to some other affiliate.
             if (is_subsidiary && cookie_token && cookie_token.t) {
@@ -227,7 +234,8 @@ const Page = (() => {
             cookie_hash.s = '1';
         }
 
-        Cookies.set('affiliate_tracking', cookie_hash, {
+        // js-cookie v3 no longer auto-serializes objects; stringify the value explicitly.
+        Cookies.set('affiliate_tracking', JSON.stringify(cookie_hash), {
             expires : 365, // expires in 365 days
             path    : '/',
             domain  : `.${location.hostname.split('.').slice(-2).join('.')}`,
