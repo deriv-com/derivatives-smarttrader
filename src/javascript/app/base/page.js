@@ -210,7 +210,7 @@ const Page = (() => {
         const token_length  = token.length;
         const is_subsidiary = /\w{1}/.test(Url.param('s'));
 
-        // js-cookie v3 (CVE-2026-46625 fix) removed getJSON(); parse the stored JSON string manually.
+        // js-cookie v3 removed getJSON() (v3.0.0 breaking API change); parse the stored JSON string manually.
         const affiliate_cookie = Cookies.get('affiliate_tracking');
         let cookie_token;
         try {

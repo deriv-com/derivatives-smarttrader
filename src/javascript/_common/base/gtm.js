@@ -52,7 +52,7 @@ const GTM = (() => {
         localStorage.removeItem('GTM_login');
         localStorage.removeItem('GTM_new_account');
 
-        // js-cookie v3 (CVE-2026-46625 fix) removed getJSON(); parse the stored JSON string manually.
+        // js-cookie v3 removed getJSON() (v3.0.0 breaking API change); parse the stored JSON string manually.
         const affiliate_cookie = Cookies.get('affiliate_tracking');
         let affiliate_token;
         try {
