@@ -106,6 +106,8 @@ const ViewPopup = (() => {
             CALLE       : localize('Rise or equal'),
             PUT         : form_name === 'risefall' ? localize('Fall') : localize('Lower'),
             PUTE        : localize('Fall or equal'),
+            HIGHER      : localize('Higher'),
+            LOWER       : localize('Lower'),
             DIGITMATCH  : localize('Digit Matches'),
             DIGITDIFF   : localize('Digit Differs'),
             DIGITODD    : localize('Digit Odd'),
