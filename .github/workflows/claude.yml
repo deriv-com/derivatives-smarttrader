@@ -1,19 +1,28 @@
+# Automatically runs an AI-powered (Claude) code review on every pull request.
 name: Claude PR Review
 
+# Trigger on PR events. `pull_request_target` runs the workflow in the context of
+# the base repository, so the required secrets are available even for PRs from forks.
 on:
   pull_request_target:
+    # opened: new PR | synchronize: new commits pushed | reopened: PR reopened |
+    # ready_for_review: draft PR marked ready
     types: [opened, synchronize, reopened, ready_for_review]
 
 jobs:
   claude-review:
+    # Delegate the actual review logic to a shared, centrally-maintained reusable
+    # workflow so every repo stays consistent and updates in one place.
     uses: deriv-com/shared-actions/.github/workflows/claude-pr-review.yml@master
+    # Least-privilege token scopes the reusable workflow needs to do its job.
     permissions:
-      contents: read
-      pull-requests: write
-      issues: write
-      id-token: write
-      actions: write
+      contents: read          # read repo files to review the diff
+      pull-requests: write     # post review comments / approvals on the PR
+      issues: write            # comment on the PR (PRs share the issues API)
+      id-token: write          # request an OIDC token (e.g. for cloud auth)
+      actions: write           # manage workflow runs (e.g. cancel/re-trigger)
+    # Secrets are passed explicitly into the reusable workflow.
     secrets:
-      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-      AGENT_METRICS_API_URL: ${{ secrets.AGENT_METRICS_API_URL }}
-      AGENT_METRICS_API_KEY: ${{ secrets.AGENT_METRICS_API_KEY }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}      # auth for the Claude API
+      AGENT_METRICS_API_URL: ${{ secrets.AGENT_METRICS_API_URL }}  # endpoint for usage/metrics reporting
+      AGENT_METRICS_API_KEY: ${{ secrets.AGENT_METRICS_API_KEY }}  # auth for the metrics endpoint
