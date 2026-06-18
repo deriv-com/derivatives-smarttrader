@@ -286,7 +286,16 @@ const Durations = (() => {
         if (selected_duration.amount && selected_duration.unit > unit_value) {
             unit_value = selected_duration.amount;
         }
-    
+
+        // The stored default duration amount is unit-agnostic (e.g. 1), so on symbol/unit
+        // change it can fall below the selected unit's minimum (e.g. AUD Basket requires a
+        // 15-minute minimum). Clamp it up to the minimum to avoid defaulting into an
+        // immediate "Minimum: X" validation error. The `+` coercion leaves the date-based
+        // days unit untouched (NaN comparison is false).
+        if (+unit_value < +unit_min_value) {
+            unit_value = unit_min_value;
+        }
+
         CommonFunctions.getElementById('duration_amount').value = unit_value;
         Defaults.set(DURATION_AMOUNT, unit_value);
         displayExpiryType();

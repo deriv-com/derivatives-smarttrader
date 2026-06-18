@@ -228,7 +228,26 @@ const Price = (() => {
             comment.hide();
             setData();
             error.show();
-            const mapped_error = mapErrorMessage(details.error);
+            // PayoutLimits sends code_args [min_stake, max_payout, current_payout] but no max stake.
+            // Payout scales linearly with stake, so derive the max stake that keeps payout within
+            // the cap and append it as the 4th code_arg for the message to display.
+            let error_to_map = details.error;
+            const error_code = details.error.subcode || details.error.code;
+            if (error_code === 'PayoutLimits') {
+                const code_args      = details.error.code_args || [];
+                const max_payout     = parseFloat(code_args[1]);
+                const current_payout = parseFloat(code_args[2]);
+                const current_stake  = parseFloat(params.amount);
+                if (params.basis !== 'payout' && max_payout > 0 && current_payout > 0 && current_stake > 0) {
+                    const max_stake       = (current_stake * max_payout) / current_payout;
+                    const currentCurrency = currency.value || currency.getAttribute('value');
+                    error_to_map = {
+                        ...details.error,
+                        code_args: [...code_args, formatMoney(currentCurrency, max_stake, true)],
+                    };
+                }
+            }
+            const mapped_error = mapErrorMessage(error_to_map);
             CommonFunctions.elementTextContent(error, mapped_error);
             dataManager.setPurchase({
                 [`${position}_comment`]: mapped_error,

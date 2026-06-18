@@ -405,15 +405,19 @@ const mapErrorMessage = (error) => {
             return localize('Maximum payout allowed is {{param_1}}.', {
                 param_1: params[0],
             });
-        case 'PayoutLimits':
-            return localize(
-                'Minimum stake of {{param_1}} and maximum payout of {{param_2}}. Current payout is {{param_3}}.',
-                {
+        case 'PayoutLimits': {
+            // params: [min_stake, max_payout, current_payout, max_stake?]
+            // max_stake is derived (and appended as the 4th code_arg) by the caller when available.
+            const has_max_stake = params[3] !== undefined && params[3] !== null && params[3] !== '';
+            return has_max_stake
+                ? localize('Minimum stake of {{param_1}} and maximum stake of {{param_2}}.', {
                     param_1: params[0],
-                    param_2: params[1],
-                    param_3: params[2],
-                }
-            );
+                    param_2: params[3],
+                })
+                : localize('Minimum stake of {{param_1}}.', {
+                    param_1: params[0],
+                });
+        }
         case 'PermissionDenied':
             return localize('Permission denied.');
         case 'PriceMoved':
@@ -492,15 +496,19 @@ const mapErrorMessage = (error) => {
             return localize('Maximum stake allowed is {{param_1}}.', {
                 param_1: params[0],
             });
-        case 'StakeLimits':
-            return localize(
-                'Minimum stake of {{param_1}} and maximum payout of {{param_2}}. Current stake is {{param_3}}.',
-                {
+        case 'StakeLimits': {
+            // params: [min_stake, max_payout, current_stake, max_stake?]
+            // max_stake is derived (and appended as the 4th code_arg) by the caller when available.
+            const has_max_stake = params[3] !== undefined && params[3] !== null && params[3] !== '';
+            return has_max_stake
+                ? localize('Minimum stake of {{param_1}} and maximum stake of {{param_2}}.', {
                     param_1: params[0],
-                    param_2: params[1],
-                    param_3: params[2],
-                }
-            );
+                    param_2: params[3],
+                })
+                : localize('Minimum stake of {{param_1}}.', {
+                    param_1: params[0],
+                });
+        }
         case 'StakeTooLow':
             return localize(
                 'This contract\'s price is {{param_2}} {{param_1}}. Contracts purchased from {{param_3}} must have a purchase price above {{param_4}} {{param_1}}. Please accordingly increase the contract amount to meet this minimum stake.',
