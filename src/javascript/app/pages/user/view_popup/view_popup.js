@@ -380,12 +380,6 @@ const ViewPopup = (() => {
             is_sold = true;
             if (!contract.tick_count) Highchart.showChart(contract, 'update');
         }
-        if (contract.is_valid_to_sell && contract.is_settleable && !contract.is_sold && !is_sell_clicked) {
-            ViewPopupUI.forgetStreams();
-            BinarySocket.send({ sell_expired: 1 }).then((response) => {
-                getContract(response);
-            });
-        }
         if (is_ended) {
             contractEnded();
             if (is_digit) {

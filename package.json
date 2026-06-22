@@ -21,9 +21,9 @@
   },
   "homepage": "https://github.com/deriv-com/derivatives-smarttrader",
   "devDependencies": {
-    "@babel/core": "7.24.0",
+    "@babel/core": "7.29.7",
     "@babel/eslint-parser": "7.23.10",
-    "@babel/parser": "7.25.0",
+    "@babel/parser": "7.29.7",
     "@babel/plugin-proposal-decorators": "^7.24.7",
     "@babel/plugin-syntax-dynamic-import": "^7.8.3",
     "@babel/plugin-transform-class-properties": "^7.24.7",
@@ -100,7 +100,7 @@
     "webpack": "5.105.4",
     "webpack-bundle-analyzer": "4.3.0",
     "webpack-merge": "^5.10.0",
-    "ws": "8.20.1"
+    "ws": "8.21.0"
   },
   "dependencies": {
     "@babel/polyfill": "7.12.1",
@@ -126,7 +126,7 @@
     "jquery": "3.5.1",
     "jquery.scrollto": "2.1.2",
     "js-cookie": "3.0.7",
-    "js-yaml": "4.1.1",
+    "js-yaml": "4.2.0",
     "kinetic": "5.2.0",
     "moment": "^2.29.4",
     "promise-polyfill": "6.1.0",
@@ -140,14 +140,14 @@
   },
   "overrides": {
     "braces": "^3.0.3",
-    "@babel/parser": "7.25.0",
+    "@babel/parser": "7.29.7",
     "@babel/plugin-proposal-optional-chaining": "7.22.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "@semantic-release/npm": "^13.1.5",
-    "npm": "11.16.0",
+    "npm": "11.17.0",
     "serialize-javascript": "7.0.5",
-    "tar": "7.5.10",
+    "tar": "7.5.16",
     "@isaacs/brace-expansion": "5.0.6",
     "brace-expansion": "2.0.3",
     "js-cookie": "3.0.7",
@@ -159,13 +159,13 @@
     "lodash-es": "4.18.1",
     "qs": "6.15.2",
     "select2": "4.0.6",
-    "dompurify": "3.4.0",
+    "dompurify": "3.4.11",
     "diff": "8.0.3",
     "@xmldom/xmldom": "0.8.13",
     "postcss": "^8.5.10",
     "fast-uri": "3.1.2",
     "@babel/plugin-transform-modules-systemjs": "7.29.4",
-    "protobufjs": "7.5.8",
+    "protobufjs": "7.6.4",
     "@protobufjs/utf8": "1.1.1",
     "grunt": {
       "minimatch": "3.1.5"
@@ -174,8 +174,9 @@
       "minimatch": "3.1.5"
     },
     "micromatch": "4.0.8",
-    "undici": "6.24.1",
-    "js-yaml": "4.1.1"
+    "undici": "6.27.0",
+    "js-yaml": "4.2.0",
+    "ws": "8.21.0"
   },
   "engines": {
     "node": ">=20"

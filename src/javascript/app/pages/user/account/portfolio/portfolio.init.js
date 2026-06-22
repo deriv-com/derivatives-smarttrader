@@ -142,10 +142,6 @@ const PortfolioInit = (() => {
             return;
         }
 
-        // force to sell the expired contract, in order to remove from portfolio
-        if (+proposal.is_settleable === 1 && !proposal.is_sold) {
-            BinarySocket.send({ sell_expired: 1 });
-        }
         const $td = $(`#${proposal.contract_id}`).find('td.indicative');
 
         const old_indicative = values[proposal.contract_id].indicative || 0.00;
