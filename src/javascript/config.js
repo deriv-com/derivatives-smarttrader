@@ -1,4 +1,4 @@
-// const Cookies = require('js-cookie');
+const Cookies = require('js-cookie');
 const { getWebSocketUrl } = require('../templates/_common/brand.config');
 
 /*
@@ -95,7 +95,18 @@ const getAccountId = () => {
     if (storedAccountId) {
         return storedAccountId;
     }
-    
+
+    // Fall back to the home session cookie shared on the .deriv.com domain.
+    // Its presence means the user is logged in on home; reuse that account.
+    // account_type is derived from the id prefix (ROT* = real, otherwise demo) and
+    // persisted alongside it so isLoggedIn() and the socket endpoint behave like a fresh login.
+    const cookieAccountId = Cookies.get('options_account_id');
+    if (cookieAccountId) {
+        window.localStorage.setItem('account_id', cookieAccountId);
+        window.localStorage.setItem('account_type', /^ROT/i.test(cookieAccountId) ? 'real' : 'demo');
+        return cookieAccountId;
+    }
+
     // No account_id available
     return null;
 };
