@@ -288,17 +288,10 @@ const Purchase = (() => {
                     if (/^digit/i.test(contract.contract_type)) {
                         updateSpotList(contract);
                     }
-
-                    // force to sell the expired contract, in order to get the final status
-                    if (+contract.is_settleable === 1 && !contract.is_sold) {
-                        sellExpired();
-                    }
                 }
             } });
         }
     };
-
-    const sellExpired = () => BinarySocket.send({ sell_expired: 1 });
 
     const makeBold = d => `<strong>${d}</strong>`;
 
