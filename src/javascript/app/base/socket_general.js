@@ -13,6 +13,9 @@ const getPropertyValue       = require('../../_common/utility').getPropertyValue
 const isLoginPages           = require('../../_common/utility').isLoginPages;
 
 const BinarySocketGeneral = (() => {
+    // Runs balance setup only once per page load.
+    let has_initialized_balance = false;
+
     const onOpen = (is_ready) => {
         Header.hideNotification();
         if (is_ready) {
@@ -37,19 +40,20 @@ const BinarySocketGeneral = (() => {
                     }
                     Client.sendLogoutRequest(is_active_tab);
                 } else if (!isLoginPages() && !/balance/.test(State.get('skip_response'))) {
-                    // Check if this is the first balance (auth confirmation)
-                    const isFirstBalance = !Client.get('loginid');
-
-                    if (isFirstBalance) {
-                        // First balance response - set up subscriptions
+                    // Sync the active account so balance updates aren't dropped.
+                    if (Client.get('loginid') !== getPropertyValue(response, ['balance', 'loginid'])) {
                         Client.responseBalance(response);
+                    }
+
+                    // Run setup once.
+                    if (!has_initialized_balance) {
+                        has_initialized_balance = true;
                         SubscriptionManager.subscribe('transaction', { transaction: 1, subscribe: 1 }, () => false);
                         BinarySocket.sendBuffered();
                         LocalStore.remove('date_first_contact');
                         LocalStore.remove('signup_device');
                     }
 
-                    // Always update balance display
                     updateBalance(response);
                 }
                 break;
