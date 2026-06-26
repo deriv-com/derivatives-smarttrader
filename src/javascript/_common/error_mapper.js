@@ -497,17 +497,26 @@ const mapErrorMessage = (error) => {
                 param_1: params[0],
             });
         case 'StakeLimits': {
-            // params: [min_stake, max_payout, current_stake, max_stake?]
-            // max_stake is derived (and appended as the 4th code_arg) by the caller when available.
-            const has_max_stake = params[3] !== undefined && params[3] !== null && params[3] !== '';
-            return has_max_stake
-                ? localize('Minimum stake of {{param_1}} and maximum stake of {{param_2}}.', {
+            // params: [min_stake, max_payout, current_stake]
+            // Returned for payout-basis proposals: the response already carries the max payout
+            // cap and the stake derived from the entered payout, so surface all of them.
+            const has_value = value => value !== undefined && value !== null && value !== '';
+            if (has_value(params[1]) && has_value(params[2])) {
+                return localize('Minimum stake of {{param_1}} and maximum payout of {{param_2}}. Current stake is {{param_3}}.', {
                     param_1: params[0],
-                    param_2: params[3],
-                })
-                : localize('Minimum stake of {{param_1}}.', {
-                    param_1: params[0],
+                    param_2: params[1],
+                    param_3: params[2],
                 });
+            }
+            if (has_value(params[1])) {
+                return localize('Minimum stake of {{param_1}} and maximum payout of {{param_2}}.', {
+                    param_1: params[0],
+                    param_2: params[1],
+                });
+            }
+            return localize('Minimum stake of {{param_1}}.', {
+                param_1: params[0],
+            });
         }
         case 'StakeTooLow':
             return localize(
