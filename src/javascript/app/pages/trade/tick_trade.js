@@ -5,9 +5,11 @@ const requireHighstock     = require('./common').requireHighstock;
 const Reset                = require('./reset');
 const getUnderlyingPipSize = require('./symbols').getUnderlyingPipSize;
 const updatePurchaseStatus = require('./update_values').updatePurchaseStatus;
+const Defaults             = require('./defaults');
 const isEmptyObject        = require('../../../_common/utility').isEmptyObject;
 const ChartSettings        = require('../../common/chart_settings');
 const addComma             = require('../../../_common/base/currency_base').addComma;
+const generateSymbolDisplayName = require('../../common/active_symbols').generateSymbolDisplayName;
 const CommonFunctions      = require('../../../_common/common_functions');
 const dataManager          = require('../../common/data_manager').default;
 
@@ -61,6 +63,13 @@ const TickDisplay = (() => {
             const is_small_width     = window.innerWidth < 480;
             const overlay_margin_top = is_small_width ? 70 : 40;
             const overlay_height     = is_small_width ? 200 : 170;
+            // contract.display_name and contract.underlying can both be missing on the contract
+            // object during the buy flow, so fall back to the page's selected underlying (which is
+            // the symbol just traded). guard against an undefined symbol as generateSymbolDisplayName
+            // would throw on it.
+            const symbol             = contract.underlying || Defaults.get(Defaults.PARAM_NAMES.UNDERLYING);
+            const display_name       = contract.display_name ||
+                (symbol ? generateSymbolDisplayName(symbol) : '');
             const config = {
                 display_decimals,
                 data         : [],
@@ -69,12 +78,12 @@ const TickDisplay = (() => {
                 has_animation: show_contract_result,
                 height       : show_contract_result ? overlay_height : null,
                 radius       : 4,
-                title        : show_contract_result ? '' : contract.display_name,
+                title        : show_contract_result ? '' : display_name,
                 tooltip      : {
                     formatter() {
                         const tick = contract.tick_stream.find((data) => data.tick === this.y).tick_display_value;
                         const date = moment.utc(contract.tick_stream[this.x].epoch * 1000).format('dddd, MMM D, HH:mm:ss');
-                        return `<div class='tooltip-body'>${date}<br/>${contract.display_name} ${tick}</div>`;
+                        return `<div class='tooltip-body'>${date}<br/>${display_name} ${tick}</div>`;
                     },
                 },
                 type  : 'line',
