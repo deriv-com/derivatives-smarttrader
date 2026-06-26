@@ -323,7 +323,7 @@ const ViewPopup = (() => {
                 cd_info_msg  : localize('Contract has not started yet'),
             });
         } else {
-            if (contract.entry_spot > 0) {
+            if (parseFloat(String(contract.entry_spot).replace(/,/g, '')) > 0) {
                 // only show entry spot if available and contract was not sold before start time
                 containerSetText('trade_details_entry_spot > span', is_sold_before_start ? '-' : contract.entry_spot);
                 dataManager.setPurchase({
