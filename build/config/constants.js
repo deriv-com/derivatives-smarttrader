@@ -29,12 +29,6 @@ const release_config = {
         origin       : release_targets.staging.repo,
         CNAME        : release_targets.staging.CNAME,
     },
-    translations: {
-        branch       : 'master',
-        target_folder: 'translations',
-        origin       : release_targets.staging.repo,
-        CNAME        : release_targets.staging.CNAME,
-    },
 };
 
 const node_modules_paths = {
