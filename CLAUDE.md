@@ -28,10 +28,11 @@ SmartTrader is a web-based trading application for binary options and derivative
 - `grunt shell:compile_dev` - Recompile templates
 
 ### Translations
-- `./scripts/update_translations.sh` - Update translations from Crowdin
-- `scripts/extract_js_texts.js` - Extract translatable strings from JavaScript
-- Strings must use `localize('text')` function
-- Use `/* localize-ignore */` comment to skip extraction for specific strings
+- `@deriv-com/translations`: catalogues load at runtime from `https://translations.deriv.com/<R2_PROJECT_NAME>/<TRANSLATIONS_ENVIRONMENT>/translations/<lang>.json` (`src/javascript/_common/translation-init.js`; env set in `build/webpack/plugins.js`, defaults `DSmartTrader` / `staging`)
+- `.github/workflows/sync-translations.yml` translates new strings with Makima (shared `extract_and_sync_translations_makima` action) on master pushes, every 12h and on demand; dry runs until `MAKIMA_LIVE=true` per environment
+- Strings must use `localize('text')` with a string literal (the extractor only collects literals); placeholders are `{{name}}`
+- Use `/* localize-ignore */` to mark calls that intentionally pass a non-literal (e.g. API texts)
+- Terms that must stay in English: `translations.protected-terms.json` (the localisation team's DNT sheet)
 
 ### Git & Deployment
 - **Main branch**: `master` (not main)
@@ -139,7 +140,7 @@ The repository uses Husky for git hooks. Hooks automatically run before commits 
 - `.github/workflows/release_production.yml` - Production releases
 - `.github/workflows/release_staging.yml` - Staging releases
 - `.github/workflows/test.yml` - Test on PR/push
-- `.github/workflows/sync-translations.yml` - Crowdin sync
+- `.github/workflows/sync-translations.yml` - Translations sync (Makima)
 - `.github/workflows/claude.yml` - Claude Code integration
 
 ### Development Process
@@ -273,14 +274,12 @@ BinarySocket.send({
 5. Test navigation and functionality
 
 ### Adding Translations
-1. Use `localize('Your text here')` in code
-2. Run `scripts/extract_js_texts.js` to extract strings
-3. Run `./scripts/update_translations.sh` to push to Crowdin
-4. Download translations from Crowdin (part of script)
-5. Compile with `grunt shell:compile_dev`
-6. Test language switching
+1. Use `localize('Your text here')` in code, with a string literal as the first argument
+2. Merge to `master`: the Sync translations workflow extracts the new strings, translates them with Makima and uploads them to the CDN
+3. Until that run finishes, the new string shows in English
+4. Test language switching (`?lang=DE`, or the language menu)
 
-**Important**: Refactor code so `localize()` receives string literals, not variables. If string literal not possible, add to `scripts/js_texts/static_strings_app.js`.
+**Important**: Refactor code so `localize()` receives string literals, not variables; the extractor skips anything else.
 
 ### WebSocket Integration
 1. Use `BinarySocket.send()` for API calls
@@ -316,7 +315,7 @@ BinarySocket.send({
 
 ### Common Pitfalls
 - **Dual WebSocket Connections**: Main app + WebtraderChart have separate connections
-- **Language Redirects**: Unsupported languages redirect to `/en/` automatically
+- **Unsupported Languages**: An unknown `?lang=` or stored language falls back to English
 - **Storage Validation**: App disables login if storage unavailable
 - **Chart Granularity**: Automatically calculated based on contract duration
 - **Subscription Cleanup**: Must `forget_all` before new subscriptions

@@ -1,6 +1,0 @@
-project_id: '397380'
-api_token_env: 'CROWDIN_API_KEY'
-
-files:
-  - source: /src/translations/messages.pot
-    translation: /src/translations/%locale_with_underscore%.po

@@ -32,6 +32,15 @@ class WatchRunPlugin {
     }
 }
 
+// Translation catalogues: <TRANSLATIONS_CDN_URL>/<R2_PROJECT_NAME>/<TRANSLATIONS_ENVIRONMENT>,
+// kept up to date by .github/workflows/sync-translations.yml. The release workflows set
+// both; the defaults let local and test builds read the staging catalogues.
+const translations_env = {
+    TRANSLATIONS_CDN_URL    : JSON.stringify('https://translations.deriv.com'),
+    R2_PROJECT_NAME         : JSON.stringify(process.env.R2_PROJECT_NAME || 'DSmartTrader'),
+    TRANSLATIONS_ENVIRONMENT: JSON.stringify(process.env.TRANSLATIONS_ENVIRONMENT || 'staging'),
+};
+
 const getPlugins = (app, grunt) => ([
     new CircularDependencyPlugin({
         failOnError: true,
@@ -57,9 +66,7 @@ const getPlugins = (app, grunt) => ([
                     GROWTHBOOK_CLIENT_KEY: JSON.stringify(process.env.GROWTHBOOK_CLIENT_KEY),
                     RUDDERSTACK_KEY      : JSON.stringify(process.env.RUDDERSTACK_KEY),
                     REMOTE_CONFIG_URL    : JSON.stringify(process.env.REMOTE_CONFIG_URL),
-                    CROWDIN_URL          : JSON.stringify(process.env.CROWDIN_URL),
-                    R2_PROJECT_NAME      : JSON.stringify(process.env.R2_PROJECT_NAME),
-                    CROWDIN_BRANCH_NAME  : JSON.stringify(process.env.CROWDIN_BRANCH_NAME),
+                    ...translations_env,
                     POSTHOG_KEY          : JSON.stringify(process.env.POSTHOG_KEY),
                     POSTHOG_HOST         : JSON.stringify(process.env.POSTHOG_HOST),
                 },
@@ -81,9 +88,7 @@ const getPlugins = (app, grunt) => ([
                     GROWTHBOOK_CLIENT_KEY: JSON.stringify(process.env.GROWTHBOOK_CLIENT_KEY),
                     RUDDERSTACK_KEY      : JSON.stringify(process.env.RUDDERSTACK_KEY),
                     REMOTE_CONFIG_URL    : JSON.stringify(process.env.REMOTE_CONFIG_URL),
-                    CROWDIN_URL          : JSON.stringify(process.env.CROWDIN_URL),
-                    R2_PROJECT_NAME      : JSON.stringify(process.env.R2_PROJECT_NAME),
-                    CROWDIN_BRANCH_NAME  : JSON.stringify(process.env.CROWDIN_BRANCH_NAME),
+                    ...translations_env,
                     POSTHOG_KEY          : JSON.stringify(process.env.POSTHOG_KEY),
                     POSTHOG_HOST         : JSON.stringify(process.env.POSTHOG_HOST),
                 },

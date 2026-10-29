@@ -38,7 +38,6 @@ const Page = (() => {
         Url.init();
         Elevio.init();
         onDocumentReady();
-        // Crowdin removed - using @deriv-com/translations instead
         Analytics.init();
     };
 
