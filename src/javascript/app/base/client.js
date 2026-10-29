@@ -17,6 +17,9 @@ const applyToAllElements    = require('../../_common/utility').applyToAllElement
 // const clientID           = require('../../_common/utility').lc_clientID;
 
 const Client = (() => {
+    // Tab switches fire both visibilitychange and focus, so reuse a recent whoami result
+    const WHOAMI_CHECK_MAX_AGE = 30 * 1000;
+
     let tab_visibility_handler = null;
     let window_focus_handler = null;
 
@@ -25,8 +28,9 @@ const Client = (() => {
      */
     const performWhoAmICheck = async () => {
         try {
-            const result = await checkWhoAmI();
-            
+            const result = await checkWhoAmI({ max_age: WHOAMI_CHECK_MAX_AGE });
+
+            // Only a 401 means signed out; a 429 (rate limited) is backed off inside checkWhoAmI
             if (result.error && result.error.code === 401) {
                 // sendLogoutRequest handles REST logout and cleanup
                 await sendLogoutRequest(false);

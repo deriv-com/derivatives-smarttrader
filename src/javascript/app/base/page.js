@@ -15,6 +15,7 @@ const getElementById   = require('../../_common/common_functions').getElementByI
 const GTM              = require('../../_common/gtm');
 const Language         = require('../../_common/language');
 const isMobile         = require('../../_common/os_detect').isMobile;
+const getStorageReloadDelay = require('../../_common/reload_guard').getStorageReloadDelay;
 const LocalStore       = require('../../_common/storage').LocalStore;
 const SessionStore     = require('../../_common/storage').SessionStore;
 const State            = require('../../_common/storage').State;
@@ -90,7 +91,7 @@ const Page = (() => {
                         if (evt.newValue !== evt.oldValue) {
                             setTimeout(() => {
                                 window.location.reload();
-                            }, 100);
+                            }, getStorageReloadDelay());
                         }
                         break;
                     case 'current_account':
