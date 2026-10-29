@@ -14,6 +14,7 @@ const LiveChat = require('../../_common/base/livechat');
 const getElementById = require('../../_common/common_functions').getElementById;
 const ScrollToAnchor = require('../../_common/scroll_to_anchor');
 const isStorageSupported = require('../../_common/storage').isStorageSupported;
+const removeCookies = require('../../_common/storage').removeCookies;
 const ThirdPartyLinks = require('../../_common/third_party_links');
 const urlFor = require('../../_common/url').urlFor;
 const createElement = require('../../_common/utility').createElement;
@@ -54,7 +55,10 @@ const BinaryLoader = (() => {
 
             // If session is invalid (401), clear credentials before any WebSocket connection
             if (whoami_result.error?.code === 401) {
-                // Clear credentials to prevent WebSocket from connecting with stale account_id
+                // Clear credentials to prevent WebSocket from connecting with stale account_id.
+                // The home cookie must go too, or getAccountId() writes account_id back from it,
+                // which fires storage events that reload every other open tab in a loop.
+                removeCookies('options_account_id');
                 localStorage.removeItem('account_id');
                 localStorage.removeItem('account_type');
                 localStorage.removeItem('active_loginid');
