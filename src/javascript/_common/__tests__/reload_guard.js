@@ -37,34 +37,46 @@ describe('ReloadGuard', () => {
     });
 
     describe('.getStorageReloadDelay()', () => {
+        // Simulates a loop: the tab waits out each delay, takes PAGE_LOAD_MS to load, then gets the next event
+        const PAGE_LOAD_MS = 3000;
+        const runLoop = (reloads) => {
+            const delays = [];
+            for (let i = 0; i < reloads; i++) {
+                const delay = nextPageLoadDelay();
+                delays.push(delay);
+                clock.tick(delay + PAGE_LOAD_MS);
+            }
+            return delays;
+        };
+
         it('reloads quickly for occasional account changes', () => {
-            expect(nextPageLoadDelay()).to.eq(100);
-            clock.tick(1000);
-            expect(nextPageLoadDelay()).to.eq(100);
-            clock.tick(1000);
-            expect(nextPageLoadDelay()).to.eq(100);
+            for (let i = 0; i < 5; i++) {
+                expect(nextPageLoadDelay()).to.eq(100);
+                clock.tick(31000);
+            }
         });
 
         it('counts the events of one page load only once', () => {
             expect(ReloadGuard.getStorageReloadDelay()).to.eq(100);
             expect(ReloadGuard.getStorageReloadDelay()).to.eq(100);
-            expect(JSON.parse(sessionStorage.getItem('storage_event_reloads'))).to.have.lengthOf(1);
+            expect(JSON.parse(sessionStorage.getItem('storage_event_reloads')).count).to.eq(1);
         });
 
-        it('backs off exponentially when reloads keep coming', () => {
-            [100, 100, 100, 5000, 10000, 20000].forEach((expected) => {
-                expect(nextPageLoadDelay()).to.eq(expected);
-                clock.tick(200);
-            });
+        it('backs off exponentially up to the cap while the loop continues', () => {
+            expect(runLoop(10)).to.deep.eq([100, 100, 100, 5000, 10000, 20000, 40000, 60000, 60000, 60000]);
         });
 
-        it('caps the backoff and resets once reloads stop', () => {
-            for (let i = 0; i < 10; i++) {
-                nextPageLoadDelay();
-            }
+        it('resets after a quiet period longer than the last delay', () => {
+            runLoop(8);
+            // last delay was 60s, so a gap of 60s + load time is still part of the loop
             expect(nextPageLoadDelay()).to.eq(60000);
 
-            clock.tick(31000);
+            clock.tick(60000 + 31000);
+            expect(nextPageLoadDelay()).to.eq(100);
+        });
+
+        it('ignores state saved in the old format', () => {
+            sessionStorage.setItem('storage_event_reloads', JSON.stringify([Date.now(), Date.now(), Date.now()]));
             expect(nextPageLoadDelay()).to.eq(100);
         });
     });
