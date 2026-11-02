@@ -28,7 +28,7 @@ exports.sections_config = {
 
 // ---------- Languages ----------
 // TODO: add 'KO' after 'IT' in the array below to enable Korean language
-exports.languages = ['EN', 'DE', 'ES', 'FR', 'ID', 'IT', 'PL', 'PT', 'RU', 'TH', 'VI', 'ZH_CN', 'ZH_TW', 'ACH'];
+exports.languages = ['EN', 'DE', 'ES', 'FR', 'ID', 'IT', 'PL', 'PT', 'RU', 'TH', 'VI', 'ZH_CN', 'ZH_TW'];
 
 const affiliates_signup_language_map = { // object used instead of array to prevent accidental index changes
     EN   : 0,
@@ -85,7 +85,7 @@ exports.writeFile = async (path, data) => {
 };
 
 exports.isExcluded = (excludes, lang) => {
-    if (excludes && !/^ACH$/i.test(lang)) {
+    if (excludes) {
         const language_is_excluded = new RegExp(lang, 'i').test(excludes);
         return /^NOT-/i.test(excludes) ? !language_is_excluded : language_is_excluded;
     }

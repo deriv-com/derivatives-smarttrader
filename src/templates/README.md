@@ -16,7 +16,7 @@
 
 ## Using translation
 
-- Use `it.L('...')` for translations.
+- Use `localize('...')` from `@deriv-com/translations` for translations (see [scripts/README.md](../../scripts/README.md#translations)).
 - Use `it.url_for('...')` to build URLs.
 - Use `it.website_name` instead of `Deriv`.
 - There are cases where you do not want your strings to be escaped (i.g. when you place `<a/>` tags inside a `<Table />`). To bypass HTML escape, you can use `it.dangreouslyRenderHtml()` (under normal circumstances do NOT use this.):
