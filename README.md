@@ -184,7 +184,7 @@ git push origin staging_v20191010_0
 
 ## Manage translations
 
-To add translation manually use [manual translation doc](scripts/README.md#Updating-the-translations)
+Strings wrapped in `localize()` are translated automatically with Makima after they reach `master`. See [scripts/README.md](scripts/README.md#translations).
 
 ## Mobile Navigation
 

@@ -35,25 +35,19 @@
                 window.location.href = '/trading.html' + (search || utm_source ? '?' + search.replace(/^\?/, '') + (search && utm_source ? '&' : '') + utm_source.replace(/^\?/, '') : '');
             }
 
-            // Handle Crowdin in-context translation
-            if (/^https:\/\/staging\.binary\.com\/translations\//i.test(window.location.href)) {
-                localStorage.setItem('i18n_language', JSON.stringify('ACH'));
-                window.location.href = '/trading.html';
-            } else {
-                // Check if language is already set in localStorage or cookie
-                var storedLang = localStorage.getItem('i18n_language');
-                var cookieLang = getCookieItem('language');
-                
-                if (!storedLang && cookieLang) {
-                    // Migrate from cookie to localStorage
-                    localStorage.setItem('i18n_language', JSON.stringify(cookieLang.toUpperCase()));
-                } else if (!storedLang && !cookieLang) {
-                    // Set default language for first-time visitors
-                    localStorage.setItem('i18n_language', JSON.stringify('EN'));
-                }
-                
-                redirect();
+            // Check if language is already set in localStorage or cookie
+            var storedLang = localStorage.getItem('i18n_language');
+            var cookieLang = getCookieItem('language');
+            
+            if (!storedLang && cookieLang) {
+                // Migrate from cookie to localStorage
+                localStorage.setItem('i18n_language', JSON.stringify(cookieLang.toUpperCase()));
+            } else if (!storedLang && !cookieLang) {
+                // Set default language for first-time visitors
+                localStorage.setItem('i18n_language', JSON.stringify('EN'));
             }
+            
+            redirect();
         </script>
     </head>
 </html>

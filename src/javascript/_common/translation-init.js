@@ -10,7 +10,7 @@ const initializeTranslations = async () => {
     try {
         // Initialize i18n instance with CDN configuration
         i18nInstance = initializeI18n({
-            cdnUrl: `${process.env.CROWDIN_URL}/${process.env.R2_PROJECT_NAME}/${process.env.CROWDIN_BRANCH_NAME}`,
+            cdnUrl: `${process.env.TRANSLATIONS_CDN_URL}/${process.env.R2_PROJECT_NAME}/${process.env.TRANSLATIONS_ENVIRONMENT}`,
         });
 
         // Get initial language

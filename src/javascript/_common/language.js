@@ -8,7 +8,6 @@ const { updateTooltipTranslations } = require('./tooltip_translations');
 
 const Language = (() => {
     const all_languages = {
-        ACH  : 'Translations',
         EN   : 'English',
         // AR   : 'العربية',
         BN   : 'বাংলা',
@@ -78,31 +77,7 @@ const Language = (() => {
 
     let current_lang = null;
 
-    // Crowdin integration (maintain existing functionality)
-    const getCrowdinLanguage = () => {
-        if (!/ach/i.test(window.location.href)) return null;
-
-        const crowdin_lang_key = 'jipt_language_code_dsmarttrader';
-        const crowdin_lang =
-      localStorage.getItem(crowdin_lang_key) || Cookies.get(crowdin_lang_key);
-
-        if (crowdin_lang) {
-            return crowdin_lang.toUpperCase().replace('-', '_');
-        }
-        return null;
-    };
-
     const getLanguage = () => {
-    // Handle Crowdin override
-        const crowdinLang = getCrowdinLanguage();
-        if (crowdinLang) {
-            current_lang = crowdinLang;
-            if (document.body) {
-                document.body.classList.add(current_lang); // set the body class removed by crowdin code
-            }
-            return current_lang;
-        }
-
         // Process URL parameter first (saves to localStorage and cleans URL)
         languageFromUrl();
 
@@ -128,10 +103,7 @@ const Language = (() => {
         return current_lang;
     };
 
-    const getAllowedLanguages = () =>
-        Object.keys(all_languages).filter(
-            (lang) => !['ACH'].includes(lang) // Exclude Crowdin pseudo-language
-        );
+    const getAllowedLanguages = () => Object.keys(all_languages);
 
     const changeSelectedLanguage = async (language_key) => {
         if (is_language_changing) return;
