@@ -11,7 +11,6 @@ permissions:
 
 env:
   # Prefixes only — run_id suffix is appended by the source workflows
-  DOCSYNC_PREFIX: "docsync-event-log-" # file inside zip: docsync-payload.json  (JSON array)
   CLAUDE_PREFIX: "claude-review-summary-" # file inside zip: click2fix-payload.json (JSON object)
   MAX_RUNS: "30"
 
@@ -62,44 +61,7 @@ jobs:
           echo "since_run_event=$SINCE_RUN_EVENT"   >> $GITHUB_OUTPUT
           echo "since_fallback=$SINCE_FALLBACK"     >> $GITHUB_OUTPUT
 
-      # ── Step 2: Download DocSync artifacts ──────────────────────────────
-      # Artifact name: docsync-event-log-<run_id>
-      # File inside:   docsync-payload.json  (JSON array of events)
-      # Retention:     90 days
-      - name: Download DocSync AI artifacts
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: ${{ github.repository }}
-          SINCE: ${{ steps.meta.outputs.since }}
-        run: |
-          mkdir -p downloads/docsync
-
-          artifact_ids=$(gh api "/repos/$REPO/actions/artifacts?per_page=100" \
-            --jq "[.artifacts[]
-                    | select(.name | startswith(\"$DOCSYNC_PREFIX\"))
-                    | select(.expired == false)
-                    | select(.created_at >= \"$SINCE\")]
-                  | sort_by(.created_at) | reverse | .[:$MAX_RUNS] | .[].id")
-
-          if [ -z "$artifact_ids" ]; then
-            echo "WARNING: No non-expired artifacts found matching prefix '$DOCSYNC_PREFIX'"
-            exit 0
-          fi
-
-          for id in $artifact_ids; do
-            echo "Downloading docsync artifact id=$id"
-            curl -sL \
-              -H "Authorization: Bearer $GH_TOKEN" \
-              -H "Accept: application/vnd.github+json" \
-              "https://api.github.com/repos/$REPO/actions/artifacts/$id/zip" \
-              -o "downloads/docsync/$id.zip"
-            unzip -q "downloads/docsync/$id.zip" -d "downloads/docsync/$id/"
-            rm "downloads/docsync/$id.zip"
-          done
-
-          echo "DocSync: downloaded $(ls -d downloads/docsync/*/ 2>/dev/null | wc -l) artifact(s)"
-
-      # ── Step 3: Download Claude PR Review artifacts ──────────────────────
+      # ── Step 2: Download Claude PR Review artifacts ──────────────────────
       # Artifact name: claude-review-summary-<run_id>
       # File inside:   click2fix-payload.json  (single JSON object)
       # Retention:     7 days  ← cron must run before these expire
@@ -137,7 +99,7 @@ jobs:
 
           echo "Claude: downloaded $(ls -d downloads/claude/*/ 2>/dev/null | wc -l) artifact(s)"
 
-      # ── Step 4: Merge into one structured JSON file ──────────────────────
+      # ── Step 3: Merge into one structured JSON file ──────────────────────
       - name: Compile into workflow-summaries.json
         env:
           REPO: ${{ github.repository }}
@@ -153,20 +115,12 @@ jobs:
           COLLECTION_WEEK = os.environ["COLLECTION_WEEK"]
           COLLECTION_DATE = os.environ["COLLECTION_DATE"]
 
-          # Describes where to find each workflow's artifacts and how to read them.
-          # data_format:
-          #   "array"  -> the JSON file is a list of event objects (DocSync JSONL -> jq -s)
-          #   "object" -> the JSON file is a single payload object (Claude EVENT_PAYLOAD)
+          # Describes where to find each workflow's artifacts.
+          # Each payload file is a single JSON object (Claude EVENT_PAYLOAD).
           SOURCES = {
-              "DocSync AI - Documentation Sync": {
-                  "dir":         Path("downloads/docsync"),
-                  "filename":    "docsync-payload.json",
-                  "data_format": "array",
-              },
               "Claude PR Review": {
                   "dir":         Path("downloads/claude"),
                   "filename":    "click2fix-payload.json",
-                  "data_format": "object",
                   "retention_warning": "Artifacts expire after 7 days",
               },
           }
@@ -182,7 +136,6 @@ jobs:
           for wf_name, cfg in SOURCES.items():
               base_dir    = cfg["dir"]
               target_file = cfg["filename"]
-              fmt         = cfg["data_format"]
               runs        = []
 
               if not base_dir.exists() or not any(base_dir.iterdir()):
@@ -222,17 +175,9 @@ jobs:
                   run_entry = {
                       "artifact_id": artifact_dir.name,
                       "source_file": payload_file.name,
+                      "event_count": 1,
+                      "payload":     raw,
                   }
-
-                  if fmt == "array":
-                      # DocSync: JSON array of individual event objects
-                      events = raw if isinstance(raw, list) else [raw]
-                      run_entry["event_count"] = len(events)
-                      run_entry["events"]      = events
-                  else:
-                      # Claude: single JSON object -> the entire payload
-                      run_entry["event_count"] = 1
-                      run_entry["payload"]     = raw
 
                   runs.append(run_entry)
 
@@ -255,7 +200,7 @@ jobs:
           print("\\nworkflow-summaries.json written")
           PYEOF
 
-      # ── Step 5: Job summary ──────────────────────────────────────────────
+      # ── Step 4: Job summary ──────────────────────────────────────────────
       - name: Write job summary
         run: |
           {
@@ -284,7 +229,7 @@ jobs:
             ' workflow-summaries.json
           } >> $GITHUB_STEP_SUMMARY
 
-      # ── Step 6: Upload compiled artifact ────────────────────────────────
+      # ── Step 5: Upload compiled artifact ────────────────────────────────
       - name: Upload workflow-summaries artifact
         uses: actions/upload-artifact@v4
         with:
