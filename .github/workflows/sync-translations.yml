@@ -1,45 +1,81 @@
 name: Sync translations
 
+# Extracts the localize() strings in src/, translates the new ones with Makima and uploads the
+# catalogues to translations.deriv.com/<R2_PROJECT_NAME>/<environment>/, where the app reads them
+# (src/javascript/_common/translation-init.js). Same action and setup as the other Deriv front
+# ends (see deriv-com/derivatives-trader's sync-translations.yml).
+#
+# Both environments sync on every master push and every 12 hours, so a production release finds
+# its new strings already translated. A manual dispatch can target one environment.
+# A run is live (R2 upload) only when the environment variable MAKIMA_LIVE is exactly 'true' and,
+# for a manual dispatch, dry_run is unticked. Otherwise it is a dry run that writes the catalogues
+# as a workflow artifact, so each environment stays in dry-run mode until MAKIMA_LIVE is set for it.
 on:
   push:
     branches:
       - master
+  schedule:
+    # Offset from :00 to avoid GitHub Actions UTC midnight/noon contention.
+    - cron: '17 */12 * * *'
   workflow_dispatch:
-        
+    inputs:
+      environment:
+        description: Target environment
+        required: true
+        default: both
+        type: choice
+        options:
+          - both
+          - staging
+          - production
+      dry_run:
+        description: Write the catalogues as a workflow artifact instead of uploading to R2
+        required: false
+        type: boolean
+        default: true
+
 jobs:
   sync_translations:
-    runs-on: ubuntu-latest
-    environment: staging
+    strategy:
+      fail-fast: false
+      matrix:
+        # Both, unless a manual dispatch picked one (a job-level `if` cannot read `matrix`).
+        environment: ${{ fromJSON(github.event_name == 'workflow_dispatch' && inputs.environment != 'both' && format('["{0}"]', inputs.environment) || '["staging","production"]') }}
+    # Cloudflare in front of the Makima gateway blocks GitHub-hosted runner
+    # IPs (HTTP 403 "Attention Required!"); this self-hosted group is allow-listed.
+    runs-on:
+      group: github_claude_code_reviewer
+    environment: ${{ matrix.environment }}
+    timeout-minutes: 30
+    concurrency:
+      group: sync-translations-${{ matrix.environment }}
+      cancel-in-progress: false
     permissions:
       contents: read
     steps:
-      - name: Derivatives SmartTrader translations
-        uses: deriv-com/translations/.github/actions/extract_and_sync_translations@master
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
-          PROJECT_NAME: ${{ vars.R2_PROJECT_NAME }}
-          CROWDIN_BRANCH_NAME: staging
-          CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
-          CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
+          ref: ${{ github.ref }}
+
+      - name: Sync Derivatives SmartTrader translations
+        uses: deriv-com/translations/.github/actions/extract_and_sync_translations_makima@17dbcfe83c92d6622134c29789429e3df484cf61 # v1.5.4
+        with:
+          PROJECT_NAME: ${{ vars.R2_PROJECT_NAME || 'DSmartTrader' }}
+          PROJECT_SOURCE_DIRECTORY: src
+          ENVIRONMENT: ${{ matrix.environment }}
+          # The languages the app offers: all_languages in src/javascript/_common/language.js,
+          # minus English.
+          TARGET_LOCALES: bn,de,es,fr,it,ko,mn,pl,pt,ru,si,sw,ta,vi,zh_cn,zh_tw
+          MAKIMA_API_KEY: ${{ secrets.MAKIMA_API_KEY }}
+          MAKIMA_API_BASE: ${{ vars.MAKIMA_API_BASE }}
+          # Terms that stay in English: the red "do not translate" entries of the localisation team's
+          # "Translation/Transliteration of certain words" sheet (Translation Key and Contract names tabs),
+          # plus brand names. Keep it in sync with the sheet and derivatives-trader's copy.
+          PROTECTED_TERMS_FILE: translations.protected-terms.json
+          # `== true`: a bare `inputs.dry_run` is empty, not false, outside a manual dispatch.
+          DRY_RUN: ${{ vars.MAKIMA_LIVE != 'true' || (github.event_name == 'workflow_dispatch' && inputs.dry_run == true) }}
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
-          PROJECT_SOURCE_DIRECTORY: "src"
-  sync_translations_production:
-    runs-on: ubuntu-latest
-    environment: production
-    permissions:
-      contents: read
-    steps:
-      - name: Derivatives SmartTrader translations
-        uses: deriv-com/translations/.github/actions/extract_and_sync_translations@master
-        with:
-          PROJECT_NAME: ${{ vars.R2_PROJECT_NAME }}
-          CROWDIN_BRANCH_NAME: production
-          CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
-          CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
-          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
-          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-          R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
-          PROJECT_SOURCE_DIRECTORY: "src"
