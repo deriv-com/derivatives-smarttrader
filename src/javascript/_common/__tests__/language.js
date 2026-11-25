@@ -52,4 +52,61 @@ describe('Language', () => {
         });
     });
 
+    describe('.sanitizeStoredLanguage()', () => {
+        const xss_payload = '../../../<img src=x onerror=alert(1)>.';
+
+        afterEach(() => {
+            setURL(`${website_url}home.html`);
+        });
+
+        it('strips an unsupported lang param from the URL', () => {
+            setURL(`${website_url}home.html?lang=${encodeURIComponent(xss_payload)}&foo=bar`);
+            Language.sanitizeStoredLanguage();
+            const params = new URL(window.location.href).searchParams;
+            expect(params.has('lang')).to.eq(false);
+            expect(params.get('foo')).to.eq('bar');
+        });
+
+        it('keeps a supported lang param in the URL', () => {
+            setURL(`${website_url}home.html?lang=es`);
+            Language.sanitizeStoredLanguage();
+            expect(new URL(window.location.href).searchParams.get('lang')).to.eq('es');
+        });
+
+        it('removes an unsupported language already saved in localStorage', () => {
+            setURL(`${website_url}home.html`);
+            localStorage.setItem('i18n_language', JSON.stringify(xss_payload.toUpperCase()));
+            Language.sanitizeStoredLanguage();
+            expect(localStorage.getItem('i18n_language')).to.eq(null);
+        });
+
+        it('removes an unsupported unquoted language saved in localStorage', () => {
+            setURL(`${website_url}home.html`);
+            localStorage.setItem('i18n_language', '<svg onload=alert(1)>');
+            Language.sanitizeStoredLanguage();
+            expect(localStorage.getItem('i18n_language')).to.eq(null);
+        });
+
+        it('keeps a supported language saved in localStorage', () => {
+            setURL(`${website_url}home.html`);
+            localStorage.setItem('i18n_language', JSON.stringify('ZH_CN'));
+            Language.sanitizeStoredLanguage();
+            expect(localStorage.getItem('i18n_language')).to.eq(JSON.stringify('ZH_CN'));
+        });
+    });
+
+    describe('.isSupported()', () => {
+        it('accepts supported languages in any case', () => {
+            expect(Language.isSupported('es')).to.eq(true);
+            expect(Language.isSupported('ZH_TW')).to.eq(true);
+        });
+        it('rejects unsupported or non-string values', () => {
+            expect(Language.isSupported('en.<img src=x onerror=alert(1)>')).to.eq(false);
+            expect(Language.isSupported('zz')).to.eq(false);
+            expect(Language.isSupported('')).to.eq(false);
+            expect(Language.isSupported(null)).to.eq(false);
+            expect(Language.isSupported({})).to.eq(false);
+        });
+    });
+
 });
