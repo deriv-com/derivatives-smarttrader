@@ -1,5 +1,6 @@
 // Translation initialization for SmartTrader's existing architecture
 const { getInitialLanguage, initializeI18n } = require('@deriv-com/translations');
+const Language = require('./language');
 
 let i18nInstance = null;
 let isInitialized = false;
@@ -8,13 +9,17 @@ const initializeTranslations = async () => {
     if (isInitialized) return i18nInstance;
     
     try {
+        // Must run before initializeI18n(), which reads ?lang and localStorage itself
+        Language.sanitizeStoredLanguage();
+
         // Initialize i18n instance with CDN configuration
         i18nInstance = initializeI18n({
             cdnUrl: `${process.env.CROWDIN_URL}/${process.env.R2_PROJECT_NAME}/${process.env.CROWDIN_BRANCH_NAME}`,
         });
 
         // Get initial language
-        const language = getInitialLanguage();
+        const initial_language = getInitialLanguage();
+        const language = Language.isSupported(initial_language) ? initial_language : 'EN';
 
         // Use changeLanguage to ensure translation resources are loaded
         await i18nInstance.changeLanguage(language.toLowerCase());

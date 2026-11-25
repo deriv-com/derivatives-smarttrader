@@ -34,7 +34,41 @@ const Language = (() => {
         ZH_TW: '繁體中文',
     };
     const default_language = 'EN';
+    const storage_key = 'i18n_language';
     let is_language_changing = false;
+
+    const isSupported = (lang) =>
+        typeof lang === 'string' && Object.keys(all_languages).includes(lang.toUpperCase());
+
+    // @deriv-com/translations reads ?lang and localStorage without checking them,
+    // so drop anything outside the supported list before i18next is initialised.
+    const sanitizeStoredLanguage = () => {
+        try {
+            const url = new URL(window.location.href);
+            if (url.searchParams.has('lang') && !isSupported(url.searchParams.get('lang'))) {
+                url.searchParams.delete('lang');
+                window.history.replaceState(window.history.state, '', url.toString());
+            }
+        } catch (e) {
+            // ignore malformed URLs
+        }
+
+        try {
+            const stored = localStorage.getItem(storage_key);
+            if (stored === null) return;
+            let value = stored;
+            try {
+                value = JSON.parse(stored);
+            } catch (e) {
+                // older values were saved without JSON quoting
+            }
+            if (!isSupported(value)) {
+                localStorage.removeItem(storage_key);
+            }
+        } catch (e) {
+            // storage unavailable
+        }
+    };
 
     const setCookieLanguage = (lang) => {
         if (!Cookies.get('language') || lang) {
@@ -209,6 +243,8 @@ const Language = (() => {
     return {
         getAll    : () => all_languages,
         getAllowedLanguages,
+        isSupported,
+        sanitizeStoredLanguage,
         setCookie : setCookieLanguage,
         get       : getLanguage,
         onChange  : onChangeLanguage,
