@@ -121,15 +121,6 @@ module.exports = function (grunt) {
                 stdout: false
             }
         },
-        release_translations: {
-            command: [
-                prompt('Starting the release to \'translations\'\n'),
-                'grunt release --translations --section=app --color',
-            ].join(' && '),
-            options: {
-                stdout: true
-            }
-        },
         reset_ghpages: {
             command: grunt.option('reset') ?
                 (grunt.option('staging') ?

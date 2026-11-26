@@ -4,7 +4,6 @@ const Url                = require('../url');
 
 describe('Language', () => {
     const all_languages = {
-        ACH  : 'Translations',
         EN   : 'English',
         // AR   : 'العربية',
         BN   : 'বাংলা',
