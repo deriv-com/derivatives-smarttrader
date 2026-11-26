@@ -21,7 +21,7 @@ import dataManager from '../../../common/data_manager';
 // Configuration for market filtering
 const MARKET_FILTERS = {
     excludedMarkets   : ['cryptocurrency'],
-    excludedSubmarkets: ['range_index'],
+    excludedSubmarkets: ['crash_index', 'range_index'],
     excludedSymbols   : ['OTC_IBEX35', 'RB100', 'RB200'],
 };
 
